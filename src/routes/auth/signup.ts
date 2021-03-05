@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post(
   "/api/v1/users/signup",
-  [body("email").isEmail().withMessage("Email must be valid")],
+  [],
   validateRequest,
   async (req: Request, res: Response) => {
     const { email, password, fullName, passportNumber, phoneNumber } = req.body;
