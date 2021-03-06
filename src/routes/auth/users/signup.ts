@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import { validateRequest } from "../../errors";
-import { User } from "../../models/User";
-import { BadRequestError } from "../../errors";
+import { validateRequest } from "../../../errors";
+import { User } from "../../../models/User";
+import { BadRequestError } from "../../../errors";
 
 const router = express.Router();
 

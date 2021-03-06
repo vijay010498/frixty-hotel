@@ -1,10 +1,10 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
-import { Password } from "../../services/auth/password";
-import { User } from "../../models/User";
-import { validateRequest } from "../../errors";
-import { BadRequestError } from "../../errors";
+import { Password } from "../../../services/auth/password";
+import { User } from "../../../models/User";
+import { validateRequest } from "../../../errors";
+import { BadRequestError } from "../../../errors";
 
 const router = express.Router();
 

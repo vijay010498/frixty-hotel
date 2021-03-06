@@ -2,8 +2,8 @@ import express from "express";
 import "express-async-errors";
 import { json } from "express";
 //all routes imports
-import { signupRouter } from "./routes/auth/signup";
-import { signInRouter } from "./routes/auth/signin";
+import { signupRouter } from "./routes/auth/users/signup";
+import { signInRouter } from "./routes/auth/users/signin";
 import { createHotelRouter } from "./routes/hotel/createHotel";
 import { getHotelByID } from "./routes/hotel/getHotelByID";
 import { getAllHotelsRouter } from "./routes/hotel/getAllHotels";
