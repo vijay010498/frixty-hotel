@@ -36,6 +36,7 @@ const hotelSchema = new mongoose.Schema(
       type: String,
       required: true,
       uppercase: true,
+      unique: true,
     },
     address: addressObject,
     facility: [facilityObject],
