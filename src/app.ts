@@ -8,6 +8,7 @@ import { createHotelRouter } from "./routes/hotel/sAdmin/createHotel";
 import { getHotelByID } from "./routes/hotel/getHotelByID";
 import { getAllHotelsRouter } from "./routes/hotel/getAllHotels";
 import { searchHotelByStateRouter } from "./routes/hotel/searchHotel";
+import { hotelsWithinRangeRouter } from "./routes/hotel/geoRoutes/withinRange";
 
 //error handlers
 import { errorhandler } from "./errors";
@@ -22,6 +23,7 @@ app.use(createHotelRouter);
 app.use(getHotelByID);
 app.use(getAllHotelsRouter);
 app.use(searchHotelByStateRouter);
+app.use(hotelsWithinRangeRouter);
 app.use(errorhandler);
 
 app.all("*", async (req, res) => {
