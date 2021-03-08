@@ -4,7 +4,7 @@ import { json } from "express";
 //all routes imports
 import { signupRouter } from "./routes/auth/users/signup";
 import { signInRouter } from "./routes/auth/users/signin";
-import { createHotelRouter } from "./routes/hotel/createHotel";
+import { createHotelRouter } from "./routes/hotel/sAdmin/createHotel";
 import { getHotelByID } from "./routes/hotel/getHotelByID";
 import { getAllHotelsRouter } from "./routes/hotel/getAllHotels";
 import { searchHotelByStateRouter } from "./routes/hotel/searchHotel";

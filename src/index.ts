@@ -5,7 +5,11 @@ import { app } from "./app";
 
 const start = async () => {
   try {
-    await mongoose.connect(keys.mongoURI);
+    await mongoose.connect(keys.mongoURI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+    });
   } catch (err) {
     console.error(err);
   }

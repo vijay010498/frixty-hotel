@@ -1,9 +1,9 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import * as _ from "lodash";
-import { validateRequest } from "../../errors";
-import { Hotel } from "../../models/Hotel";
-import { BadRequestError } from "../../errors";
+import { validateRequest } from "../../../errors";
+import { Hotel } from "../../../models/Hotel";
+import { BadRequestError } from "../../../errors";
 
 const router = express.Router();
 
@@ -21,16 +21,12 @@ router.post(
     }
 
     const hotel = Hotel.build({
-      address: toUpper(address),
-      // @ts-ignore
-      amenities: toUpper(amenities),
-      // @ts-ignore
-      facility: toUpper(facility),
-      name: name.trim().toUpperCase(),
-      // @ts-ignore
-      rooms: toUpper(rooms),
-      // @ts-ignore
-      services: toUpper(services),
+      address: address,
+      amenities: amenities,
+      facility: facility,
+      name: name,
+      rooms: rooms,
+      services: services,
     });
     await hotel.save();
 
@@ -38,11 +34,4 @@ router.post(
   }
 );
 
-const toUpper = (obj: Object) => {
-  for (let i in obj) {
-    // @ts-ignore
-    obj[i] = obj[i].trim().toUpperCase();
-  }
-  return obj;
-};
 export { router as createHotelRouter };

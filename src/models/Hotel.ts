@@ -1,13 +1,18 @@
 import mongoose from "mongoose";
+import { addressObject } from "./objectModels/addressObject";
+import { facilityObject } from "./objectModels/facilityObject";
+import { amenitiesObject } from "./objectModels/amenitiesObject";
+import { roomsObject } from "./objectModels/roomsObject";
+import { serviceObject } from "./objectModels/serviceObject";
 
 //Interface that describes the properties that are required to create a new Hotel
 interface HotelAttrs {
   name: string;
-  address: {};
-  facility: [string];
-  amenities: [string];
-  rooms: [string];
-  services: [string];
+  address: typeof addressObject;
+  facility: [typeof facilityObject];
+  amenities: [typeof amenitiesObject];
+  rooms: [typeof roomsObject];
+  services: [typeof serviceObject];
 }
 
 //An interface that describes the properties that a hotel model has
@@ -18,11 +23,11 @@ interface HotelModel extends mongoose.Model<HotelDoc> {
 //an interface that describes the properties that a hotel document has
 interface HotelDoc extends mongoose.Document {
   name: string;
-  address: {};
-  facility: [string];
-  amenities: [string];
-  rooms: [string];
-  services: [string];
+  address: typeof addressObject;
+  facility: [typeof facilityObject];
+  amenities: [typeof amenitiesObject];
+  rooms: [typeof roomsObject];
+  services: [typeof serviceObject];
 }
 
 const hotelSchema = new mongoose.Schema(
@@ -30,27 +35,13 @@ const hotelSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      uppercase: true,
     },
-    address: {
-      type: {},
-      required: true,
-    },
-    facility: {
-      type: [String],
-      required: true,
-    },
-    amenities: {
-      type: [String],
-      required: true,
-    },
-    rooms: {
-      type: [String],
-      required: true,
-    },
-    services: {
-      type: [String],
-      required: true,
-    },
+    address: addressObject,
+    facility: [facilityObject],
+    amenities: [amenitiesObject],
+    rooms: [roomsObject],
+    services: [serviceObject],
   },
   {
     toJSON: {
