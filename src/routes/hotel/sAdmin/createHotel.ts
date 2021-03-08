@@ -12,7 +12,15 @@ router.post(
   [],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { name, address, facility, amenities, rooms, services } = req.body;
+    const {
+      name,
+      address,
+      facility,
+      amenities,
+      rooms,
+      services,
+      location,
+    } = req.body;
 
     const existingHotel = await Hotel.findOne({ name: name.toUpperCase() });
 
@@ -27,6 +35,7 @@ router.post(
       name: name,
       rooms: rooms,
       services: services,
+      location: location,
     });
     await hotel.save();
 

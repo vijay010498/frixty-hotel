@@ -13,6 +13,7 @@ interface HotelAttrs {
   amenities: [typeof amenitiesObject];
   rooms: [typeof roomsObject];
   services: [typeof serviceObject];
+  location: {};
 }
 
 //An interface that describes the properties that a hotel model has
@@ -28,6 +29,7 @@ interface HotelDoc extends mongoose.Document {
   amenities: [typeof amenitiesObject];
   rooms: [typeof roomsObject];
   services: [typeof serviceObject];
+  location: {};
 }
 
 const hotelSchema = new mongoose.Schema(
@@ -43,6 +45,18 @@ const hotelSchema = new mongoose.Schema(
     amenities: [amenitiesObject],
     rooms: [roomsObject],
     services: [serviceObject],
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
   },
   {
     toJSON: {
@@ -54,7 +68,7 @@ const hotelSchema = new mongoose.Schema(
     },
   }
 );
-
+hotelSchema.index({ location: "2dsphere" });
 hotelSchema.statics.build = (attrs: HotelAttrs) => {
   return new Hotel(attrs);
 };
