@@ -17,16 +17,21 @@ router.post(
     if (existingUser) {
       throw new BadRequestError("Email Already in use");
     }
-    const user = User.build({
-      email: email,
-      password: password,
-      fullName: fullName,
-      passportNumber: passportNumber,
-      phoneNumber: phoneNumber,
-    });
-    await user.save();
+    try {
+      const user = User.build({
+        email: email,
+        password: password,
+        fullName: fullName,
+        passportNumber: passportNumber,
+        phoneNumber: phoneNumber,
+      });
+      await user.save();
 
-    res.status(201).send(user);
+      res.status(201).send(user);
+    } catch (err) {
+      console.error(err);
+      res.send(err).status(401);
+    }
   }
 );
 

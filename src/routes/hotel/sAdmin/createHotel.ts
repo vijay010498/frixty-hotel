@@ -15,11 +15,25 @@ router.post(
     const {
       name,
       address,
-      facility,
-      amenities,
       rooms,
-      services,
       location,
+      outdoors,
+      pets,
+      general,
+      activities,
+      frontDeskServices,
+      foodAndDrink,
+      entertainmentAndFamilyServices,
+      cleaningServices,
+      businessFacilities,
+      safetyAndSecurity,
+      spa,
+      internet,
+      parking,
+      outdoorSwimmingPool,
+      languagesSpoken,
+      description,
+      images,
     } = req.body;
 
     const existingHotel = await Hotel.findOne({ name: name.toUpperCase() });
@@ -27,19 +41,37 @@ router.post(
     if (existingHotel) {
       throw new BadRequestError("Hotel Name Already exists");
     }
+    try {
+      const hotel = Hotel.build({
+        address: address,
+        name: name,
+        rooms: rooms,
+        location: location,
+        outdoors: outdoors,
+        activities: activities,
+        businessFacilities: businessFacilities,
+        cleaningServices: cleaningServices,
+        entertainmentAndFamilyServices: entertainmentAndFamilyServices,
+        foodAndDrink: foodAndDrink,
+        frontDeskServices: frontDeskServices,
+        general: general,
+        internet: internet,
+        languagesSpoken: languagesSpoken,
+        outdoorSwimmingPool: outdoorSwimmingPool,
+        parking: parking,
+        pets: pets,
+        safetyAndSecurity: safetyAndSecurity,
+        spa: spa,
+        description,
+        images,
+      });
+      await hotel.save();
 
-    const hotel = Hotel.build({
-      address: address,
-      amenities: amenities,
-      facility: facility,
-      name: name,
-      rooms: rooms,
-      services: services,
-      location: location,
-    });
-    await hotel.save();
-
-    res.status(201).send(hotel);
+      res.status(201).send(hotel);
+    } catch (err) {
+      console.error(err);
+      res.send(err).status(401);
+    }
   }
 );
 
