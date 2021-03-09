@@ -35,17 +35,9 @@ router.put(
     const doesOTPRequested = await OTP.findOne({ email: email });
     if (!doesOTPRequested) {
       //OPT NOT Requested of expired
-      res
-        .send({
-          errors: [
-            {
-              message:
-                "OPT Not Requested or Expired, Please Request For OTP Again",
-            },
-          ],
-        })
-        .status(400);
-      return;
+      throw new BadRequestError(
+        "OPT Not Requested or Expired, Please Request For OTP Again"
+      );
     }
 
     //All Ok NoW Check if the Entered OTP is Correct
