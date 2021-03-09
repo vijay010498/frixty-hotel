@@ -9,6 +9,6 @@ export class BadRequestError extends CustomError {
     Object.setPrototypeOf(this, BadRequestError.prototype);
   }
   serializeErrors() {
-    return [{ message: this.message }];
+    return [{ message: this.message, status: this.statusCode }];
   }
 }

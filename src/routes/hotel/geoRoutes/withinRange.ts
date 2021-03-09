@@ -1,10 +1,10 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import { NotFoundError, validateRequest } from "../../../errors";
+import { BadRequestError, validateRequest } from "../../../errors";
 import { Hotel } from "../../../models/Hotel";
 
 const defaultMeterRange = 5 * 1000; //default nearBy distance is 5KM or 5000 meter
-
+const perPage = 10;
 const router = express.Router();
 
 router.get(
@@ -16,6 +16,10 @@ router.get(
     const latitude = parseFloat(req.query.latitude);
     // @ts-ignore
     const longitude = parseFloat(req.query.longitude);
+    // @ts-ignore
+    let page = parseInt(req.query.page);
+
+    if (!page) page = 0;
 
     // @ts-ignore
     let rangeKM = req.query.range;
@@ -29,7 +33,23 @@ router.get(
       rangeInMeter = rangeKM * 1000;
     }
 
+    //No Within Range
     if (rangeKM === undefined) {
+      const totalHotels = await Hotel.find({
+        location: {
+          $near: {
+            $geometry: {
+              type: "Point",
+              coordinates: [longitude, latitude],
+            },
+            $maxDistance: defaultMeterRange,
+          },
+        },
+      }).count();
+      if (page >= Math.ceil(totalHotels / perPage)) {
+        page = 0;
+      }
+
       const hotels = await Hotel.find({
         location: {
           $near: {
@@ -40,12 +60,36 @@ router.get(
             $maxDistance: defaultMeterRange,
           },
         },
-      });
-      if (!hotels) {
-        throw new NotFoundError();
+      })
+        .skip(perPage * page)
+        .limit(perPage);
+      if (hotels.length === 0) {
+        throw new BadRequestError("No Hotels Found");
       }
-      res.send(hotels);
-    } else if (rangeKM !== undefined) {
+      res
+        .send({
+          hotels: hotels,
+          page: page,
+          pages: Math.ceil(totalHotels / perPage),
+        })
+        .status(200);
+    }
+    //within certain range in KM
+    else if (rangeKM !== undefined) {
+      const totalHotels = await Hotel.find({
+        location: {
+          $near: {
+            $geometry: {
+              type: "Point",
+              coordinates: [longitude, latitude],
+            },
+            $maxDistance: rangeInMeter,
+          },
+        },
+      }).count();
+      if (page >= Math.ceil(totalHotels / perPage)) {
+        page = 0;
+      }
       const hotels = await Hotel.find({
         location: {
           $near: {
@@ -56,11 +100,19 @@ router.get(
             $maxDistance: rangeInMeter,
           },
         },
-      });
-      if (!hotels) {
-        throw new NotFoundError();
+      })
+        .skip(perPage * page)
+        .limit(perPage);
+      if (hotels.length === 0) {
+        throw new BadRequestError("No Hotels Found");
       }
-      res.send(hotels);
+      res
+        .send({
+          hotels: hotels,
+          page: page,
+          pages: Math.ceil(totalHotels / perPage),
+        })
+        .status(200);
     }
   }
 );

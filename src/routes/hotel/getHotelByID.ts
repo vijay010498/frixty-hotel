@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { body, param } from "express-validator";
 
-import { NotFoundError, validateRequest } from "../../errors";
+import { BadRequestError, NotFoundError, validateRequest } from "../../errors";
 import { Hotel } from "../../models/Hotel";
 
 const router = express.Router();
@@ -13,7 +13,7 @@ router.get(
   async (req: Request, res: Response) => {
     const hotel = await Hotel.findById(req.params.id);
     if (!hotel) {
-      throw new NotFoundError();
+      throw new BadRequestError("No Hotel Found");
     }
     res.send(hotel).status(200);
   }
