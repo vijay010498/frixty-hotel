@@ -72,6 +72,20 @@ UserSchema.pre("save", async function (done) {
   }
   done();
 });
+UserSchema.pre("findOneAndUpdate", async function (next) {
+  // @ts-ignore
+  const password = this.getUpdate().$set.password;
+  if (!password) {
+    // @ts-ignore
+    return next();
+  }
+  try {
+    const hashed = await Password.toHash(password);
+    this.set("password", hashed);
+  } catch (error) {
+    return next(error);
+  }
+});
 
 UserSchema.statics.build = (attrs: UserAttrs) => {
   return new User(attrs);

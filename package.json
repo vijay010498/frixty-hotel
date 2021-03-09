@@ -15,6 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@sendgrid/mail": "^7.4.2",
     "@types/express": "^4.17.11",
     "@types/lodash": "^4.14.168",
     "@types/mongoose": "^5.10.3",

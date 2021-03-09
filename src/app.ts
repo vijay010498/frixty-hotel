@@ -10,7 +10,7 @@ import { getAllHotelsRouter } from "./routes/hotel/getAllHotels";
 import { searchHotelByStateRouter } from "./routes/hotel/searchHotel";
 import { hotelsWithinRangeRouter } from "./routes/hotel/geoRoutes/withinRange";
 import { requestOTPRouter } from "./routes/auth/users/requestOTP";
-import { verifyOTPRouter } from "./routes/auth/users/verifyOTP";
+import { verifyOTPRouter } from "./routes/auth/users/verifyOTPAndChangePassword";
 
 //error handlers
 import { errorhandler } from "./errors";

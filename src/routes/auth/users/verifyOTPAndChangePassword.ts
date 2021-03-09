@@ -7,8 +7,8 @@ import { BadRequestError } from "../../../errors";
 import { OTPService } from "../../../services/auth/OTPService";
 
 const router = express.Router();
-router.post(
-  "/api/v1/users/verifyOTP",
+router.put(
+  "/api/v1/users/verifyOTPAndChangePassword",
   [
     body("email").isEmail().withMessage("Email Must be Valid"),
     body("userOTP")
@@ -20,10 +20,11 @@ router.post(
         max: 6,
       })
       .withMessage("OTP Must Be Valid"),
+    body("password").isString().withMessage("Please Provide The New Password"),
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { email, userOTP } = req.body;
+    const { email, userOTP, password } = req.body;
     //First check if user exists
     const doesUserExists = await User.findOne({ email: email });
     if (!doesUserExists) {
@@ -57,8 +58,22 @@ router.post(
 
     //OTP Verified
     //first make the verified OTP expired
-    await OTP.deleteOne({ email: email });
-    res.status(200).send("OTP Verified Successfully");
+    try {
+      await OTP.deleteOne({ email: email });
+      //change Password
+      await User.findOneAndUpdate(
+        { email: email },
+        {
+          $set: {
+            password: password,
+          },
+        }
+      );
+      res.status(200).send("Password Updated Successfully");
+    } catch (err) {
+      console.error(err);
+      res.status(400).send(err);
+    }
   }
 );
 
