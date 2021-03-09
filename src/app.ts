@@ -12,12 +12,18 @@ import { hotelsWithinRangeRouter } from "./routes/hotel/geoRoutes/withinRange";
 import { requestOTPRouter } from "./routes/auth/users/requestOTP";
 import { verifyOTPRouter } from "./routes/auth/users/verifyOTPAndChangePassword";
 
+const RateLimit = require("express-rate-limit");
 //error handlers
 import { errorhandler } from "./errors";
 import { NotFoundError } from "./errors";
+const limiter = new RateLimit({
+  windowMs: 60 * 1000,
+  max: 25,
+});
 
 const app = express();
 app.use(json());
+app.use(limiter);
 app.set("trust proxy", true);
 app.use(signupRouter);
 app.use(signInRouter);
