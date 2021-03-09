@@ -27,18 +27,9 @@ router.post(
     if (alreadyRequested) {
       const { createdAt } = alreadyRequested;
       const lastSentTimeStamp = createdAt.getTime();
-      res
-        .send({
-          errors: [
-            {
-              message:
-                "OTP Sent Already, Please wait 5 minutes from last sent OTP request",
-              lastSentOtpTimeStamp: lastSentTimeStamp,
-            },
-          ],
-        })
-        .status(400);
-      return;
+      throw new BadRequestError(
+        "OTP Sent Already, Please wait 5 minutes from last sent OTP request"
+      );
     }
 
     const sixDigitOTP = Math.floor(100000 + Math.random() * 900000);
