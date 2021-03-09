@@ -9,6 +9,8 @@ import { getHotelByID } from "./routes/hotel/getHotelByID";
 import { getAllHotelsRouter } from "./routes/hotel/getAllHotels";
 import { searchHotelByStateRouter } from "./routes/hotel/searchHotel";
 import { hotelsWithinRangeRouter } from "./routes/hotel/geoRoutes/withinRange";
+import { requestOTPRouter } from "./routes/auth/users/requestOTP";
+import { verifyOTPRouter } from "./routes/auth/users/verifyOTP";
 
 //error handlers
 import { errorhandler } from "./errors";
@@ -24,6 +26,8 @@ app.use(getHotelByID);
 app.use(getAllHotelsRouter);
 app.use(searchHotelByStateRouter);
 app.use(hotelsWithinRangeRouter);
+app.use(requestOTPRouter);
+app.use(verifyOTPRouter);
 app.use(errorhandler);
 
 app.all("*", async (req, res) => {
