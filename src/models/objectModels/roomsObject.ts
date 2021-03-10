@@ -61,6 +61,7 @@ const roomsObject = {
   images: {
     type: [String],
   },
+  _id: false,
 };
 
 export { roomsObject };
