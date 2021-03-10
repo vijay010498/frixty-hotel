@@ -1,10 +1,12 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-
 import { Password } from "../../../services/auth/password";
 import { User } from "../../../models/User";
 import { validateRequest } from "../../../errors";
 import { BadRequestError } from "../../../errors";
+
+import jwt from "jsonwebtoken";
+const keys = require("../../../config/keys");
 
 const router = express.Router();
 
@@ -26,8 +28,31 @@ router.post(
     if (!passwordsMatch) {
       throw new BadRequestError("Invalid Credentials");
     }
+    try {
+      //generate JWTToken and send with the user response
+      const jwtAuthToken = await jwt.sign(
+        {
+          userId: existingUser.id,
+          email: existingUser.email,
+        },
+        keys.jwtKey,
+        {
+          expiresIn: keys.JWTEXPIRETIME,
+          algorithm: "HS512",
+        }
+      );
 
-    res.status(200).send(existingUser);
+      res.status(200).send({
+        user: existingUser,
+        auth: {
+          jwtAuthToken,
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      res.send(err).status(401);
+      return;
+    }
   }
 );
 

@@ -6,8 +6,10 @@ import { User } from "../../../models/User";
 import { BadRequestError } from "../../../errors";
 import { OTPService } from "../../../services/auth/OTPService";
 
+import jwt from "jsonwebtoken";
+const keys = require("../../../config/keys");
 const router = express.Router();
-router.put(
+router.patch(
   "/api/v1/users/verifyOTPAndChangePassword",
   [
     body("email").isEmail().withMessage("Email Must be Valid"),
@@ -61,10 +63,35 @@ router.put(
           },
         }
       );
-      res.status(200).send("Password Updated Successfully");
+      try {
+        //generate new JWT Token and send with the response
+        const jwtAuthToken = await jwt.sign(
+          {
+            userId: doesUserExists.id,
+            email: doesUserExists.email,
+          },
+          keys.jwtKey,
+          {
+            expiresIn: keys.JWTEXPIRETIME,
+            algorithm: "HS512",
+          }
+        );
+        res.status(200).send({
+          message: "Password Updated Successfully",
+          auth: {
+            jwtAuthToken,
+          },
+        });
+        return;
+      } catch (err) {
+        console.error(err);
+        res.send(err).status(401);
+        return;
+      }
     } catch (err) {
       console.error(err);
       res.status(400).send(err);
+      return;
     }
   }
 );

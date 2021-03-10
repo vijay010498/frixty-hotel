@@ -3,6 +3,8 @@ import { body } from "express-validator";
 import { validateRequest } from "../../../errors";
 import { User } from "../../../models/User";
 import { BadRequestError } from "../../../errors";
+import jwt from "jsonwebtoken";
+const keys = require("../../../config/keys");
 
 const router = express.Router();
 
@@ -27,10 +29,30 @@ router.post(
       });
       await user.save();
 
-      res.status(201).send(user);
+      //generate JWTToken and send with the user response
+      const jwtAuthToken = await jwt.sign(
+        {
+          userId: user.id,
+          email: user.email,
+        },
+        keys.jwtKey,
+        {
+          expiresIn: keys.JWTEXPIRETIME,
+          algorithm: "HS512",
+        }
+      );
+      console.log(jwtAuthToken);
+      res.status(201).send({
+        user,
+        auth: {
+          jwtAuthToken,
+        },
+      });
+      return;
     } catch (err) {
       console.error(err);
       res.send(err).status(401);
+      return;
     }
   }
 );
