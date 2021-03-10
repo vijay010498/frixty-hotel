@@ -16,7 +16,7 @@ router.get(
 
     let isFilterBy = false;
     let isGeoQuery = false;
-    const isFilter_ByString = req.query.isFilterBy || "false";
+    const isFilter_ByString = req.query.isFilterBy || "false ";
     const isGeoQueryString = req.query.isGeoQuery || "false";
     if (isFilter_ByString === "true") isFilterBy = true;
     if (isGeoQueryString === "true") isGeoQuery = true;
