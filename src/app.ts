@@ -11,6 +11,7 @@ import { searchHotelByStateRouter } from "./routes/hotel/searchHotel";
 import { requestOTPRouter } from "./routes/auth/users/requestOTP";
 import { verifyOTPRouter } from "./routes/auth/users/verifyOTPAndChangePassword";
 import { changePasswordRouter } from "./routes/auth/users/changePassword";
+import { verifyAuthRouter } from "./routes/auth/users/verifyAuth";
 
 const RateLimit = require("express-rate-limit");
 //error handlers
@@ -34,6 +35,7 @@ app.use(searchHotelByStateRouter);
 app.use(requestOTPRouter);
 app.use(verifyOTPRouter);
 app.use(changePasswordRouter);
+app.use(verifyAuthRouter);
 app.use(errorhandler);
 
 app.all("*", async (req, res) => {
