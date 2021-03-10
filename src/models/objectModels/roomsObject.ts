@@ -32,6 +32,18 @@ const roomsObject = {
     required: true,
     index: true,
   },
+  discount: {
+    isDiscount: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+    discountPercentage: {
+      type: Number,
+      default: 0.0,
+      required: true,
+    },
+  },
   isBreakfastIncluded: {
     type: Boolean,
     default: false,
