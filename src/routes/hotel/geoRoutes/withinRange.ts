@@ -17,9 +17,7 @@ router.get(
     // @ts-ignore
     const longitude = parseFloat(req.query.longitude);
     // @ts-ignore
-    let page = parseInt(req.query.page);
-
-    if (!page) page = 0;
+    let page = parseInt(req.query.page) || 0;
 
     // @ts-ignore
     let rangeKM = req.query.range;
@@ -46,7 +44,23 @@ router.get(
           },
         },
       }).count();
-      if (page >= Math.ceil(totalHotels / perPage)) {
+
+      /*const totalHotels1 = await Hotel.aggregate([
+        {
+          $geoNear: {
+            near: {
+              type: "Point",
+              coordinates: [longitude, latitude],
+            },
+            distanceField: "distance",
+          },
+        },
+      ]);
+      // @ts-ignore
+      console.log(totalHotels1.length);
+      console.log(totalHotels1);*/
+
+      if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
         page = 0;
       }
 
@@ -73,6 +87,7 @@ router.get(
           pages: Math.ceil(totalHotels / perPage),
         })
         .status(200);
+      return;
     }
     //within certain range in KM
     else if (rangeKM !== undefined) {
@@ -87,7 +102,7 @@ router.get(
           },
         },
       }).count();
-      if (page >= Math.ceil(totalHotels / perPage)) {
+      if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
         page = 0;
       }
       const hotels = await Hotel.find({

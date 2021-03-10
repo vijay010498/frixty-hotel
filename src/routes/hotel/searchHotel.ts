@@ -1,10 +1,10 @@
 import express, { Request, Response } from "express";
-import { param, query } from "express-validator";
-import { BadRequestError, NotFoundError, validateRequest } from "../../errors";
+import { body, param, query } from "express-validator";
+import { BadRequestError, validateRequest } from "../../errors";
 import { Hotel } from "../../models/Hotel";
 
 const router = express.Router();
-
+const defaultMeterRange = 5 * 1000; //default nearBy distance is 5KM or 5000 meter
 const perPage = 10; //
 router.get(
   "/api/v1/hotels/search",
@@ -14,84 +14,393 @@ router.get(
     const city = req.query.city;
     const state = req.query.state;
     // @ts-ignore
-    let page = parseInt(req.query.page);
+    let page = parseInt(req.query.page) || 0;
+    let isGeoQuery = false;
+    const isGeoQueryString = req.query.isGeoQuery || "false";
+    if (isGeoQueryString === "true") isGeoQuery = true;
 
-    if (!page) page = 0;
-
-    //Search by both city and state
-    if (city !== undefined && state !== undefined) {
-      const totalHotels = await Hotel.find({
-        "address.city": city.toString().toUpperCase(),
-        "address.state": state.toString().toUpperCase(),
-      }).countDocuments();
-
-      if (page >= Math.ceil(totalHotels / perPage)) {
-        page = 0;
+    //Geo Search Included search with geoQuery
+    if (isGeoQuery) {
+      // @ts-ignore
+      const latitude = parseFloat(req.query.latitude);
+      // @ts-ignore
+      const longitude = parseFloat(req.query.longitude);
+      // @ts-ignore
+      let rangeKM = req.query.range;
+      let rangeInMeter = 0;
+      if (!latitude || !longitude) {
+        throw new BadRequestError("Latitude and Longitude must be given");
       }
-      const hotels = await Hotel.find({
-        "address.city": city.toString().toUpperCase(),
-        "address.state": state.toString().toUpperCase(),
-      })
-        .skip(perPage * page)
-        .limit(perPage);
-      if (hotels.length === 0) {
-        throw new BadRequestError("No Hotels Found");
+
+      if (rangeKM !== undefined) {
+        // @ts-ignore
+        rangeKM = parseFloat(req.query.range);
+        //convert km to meter
+        // @ts-ignore
+        rangeInMeter = rangeKM * 1000;
       }
-      res
-        .send({
-          hotels: hotels,
-          page: page,
-          pages: Math.ceil(totalHotels / perPage),
-        })
-        .status(200);
+
+      if (rangeKM === undefined) {
+        //No Within Range
+        //city and state
+        if (city !== undefined && state !== undefined) {
+          const totalHotels = await Hotel.find({
+            location: {
+              $near: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [longitude, latitude],
+                },
+                $maxDistance: defaultMeterRange,
+              },
+            },
+            "address.city": city.toString().toUpperCase(),
+            "address.state": state.toString().toUpperCase(),
+          }).count();
+
+          if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+            page = 0;
+          }
+
+          const hotels = await Hotel.find({
+            location: {
+              $near: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [longitude, latitude],
+                },
+                $maxDistance: defaultMeterRange,
+              },
+            },
+            "address.city": city.toString().toUpperCase(),
+            "address.state": state.toString().toUpperCase(),
+          })
+            .skip(perPage * page)
+            .limit(perPage);
+          if (hotels.length === 0) {
+            throw new BadRequestError("No Hotels Found");
+          }
+          res
+            .send({
+              hotels,
+              page: page,
+              pages: Math.ceil(totalHotels / perPage),
+            })
+            .status(200);
+          return;
+        }
+
+        //Only city
+        else if (city !== undefined) {
+          const totalHotels = await Hotel.find({
+            location: {
+              $near: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [longitude, latitude],
+                },
+                $maxDistance: defaultMeterRange,
+              },
+            },
+            "address.city": city.toString().toUpperCase(),
+          }).count();
+          if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+            page = 0;
+          }
+
+          const hotels = await Hotel.find({
+            location: {
+              $near: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [longitude, latitude],
+                },
+                $maxDistance: defaultMeterRange,
+              },
+            },
+            "address.city": city.toString().toUpperCase(),
+          })
+            .skip(perPage * page)
+            .limit(perPage);
+          if (hotels.length === 0) {
+            throw new BadRequestError("No Hotels Found");
+          }
+          res
+            .send({
+              hotels: hotels,
+              page: page,
+              pages: Math.ceil(totalHotels / perPage),
+            })
+            .status(200);
+          return;
+        }
+
+        //search by only state
+        else if (state !== undefined) {
+          const totalHotels = await Hotel.find({
+            location: {
+              $near: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [longitude, latitude],
+                },
+                $maxDistance: defaultMeterRange,
+              },
+            },
+            "address.state": state.toString().toUpperCase(),
+          }).count();
+          if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+            page = 0;
+          }
+          const hotels = await Hotel.find({
+            location: {
+              $near: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [longitude, latitude],
+                },
+                $maxDistance: defaultMeterRange,
+              },
+            },
+            "address.state": state.toString().toUpperCase(),
+          })
+            .skip(perPage * page)
+            .limit(perPage);
+          if (hotels.length === 0) {
+            throw new BadRequestError("No Hotels Found");
+          }
+          res
+            .send({
+              hotels: hotels,
+              page: page,
+              pages: Math.ceil(totalHotels / perPage),
+            })
+            .status(200);
+          return;
+        }
+      }
+      //Within  range defined
+      else {
+        //Within  range defined
+        //city and state
+        if (city !== undefined && state !== undefined) {
+          const totalHotels = await Hotel.find({
+            location: {
+              $near: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [longitude, latitude],
+                },
+                $maxDistance: rangeInMeter,
+              },
+            },
+            "address.city": city.toString().toUpperCase(),
+            "address.state": state.toString().toUpperCase(),
+          }).count();
+
+          if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+            page = 0;
+          }
+
+          const hotels = await Hotel.find({
+            location: {
+              $near: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [longitude, latitude],
+                },
+                $maxDistance: rangeInMeter,
+              },
+            },
+            "address.city": city.toString().toUpperCase(),
+            "address.state": state.toString().toUpperCase(),
+          })
+            .skip(perPage * page)
+            .limit(perPage);
+          if (hotels.length === 0) {
+            throw new BadRequestError("No Hotels Found");
+          }
+          res
+            .send({
+              hotels,
+              page: page,
+              pages: Math.ceil(totalHotels / perPage),
+            })
+            .status(200);
+          return;
+        }
+
+        //Only city
+        else if (city !== undefined) {
+          const totalHotels = await Hotel.find({
+            location: {
+              $near: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [longitude, latitude],
+                },
+                $maxDistance: rangeInMeter,
+              },
+            },
+            "address.city": city.toString().toUpperCase(),
+          }).count();
+          if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+            page = 0;
+          }
+
+          const hotels = await Hotel.find({
+            location: {
+              $near: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [longitude, latitude],
+                },
+                $maxDistance: rangeInMeter,
+              },
+            },
+            "address.city": city.toString().toUpperCase(),
+          })
+            .skip(perPage * page)
+            .limit(perPage);
+          if (hotels.length === 0) {
+            throw new BadRequestError("No Hotels Found");
+          }
+          res
+            .send({
+              hotels: hotels,
+              page: page,
+              pages: Math.ceil(totalHotels / perPage),
+            })
+            .status(200);
+          return;
+        }
+
+        //search by only state
+        else if (state !== undefined) {
+          const totalHotels = await Hotel.find({
+            location: {
+              $near: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [longitude, latitude],
+                },
+                $maxDistance: rangeInMeter,
+              },
+            },
+            "address.state": state.toString().toUpperCase(),
+          }).count();
+          if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+            page = 0;
+          }
+          const hotels = await Hotel.find({
+            location: {
+              $near: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [longitude, latitude],
+                },
+                $maxDistance: rangeInMeter,
+              },
+            },
+            "address.state": state.toString().toUpperCase(),
+          })
+            .skip(perPage * page)
+            .limit(perPage);
+          if (hotels.length === 0) {
+            throw new BadRequestError("No Hotels Found");
+          }
+          res
+            .send({
+              hotels: hotels,
+              page: page,
+              pages: Math.ceil(totalHotels / perPage),
+            })
+            .status(200);
+          return;
+        }
+      }
     }
-    //Search by only city
-    else if (city !== undefined) {
-      const totalHotels = await Hotel.find({
-        "address.city": city.toString().toUpperCase(),
-      }).countDocuments();
-      if (page >= Math.ceil(totalHotels / perPage)) {
-        page = 0;
-      }
-      const hotels = await Hotel.find({
-        "address.city": city.toString().toUpperCase(),
-      })
-        .skip(perPage * page)
-        .limit(perPage);
-      if (hotels.length === 0) {
-        throw new BadRequestError("No Hotels Found");
-      }
-      res
-        .send({
-          hotels: hotels,
-          page: page,
-          pages: Math.ceil(totalHotels / perPage),
+
+    //Without Geo Query
+    else {
+      //Search by both city and state
+      if (city !== undefined && state !== undefined) {
+        const totalHotels = await Hotel.find({
+          "address.city": city.toString().toUpperCase(),
+          "address.state": state.toString().toUpperCase(),
+        }).countDocuments();
+
+        if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+          page = 0;
+        }
+        const hotels = await Hotel.find({
+          "address.city": city.toString().toUpperCase(),
+          "address.state": state.toString().toUpperCase(),
         })
-        .status(200);
-    }
-    //search by only state
-    else if (state !== undefined) {
-      const totalHotels = await Hotel.find({
-        "address.state": state.toString().toUpperCase(),
-      }).countDocuments();
-      if (page >= Math.ceil(totalHotels / perPage)) {
-        page = 0;
+          .skip(perPage * page)
+          .limit(perPage);
+        if (hotels.length === 0) {
+          throw new BadRequestError("No Hotels Found");
+        }
+        res
+          .send({
+            hotels: hotels,
+            page: page,
+            pages: Math.ceil(totalHotels / perPage),
+          })
+          .status(200);
+        return;
       }
-      const hotels = await Hotel.find({
-        "address.state": state.toString().toUpperCase(),
-      })
-        .skip(perPage * page)
-        .limit(perPage);
-      if (hotels.length === 0) {
-        throw new BadRequestError("No Hotels Found");
-      }
-      res
-        .send({
-          hotels: hotels,
-          page: page,
-          pages: Math.ceil(totalHotels / perPage),
+      //Search by only city
+      else if (city !== undefined) {
+        const totalHotels = await Hotel.find({
+          "address.city": city.toString().toUpperCase(),
+        }).countDocuments();
+        if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+          page = 0;
+        }
+        const hotels = await Hotel.find({
+          "address.city": city.toString().toUpperCase(),
         })
-        .status(200);
+          .skip(perPage * page)
+          .limit(perPage);
+        if (hotels.length === 0) {
+          throw new BadRequestError("No Hotels Found");
+        }
+        res
+          .send({
+            hotels: hotels,
+            page: page,
+            pages: Math.ceil(totalHotels / perPage),
+          })
+          .status(200);
+        return;
+      }
+      //search by only state
+      else if (state !== undefined) {
+        const totalHotels = await Hotel.find({
+          "address.state": state.toString().toUpperCase(),
+        }).countDocuments();
+        if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+          page = 0;
+        }
+        const hotels = await Hotel.find({
+          "address.state": state.toString().toUpperCase(),
+        })
+          .skip(perPage * page)
+          .limit(perPage);
+        if (hotels.length === 0) {
+          throw new BadRequestError("No Hotels Found");
+        }
+        res
+          .send({
+            hotels: hotels,
+            page: page,
+            pages: Math.ceil(totalHotels / perPage),
+          })
+          .status(200);
+        return;
+      }
     }
   }
 );
