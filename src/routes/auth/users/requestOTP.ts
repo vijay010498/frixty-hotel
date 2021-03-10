@@ -72,9 +72,9 @@ router.post(
         email: email,
       });
       await userOTP.save();
-      res
-        .status(201)
-        .send("OTP Sent Successfully To Mail. Otp Will Expire in 5 Minutes");
+      res.status(201).send({
+        message: "OTP Sent Successfully To Mail. Otp Will Expire in 5 Minutes",
+      });
     } catch (err) {
       console.error(err);
       res.send(err).status(401);
