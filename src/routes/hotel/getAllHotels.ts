@@ -33,6 +33,7 @@ router.get("/api/v1/hotels", async (req: Request, res: Response) => {
       pages: Math.ceil(totalHotels / perPage),
     })
     .status(200);
+  return;
 });
 
 export { router as getAllHotelsRouter };
