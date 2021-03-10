@@ -21,6 +21,7 @@ const roomsObject = {
   sleeps: {
     type: Number,
     required: true,
+    index: true,
   },
   totalRooms: {
     type: Number,
@@ -29,10 +30,12 @@ const roomsObject = {
   priceForOneNight: {
     type: Number,
     required: true,
+    index: true,
   },
   isBreakfastIncluded: {
     type: Boolean,
     default: false,
+    index: true,
   },
   description: {
     type: String,
@@ -57,6 +60,7 @@ const roomsObject = {
   isRefundable: {
     type: Boolean,
     default: false,
+    index: true,
   },
   images: {
     type: [String],
