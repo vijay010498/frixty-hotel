@@ -16,6 +16,7 @@ import { verifyAuthRouter } from "./routes/auth/users/verifyAuth";
 //super admin
 import { superAdminSignupRouter } from "./routes/auth/superAdmins/signup";
 import { superAdminSignInRouter } from "./routes/auth/superAdmins/signin";
+import { superAdminSignOutRouter } from "./routes/auth/superAdmins/signout";
 import cookieSession from "cookie-session";
 
 const RateLimit = require("express-rate-limit");
@@ -51,6 +52,7 @@ app.use(verifyAuthRouter);
 //super admin
 app.use(superAdminSignupRouter);
 app.use(superAdminSignInRouter);
+app.use(superAdminSignOutRouter);
 app.use(errorhandler);
 
 app.all("*", async (req, res) => {

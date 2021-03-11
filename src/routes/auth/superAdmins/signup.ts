@@ -5,7 +5,9 @@ import jwt from "jsonwebtoken";
 import { BadRequestError, validateRequest } from "../../../errors";
 import { requireSuperAdmin } from "../../../errors/middleware/SAdmin/require-super-admin";
 const keys = require("../../../config/keys");
-const router = express.Router();
+const router = express.Router({
+  caseSensitive: true,
+});
 
 router.post(
   "/api/secure/sAdmin/signup",
