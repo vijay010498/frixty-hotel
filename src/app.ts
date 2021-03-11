@@ -13,6 +13,11 @@ import { verifyOTPRouter } from "./routes/auth/users/verifyOTPAndChangePassword"
 import { changePasswordRouter } from "./routes/auth/users/changePassword";
 import { verifyAuthRouter } from "./routes/auth/users/verifyAuth";
 
+//super admin
+import { superAdminSignupRouter } from "./routes/auth/superAdmins/signup";
+import { superAdminSignInRouter } from "./routes/auth/superAdmins/signin";
+import cookieSession from "cookie-session";
+
 const RateLimit = require("express-rate-limit");
 //error handlers
 import { errorhandler } from "./errors";
@@ -24,6 +29,12 @@ const limiter = new RateLimit({
 
 const app = express();
 app.use(json());
+app.use(
+  cookieSession({
+    signed: false,
+    secure: process.env.NODE_ENV === "production",
+  })
+);
 app.use(limiter);
 app.set("trust proxy", true);
 app.use(signupRouter);
@@ -36,6 +47,10 @@ app.use(requestOTPRouter);
 app.use(verifyOTPRouter);
 app.use(changePasswordRouter);
 app.use(verifyAuthRouter);
+
+//super admin
+app.use(superAdminSignupRouter);
+app.use(superAdminSignInRouter);
 app.use(errorhandler);
 
 app.all("*", async (req, res) => {

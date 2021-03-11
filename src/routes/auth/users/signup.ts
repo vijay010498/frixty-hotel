@@ -35,9 +35,9 @@ router.post(
           userId: user.id,
           email: user.email,
         },
-        keys.jwtKey,
+        keys.jwtSuperAdminKey,
         {
-          expiresIn: keys.JWTEXPIRETIME,
+          expiresIn: keys.JWTEXPIRETIMESUPERADMIN,
           algorithm: "HS512",
         }
       );

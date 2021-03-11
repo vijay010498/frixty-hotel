@@ -1,27 +1,25 @@
 import mongoose from "mongoose";
 import { Password } from "../services/auth/password";
 
-interface UserAttrs {
+interface SuperAdminAttrs {
   email: string;
   password: string;
   fullName: string;
-  passportNumber: string;
   phoneNumber: string;
 }
 
-interface UserModel extends mongoose.Model<UserDoc> {
-  build(attrs: UserAttrs): UserDoc;
+interface SuperAdminModel extends mongoose.Model<SuperAdminDoc> {
+  build(attrs: SuperAdminAttrs): SuperAdminDoc;
 }
 
-interface UserDoc extends mongoose.Document {
+interface SuperAdminDoc extends mongoose.Document {
   email: string;
   password: string;
   fullName: string;
-  passportNumber: string;
   phoneNumber: string;
 }
 
-const UserSchema = new mongoose.Schema(
+const SuperAdminSchema = new mongoose.Schema(
   {
     email: {
       type: String,
@@ -37,13 +35,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    passportNumber: {
-      type: String,
-      required: true,
-    },
     phoneNumber: {
       type: String,
       required: true,
+      unique: true,
     },
   },
   {
@@ -64,14 +59,14 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
-UserSchema.pre("save", async function (done) {
+SuperAdminSchema.pre("save", async function (done) {
   if (this.isModified("password")) {
     const hashed = await Password.toHash(this.get("password"));
     this.set("password", hashed);
   }
   done();
 });
-UserSchema.pre("findOneAndUpdate", async function (next) {
+SuperAdminSchema.pre("findOneAndUpdate", async function (next) {
   // @ts-ignore
   const password = this.getUpdate().$set.password;
   if (!password) {
@@ -86,9 +81,13 @@ UserSchema.pre("findOneAndUpdate", async function (next) {
   }
 });
 
-UserSchema.statics.build = (attrs: UserAttrs) => {
-  return new User(attrs);
+SuperAdminSchema.statics.build = (attrs: SuperAdminAttrs) => {
+  return new SuperAdmin(attrs);
 };
 
-const User = mongoose.model<UserDoc, UserModel>("users", UserSchema);
-export { User };
+const SuperAdmin = mongoose.model<SuperAdminDoc, SuperAdminModel>(
+  "superAdmins",
+  SuperAdminSchema
+);
+
+export { SuperAdmin };
