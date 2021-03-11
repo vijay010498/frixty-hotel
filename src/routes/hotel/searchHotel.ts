@@ -645,7 +645,6 @@ router.get(
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
-              // console.log(hotels.length);
 
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
@@ -1170,7 +1169,6 @@ router.get(
             },
           ]);
           const totalHotels = hotelsDB.length;
-          console.log(totalHotels);
           if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
             page = 0;
           }
@@ -1377,7 +1375,6 @@ router.get(
                 throw new BadRequestError("No Hotels Found");
               }
               // @ts-ignore
-              console.log(hotels[0].distanceToReach);
               res
                 .send({
                   hotels: hotels,
@@ -1436,7 +1433,6 @@ router.get(
             },
           ]);
           let totalHotels = hotelsDB.length;
-          console.log(totalHotels);
           if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
             page = 0;
           }
