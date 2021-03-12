@@ -19,7 +19,7 @@ router.post(
     body("password")
       .trim()
       .notEmpty()
-      .withMessage("You Must supple a password"),
+      .withMessage("You Must supply a password"),
   ],
   validateRequest,
   async (req: Request, res: Response) => {
@@ -55,6 +55,7 @@ router.post(
         JWT,
       };
       res.status(201).send(existingSuperAdmin);
+      return;
     } catch (err) {
       console.error(err);
       res.status(401).send(err);

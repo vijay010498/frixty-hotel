@@ -198,14 +198,12 @@ router.get(
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
-                res
-                  .send({
-                    hotels: hotels,
-                    totalHotels,
-                    page: page,
-                    pages: Math.ceil(totalHotels / perPage),
-                  })
-                  .status(200);
+                res.status(200).send({
+                  hotels: hotels,
+                  totalHotels,
+                  page: page,
+                  pages: Math.ceil(totalHotels / perPage),
+                });
                 return;
               }
             } else {
@@ -234,14 +232,12 @@ router.get(
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
-              res
-                .send({
-                  hotels,
-                  totalHotels,
-                  page: page,
-                  pages: Math.ceil(totalHotels / perPage),
-                })
-                .status(200);
+              res.status(200).send({
+                hotels,
+                totalHotels,
+                page: page,
+                pages: Math.ceil(totalHotels / perPage),
+              });
               return;
             }
           }
@@ -337,14 +333,12 @@ router.get(
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
-                res
-                  .send({
-                    hotels: hotels,
-                    totalHotels,
-                    page: page,
-                    pages: Math.ceil(totalHotels / perPage),
-                  })
-                  .status(200);
+                res.status(200).send({
+                  hotels: hotels,
+                  totalHotels,
+                  page: page,
+                  pages: Math.ceil(totalHotels / perPage),
+                });
                 return;
               }
             } else {
@@ -370,14 +364,12 @@ router.get(
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
-              res
-                .send({
-                  hotels: hotels,
-                  totalHotels,
-                  page: page,
-                  pages: Math.ceil(totalHotels / perPage),
-                })
-                .status(200);
+              res.status(200).send({
+                hotels: hotels,
+                totalHotels,
+                page: page,
+                pages: Math.ceil(totalHotels / perPage),
+              });
               return;
             }
           }
@@ -473,14 +465,12 @@ router.get(
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
-                res
-                  .send({
-                    hotels: hotels,
-                    totalHotels,
-                    page: page,
-                    pages: Math.ceil(totalHotels / perPage),
-                  })
-                  .status(200);
+                res.status(200).send({
+                  hotels: hotels,
+                  totalHotels,
+                  page: page,
+                  pages: Math.ceil(totalHotels / perPage),
+                });
                 return;
               }
             } else {
@@ -506,14 +496,12 @@ router.get(
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
-              res
-                .send({
-                  hotels: hotels,
-                  totalHotels,
-                  page: page,
-                  pages: Math.ceil(totalHotels / perPage),
-                })
-                .status(200);
+              res.status(200).send({
+                hotels: hotels,
+                totalHotels,
+                page: page,
+                pages: Math.ceil(totalHotels / perPage),
+              });
               return;
             }
           }
@@ -614,14 +602,12 @@ router.get(
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
-                res
-                  .send({
-                    hotels: hotels,
-                    totalHotels,
-                    page: page,
-                    pages: Math.ceil(totalHotels / perPage),
-                  })
-                  .status(200);
+                res.status(200).send({
+                  hotels: hotels,
+                  totalHotels,
+                  page: page,
+                  pages: Math.ceil(totalHotels / perPage),
+                });
                 return;
               }
             } else {
@@ -649,14 +635,12 @@ router.get(
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
-              res
-                .send({
-                  hotels,
-                  totalHotels,
-                  page: page,
-                  pages: Math.ceil(totalHotels / perPage),
-                })
-                .status(200);
+              res.status(200).send({
+                hotels,
+                totalHotels,
+                page: page,
+                pages: Math.ceil(totalHotels / perPage),
+              });
               return;
             }
           }
@@ -752,14 +736,12 @@ router.get(
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
-                res
-                  .send({
-                    hotels: hotels,
-                    totalHotels,
-                    page: page,
-                    pages: Math.ceil(totalHotels / perPage),
-                  })
-                  .status(200);
+                res.status(200).send({
+                  hotels: hotels,
+                  totalHotels,
+                  page: page,
+                  pages: Math.ceil(totalHotels / perPage),
+                });
                 return;
               }
             } else {
@@ -786,14 +768,12 @@ router.get(
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
-              res
-                .send({
-                  hotels,
-                  totalHotels,
-                  page: page,
-                  pages: Math.ceil(totalHotels / perPage),
-                })
-                .status(200);
+              res.status(200).send({
+                hotels,
+                totalHotels,
+                page: page,
+                pages: Math.ceil(totalHotels / perPage),
+              });
               return;
             }
           }
@@ -889,14 +869,12 @@ router.get(
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
-                res
-                  .send({
-                    hotels: hotels,
-                    totalHotels,
-                    page: page,
-                    pages: Math.ceil(totalHotels / perPage),
-                  })
-                  .status(200);
+                res.status(200).send({
+                  hotels: hotels,
+                  totalHotels,
+                  page: page,
+                  pages: Math.ceil(totalHotels / perPage),
+                });
                 return;
               }
             } else {
@@ -923,14 +901,12 @@ router.get(
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
-              res
-                .send({
-                  hotels,
-                  totalHotels,
-                  page: page,
-                  pages: Math.ceil(totalHotels / perPage),
-                })
-                .status(200);
+              res.status(200).send({
+                hotels,
+                totalHotels,
+                page: page,
+                pages: Math.ceil(totalHotels / perPage),
+              });
               return;
             }
           }
@@ -1013,14 +989,12 @@ router.get(
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
-              res
-                .send({
-                  hotels: hotels,
-                  totalHotels,
-                  page: page,
-                  pages: Math.ceil(totalHotels / perPage),
-                })
-                .status(200);
+              res.status(200).send({
+                hotels: hotels,
+                totalHotels,
+                page: page,
+                pages: Math.ceil(totalHotels / perPage),
+              });
               return;
             }
           } else {
@@ -1038,14 +1012,12 @@ router.get(
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
             }
-            res
-              .send({
-                hotels: hotels,
-                totalHotels,
-                page: page,
-                pages: Math.ceil(totalHotels / perPage),
-              })
-              .status(200);
+            res.status(200).send({
+              hotels: hotels,
+              totalHotels,
+              page: page,
+              pages: Math.ceil(totalHotels / perPage),
+            });
             return;
           }
         }
@@ -1123,14 +1095,12 @@ router.get(
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
-              res
-                .send({
-                  hotels: hotels,
-                  totalHotels,
-                  page: page,
-                  pages: Math.ceil(totalHotels / perPage),
-                })
-                .status(200);
+              res.status(200).send({
+                hotels: hotels,
+                totalHotels,
+                page: page,
+                pages: Math.ceil(totalHotels / perPage),
+              });
               return;
             }
           } else {
@@ -1147,14 +1117,12 @@ router.get(
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
             }
-            res
-              .send({
-                hotels: hotels,
-                totalHotels,
-                page: page,
-                pages: Math.ceil(totalHotels / perPage),
-              })
-              .status(200);
+            res.status(200).send({
+              hotels: hotels,
+              totalHotels,
+              page: page,
+              pages: Math.ceil(totalHotels / perPage),
+            });
             return;
           }
         }
@@ -1230,14 +1198,12 @@ router.get(
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
-              res
-                .send({
-                  hotels: hotels,
-                  totalHotels,
-                  page: page,
-                  pages: Math.ceil(totalHotels / perPage),
-                })
-                .status(200);
+              res.status(200).send({
+                hotels: hotels,
+                totalHotels,
+                page: page,
+                pages: Math.ceil(totalHotels / perPage),
+              });
               return;
             }
           } else {
@@ -1254,14 +1220,12 @@ router.get(
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
             }
-            res
-              .send({
-                hotels: hotels,
-                totalHotels,
-                page: page,
-                pages: Math.ceil(totalHotels / perPage),
-              })
-              .status(200);
+            res.status(200).send({
+              hotels: hotels,
+              totalHotels,
+              page: page,
+              pages: Math.ceil(totalHotels / perPage),
+            });
             return;
           }
         }
@@ -1375,14 +1339,12 @@ router.get(
                 throw new BadRequestError("No Hotels Found");
               }
               // @ts-ignore
-              res
-                .send({
-                  hotels: hotels,
-                  totalHotels,
-                  page: page,
-                  pages: Math.ceil(totalHotels / perPage),
-                })
-                .status(200);
+              res.status(200).send({
+                hotels: hotels,
+                totalHotels,
+                page: page,
+                pages: Math.ceil(totalHotels / perPage),
+              });
               return;
             }
           }
@@ -1406,14 +1368,12 @@ router.get(
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
             }
-            res
-              .send({
-                hotels,
-                totalHotels,
-                page: page,
-                pages: Math.ceil(totalHotels / perPage),
-              })
-              .status(200);
+            res.status(200).send({
+              hotels,
+              totalHotels,
+              page: page,
+              pages: Math.ceil(totalHotels / perPage),
+            });
             return;
           }
         }
@@ -1498,14 +1458,12 @@ router.get(
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
-              res
-                .send({
-                  hotels: hotels,
-                  totalHotels,
-                  page: page,
-                  pages: Math.ceil(totalHotels / perPage),
-                })
-                .status(200);
+              res.status(200).send({
+                hotels: hotels,
+                totalHotels,
+                page: page,
+                pages: Math.ceil(totalHotels / perPage),
+              });
               return;
             }
           }
@@ -1530,14 +1488,12 @@ router.get(
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
             }
-            res
-              .send({
-                hotels,
-                totalHotels,
-                page: page,
-                pages: Math.ceil(totalHotels / perPage),
-              })
-              .status(200);
+            res.status(200).send({
+              hotels,
+              totalHotels,
+              page: page,
+              pages: Math.ceil(totalHotels / perPage),
+            });
             return;
           }
         }
@@ -1605,14 +1561,12 @@ router.get(
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
             }
-            res
-              .send({
-                hotels: hotels,
-                totalHotels,
-                page: page,
-                pages: Math.ceil(totalHotels / perPage),
-              })
-              .status(200);
+            res.status(200).send({
+              hotels: hotels,
+              totalHotels,
+              page: page,
+              pages: Math.ceil(totalHotels / perPage),
+            });
             return;
           }
         }
@@ -1626,14 +1580,12 @@ router.get(
           if (hotels.length === 0) {
             throw new BadRequestError("No Hotels Found");
           }
-          res
-            .send({
-              hotels: hotels,
-              totalHotels,
-              page: page,
-              pages: Math.ceil(totalHotels / perPage),
-            })
-            .status(200);
+          res.status(200).send({
+            hotels: hotels,
+            totalHotels,
+            page: page,
+            pages: Math.ceil(totalHotels / perPage),
+          });
           return;
         }
       }

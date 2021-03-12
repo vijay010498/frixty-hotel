@@ -15,7 +15,8 @@ router.get(
     if (!hotel) {
       throw new BadRequestError("No Hotel Found");
     }
-    res.send(hotel).status(200);
+    res.status(200).send(hotel);
+    return;
   }
 );
 

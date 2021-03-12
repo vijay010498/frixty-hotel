@@ -1,44 +1,41 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import { validateRequest } from "../../../errors";
-import { User } from "../../../models/User";
+import { SuperAdmin } from "../../../models/SuperAdmin";
 import { OTP } from "../../../models/OTP";
-import { BadRequestError } from "../../../errors";
 import MailService from "@sendgrid/mail";
+import { BadRequestError, validateRequest } from "../../../errors";
 const keys = require("../../../config/keys");
-const router = express.Router();
-MailService.setApiKey(keys.sendgridAPI);
-
+const router = express.Router({
+  caseSensitive: true,
+});
 router.post(
-  "/api/v1/users/requestotp",
+  "/api/secure/sAdmin/requestOTP",
   [body("email").isEmail().withMessage("Email Must Be Valid")],
   validateRequest,
   async (req: Request, res: Response) => {
     const { email } = req.body;
-
-    //first check if user presents fo prevent attacks
-    const doesUserExists = await User.findOne({ email: email });
-    if (!doesUserExists) {
-      throw new BadRequestError("No User Exists");
+    //first check is super admin exists to prevent flooding attacks
+    const doesSuperAdminExists = await SuperAdmin.findOne({ email: email });
+    if (!doesSuperAdminExists) {
+      throw new BadRequestError("Super Admin Does Not Exist");
     }
 
-    //First check if already requested for OTP in last 5 minutes
+    //check if already requested for OTP in last 5 minutes
     const alreadyRequested = await OTP.findOne({ email: email });
     if (alreadyRequested) {
       const { createdAt } = alreadyRequested;
-      const lastSentTimeStamp = createdAt.getTime();
+      const lastOTPSentTimeStamp = createdAt.getTime();
       throw new BadRequestError(
         "OTP Sent Already, Please wait 5 minutes from last sent OTP request"
       );
     }
-
     const sixDigitOTP = Math.floor(100000 + Math.random() * 900000);
 
-    //send Mail first
+    //send Mail First
     const OTPEmail = {
       to: {
         email: email,
-        name: doesUserExists.fullName,
+        name: doesSuperAdminExists.fullName,
       },
       from: {
         email: "frixty-security@mails.oncampus.in",
@@ -57,7 +54,7 @@ router.post(
       },
       template_id: keys.forgotPasswordOTPTemplate,
       dynamic_template_data: {
-        name: doesUserExists.fullName,
+        name: doesSuperAdminExists.fullName,
         OTP: sixDigitOTP,
       },
     };
@@ -66,10 +63,10 @@ router.post(
       // @ts-ignore
       await MailService.send(OTPEmail);
 
-      //IF OTP SENT Successfully in EMAIL
+      //IF OTP send successfully in EMAIL
       const userOTP = await OTP.build({
         OTP: sixDigitOTP,
-        email: email,
+        email: doesSuperAdminExists.email,
       });
       await userOTP.save();
       res.status(201).send({
@@ -84,4 +81,4 @@ router.post(
   }
 );
 
-export { router as requestOTPRouter };
+export { router as superAdminRequestOTPRouter };

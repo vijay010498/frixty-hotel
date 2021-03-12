@@ -68,9 +68,11 @@ router.post(
       await hotel.save();
 
       res.status(201).send(hotel);
+      return;
     } catch (err) {
       console.error(err);
-      res.send(err).status(401);
+      res.status(401).send(err);
+      return;
     }
   }
 );

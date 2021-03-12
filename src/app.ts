@@ -17,6 +17,9 @@ import { verifyAuthRouter } from "./routes/auth/users/verifyAuth";
 import { superAdminSignupRouter } from "./routes/auth/superAdmins/signup";
 import { superAdminSignInRouter } from "./routes/auth/superAdmins/signin";
 import { superAdminSignOutRouter } from "./routes/auth/superAdmins/signout";
+import { superAdminChangePasswordRouter } from "./routes/auth/superAdmins/changePassword";
+import { superAdminRequestOTPRouter } from "./routes/auth/superAdmins/requestOTP";
+import { superAdminVerifyOTPAndChangePasswordRouter } from "./routes/auth/superAdmins/verifyOTPAndChangePassword";
 import cookieSession from "cookie-session";
 
 const RateLimit = require("express-rate-limit");
@@ -53,6 +56,11 @@ app.use(verifyAuthRouter);
 app.use(superAdminSignupRouter);
 app.use(superAdminSignInRouter);
 app.use(superAdminSignOutRouter);
+app.use(superAdminChangePasswordRouter);
+app.use(superAdminRequestOTPRouter);
+app.use(superAdminRequestOTPRouter);
+app.use(superAdminVerifyOTPAndChangePasswordRouter);
+
 app.use(errorhandler);
 
 app.all("*", async (req, res) => {

@@ -1,16 +1,17 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import { validateRequest } from "../../../errors";
 import { OTP } from "../../../models/OTP";
-import { User } from "../../../models/User";
-import { BadRequestError } from "../../../errors";
+import { SuperAdmin } from "../../../models/SuperAdmin";
 import { OTPService } from "../../../services/auth/OTPService";
-
-import jwt from "jsonwebtoken";
 const keys = require("../../../config/keys");
-const router = express.Router();
+import jwt from "jsonwebtoken";
+import { BadRequestError, validateRequest } from "../../../errors";
+const router = express.Router({
+  caseSensitive: true,
+});
+
 router.patch(
-  "/api/v1/users/verifyOTPAndChangePassword",
+  "/api/secure/sAdmin/verifyOTPAndChangePassword",
   [
     body("email").isEmail().withMessage("Email Must be Valid"),
     body("userOTP")
@@ -22,18 +23,22 @@ router.patch(
         max: 6,
       })
       .withMessage("OTP Must Be Valid"),
-    body("password").isString().withMessage("Please Provide The New Password"),
+    body("password")
+      .trim()
+      .notEmpty()
+      .withMessage("Please Provide The New Password"),
   ],
   validateRequest,
   async (req: Request, res: Response) => {
     const { email, userOTP, password } = req.body;
-    //First check if user exists
-    const doesUserExists = await User.findOne({ email: email });
-    if (!doesUserExists) {
-      throw new BadRequestError("No User Exists");
+
+    //first check is super admin exists to prevent flooding attacks
+    const doesSuperAdminExists = await SuperAdmin.findOne({ email: email });
+    if (!doesSuperAdminExists) {
+      throw new BadRequestError("Super Admin Does Not Exist");
     }
 
-    //Check if OTP is requested
+    //check if OTP is requested
     const doesOTPRequested = await OTP.findOne({ email: email });
     if (!doesOTPRequested) {
       //OPT NOT Requested of expired
@@ -42,8 +47,7 @@ router.patch(
       );
     }
 
-    //All Ok NoW Check if the Entered OTP is Correct
-
+    //Now Check if entered OTP is correct
     // @ts-ignore
     const OTPMatch = await OTPService.compare(doesOTPRequested.OTP, userOTP);
     if (!OTPMatch) {
@@ -54,8 +58,9 @@ router.patch(
     //first make the verified OTP expired
     try {
       await OTP.deleteOne({ email: email });
+
       //change Password
-      await User.findOneAndUpdate(
+      await SuperAdmin.findOneAndUpdate(
         { email: email },
         {
           $set: {
@@ -63,25 +68,25 @@ router.patch(
           },
         }
       );
+
+      //generate session and store
       try {
-        //generate new JWT Token and send with the response
-        const jwtAuthToken = await jwt.sign(
+        const JWT = await jwt.sign(
           {
-            userId: doesUserExists.id,
-            email: doesUserExists.email,
+            userId: doesSuperAdminExists.id,
+            email: doesSuperAdminExists.email,
           },
-          keys.jwtKey,
+          keys.jwtSuperAdminKey,
           {
-            expiresIn: keys.JWTEXPIRETIME,
+            expiresIn: keys.JWTEXPIRETIMESUPERADMIN,
             algorithm: "HS512",
           }
         );
-        res.status(200).send({
-          message: "Password Updated Successfully",
-          auth: {
-            jwtAuthToken,
-          },
-        });
+
+        req.session = {
+          JWT,
+        };
+        res.status(201).send(doesSuperAdminExists);
         return;
       } catch (err) {
         console.error(err);
@@ -96,4 +101,4 @@ router.patch(
   }
 );
 
-export { router as verifyOTPRouter };
+export { router as superAdminVerifyOTPAndChangePasswordRouter };

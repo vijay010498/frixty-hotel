@@ -6,7 +6,9 @@ const router = express.Router({
 router.post("/api/secure/sAdmin/signOut", (req, res) => {
   req.session = null;
 
-  res.send({});
+  res.status(200).send({
+    message: "Successfully Signed Out",
+  });
 });
 
 export { router as superAdminSignOutRouter };

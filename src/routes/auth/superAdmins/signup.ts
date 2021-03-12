@@ -11,6 +11,7 @@ const router = express.Router({
 
 router.post(
   "/api/secure/sAdmin/signup",
+  requireSuperAdmin,
   [
     body("email").isEmail().withMessage("Email Must Be Valid"),
     body("password")
@@ -58,6 +59,7 @@ router.post(
       };
 
       res.status(201).send(superAdmin);
+      return;
     } catch (err) {
       console.error(err);
       res.status(400).send(err);

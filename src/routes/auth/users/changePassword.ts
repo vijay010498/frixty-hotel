@@ -82,12 +82,12 @@ router.patch(
         return;
       } catch (err) {
         console.error(err);
-        res.send(err).status(401);
+        res.status(401).send(err);
         return;
       }
     } catch (err) {
       console.error(err);
-      res.status(400).send(err);
+      res.status(401).send(err);
       return;
     }
   }

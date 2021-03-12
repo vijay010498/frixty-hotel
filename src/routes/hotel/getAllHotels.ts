@@ -26,13 +26,12 @@ router.get("/api/v1/hotels", async (req: Request, res: Response) => {
   if (hotels.length === 0) {
     throw new BadRequestError("No Hotels Found");
   }
-  res
-    .send({
-      hotels: hotels,
-      page: page,
-      pages: Math.ceil(totalHotels / perPage),
-    })
-    .status(200);
+  res.status(200).send({
+    hotels: hotels,
+    totalHotels,
+    page: page,
+    pages: Math.ceil(totalHotels / perPage),
+  });
   return;
 });
 

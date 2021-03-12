@@ -15,7 +15,6 @@ export const requireSuperAdmin = async (
   } else {
     let email, userId;
     try {
-      console.log(req.session.JWT);
       const payload = await jwt.verify(req.session.JWT, keys.jwtSuperAdminKey);
       // @ts-ignore
       email = payload.email.toString();
