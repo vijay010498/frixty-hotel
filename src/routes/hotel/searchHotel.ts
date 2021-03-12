@@ -13,6 +13,8 @@ router.get(
   async (req: Request, res: Response) => {
     // @ts-ignore
     let page = parseInt(req.query.page) || 0;
+    // @ts-ignore
+    const totalGuests = parseInt(req.query.totalGuests) || 2;
     let isSortBy = false;
     let isFilterBy = false;
     let isGeoQuery = false;
@@ -123,6 +125,35 @@ router.get(
                   "address.state": state.toString().toUpperCase(),
                 },
               },
+              {
+                $unwind: {
+                  path: "$rooms",
+                },
+              },
+              {
+                $match: {
+                  "rooms.sleeps": { $gte: totalGuests },
+                },
+              },
+              {
+                $group: {
+                  _id: "$_id",
+                  root: { $mergeObjects: "$$ROOT" },
+                  rooms: { $push: "$rooms" },
+                },
+              },
+              {
+                $replaceRoot: {
+                  newRoot: {
+                    $mergeObjects: ["$root", "$$ROOT"],
+                  },
+                },
+              },
+              {
+                $project: {
+                  root: 0,
+                },
+              },
             ]);
             const totalHotels = hotelsDB.length;
 
@@ -161,6 +192,11 @@ router.get(
                   {
                     $unwind: {
                       path: "$rooms",
+                    },
+                  },
+                  {
+                    $match: {
+                      "rooms.sleeps": { $gte: totalGuests },
                     },
                   },
                   {
@@ -227,7 +263,35 @@ router.get(
                     "address.state": state.toString().toUpperCase(),
                   },
                 },
-
+                {
+                  $unwind: {
+                    path: "$rooms",
+                  },
+                },
+                {
+                  $match: {
+                    "rooms.sleeps": { $gte: totalGuests },
+                  },
+                },
+                {
+                  $group: {
+                    _id: "$_id",
+                    root: { $mergeObjects: "$$ROOT" },
+                    rooms: { $push: "$rooms" },
+                  },
+                },
+                {
+                  $replaceRoot: {
+                    newRoot: {
+                      $mergeObjects: ["$root", "$$ROOT"],
+                    },
+                  },
+                },
+                {
+                  $project: {
+                    root: 0,
+                  },
+                },
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
@@ -262,6 +326,35 @@ router.get(
               {
                 $match: {
                   "address.city": city.toString().toUpperCase(),
+                },
+              },
+              {
+                $unwind: {
+                  path: "$rooms",
+                },
+              },
+              {
+                $match: {
+                  "rooms.sleeps": { $gte: totalGuests },
+                },
+              },
+              {
+                $group: {
+                  _id: "$_id",
+                  root: { $mergeObjects: "$$ROOT" },
+                  rooms: { $push: "$rooms" },
+                },
+              },
+              {
+                $replaceRoot: {
+                  newRoot: {
+                    $mergeObjects: ["$root", "$$ROOT"],
+                  },
+                },
+              },
+              {
+                $project: {
+                  root: 0,
                 },
               },
             ]);
@@ -300,6 +393,11 @@ router.get(
                   {
                     $unwind: {
                       path: "$rooms",
+                    },
+                  },
+                  {
+                    $match: {
+                      "rooms.sleeps": { $gte: totalGuests },
                     },
                   },
                   {
@@ -363,6 +461,35 @@ router.get(
                 {
                   $match: {
                     "address.city": city.toString().toUpperCase(),
+                  },
+                },
+                {
+                  $unwind: {
+                    path: "$rooms",
+                  },
+                },
+                {
+                  $match: {
+                    "rooms.sleeps": { $gte: totalGuests },
+                  },
+                },
+                {
+                  $group: {
+                    _id: "$_id",
+                    root: { $mergeObjects: "$$ROOT" },
+                    rooms: { $push: "$rooms" },
+                  },
+                },
+                {
+                  $replaceRoot: {
+                    newRoot: {
+                      $mergeObjects: ["$root", "$$ROOT"],
+                    },
+                  },
+                },
+                {
+                  $project: {
+                    root: 0,
                   },
                 },
                 { $skip: perPage * page },
@@ -402,6 +529,35 @@ router.get(
                   "address.state": state.toString().toUpperCase(),
                 },
               },
+              {
+                $unwind: {
+                  path: "$rooms",
+                },
+              },
+              {
+                $match: {
+                  "rooms.sleeps": { $gte: totalGuests },
+                },
+              },
+              {
+                $group: {
+                  _id: "$_id",
+                  root: { $mergeObjects: "$$ROOT" },
+                  rooms: { $push: "$rooms" },
+                },
+              },
+              {
+                $replaceRoot: {
+                  newRoot: {
+                    $mergeObjects: ["$root", "$$ROOT"],
+                  },
+                },
+              },
+              {
+                $project: {
+                  root: 0,
+                },
+              },
             ]);
             const totalHotels = hotelsDB.length;
 
@@ -438,6 +594,11 @@ router.get(
                   {
                     $unwind: {
                       path: "$rooms",
+                    },
+                  },
+                  {
+                    $match: {
+                      "rooms.sleeps": { $gte: totalGuests },
                     },
                   },
                   {
@@ -501,6 +662,35 @@ router.get(
                 {
                   $match: {
                     "address.state": state.toString().toUpperCase(),
+                  },
+                },
+                {
+                  $unwind: {
+                    path: "$rooms",
+                  },
+                },
+                {
+                  $match: {
+                    "rooms.sleeps": { $gte: totalGuests },
+                  },
+                },
+                {
+                  $group: {
+                    _id: "$_id",
+                    root: { $mergeObjects: "$$ROOT" },
+                    rooms: { $push: "$rooms" },
+                  },
+                },
+                {
+                  $replaceRoot: {
+                    newRoot: {
+                      $mergeObjects: ["$root", "$$ROOT"],
+                    },
+                  },
+                },
+                {
+                  $project: {
+                    root: 0,
                   },
                 },
                 { $skip: perPage * page },
@@ -545,6 +735,35 @@ router.get(
                   "address.state": state.toString().toUpperCase(),
                 },
               },
+              {
+                $unwind: {
+                  path: "$rooms",
+                },
+              },
+              {
+                $match: {
+                  "rooms.sleeps": { $gte: totalGuests },
+                },
+              },
+              {
+                $group: {
+                  _id: "$_id",
+                  root: { $mergeObjects: "$$ROOT" },
+                  rooms: { $push: "$rooms" },
+                },
+              },
+              {
+                $replaceRoot: {
+                  newRoot: {
+                    $mergeObjects: ["$root", "$$ROOT"],
+                  },
+                },
+              },
+              {
+                $project: {
+                  root: 0,
+                },
+              },
             ]);
             const totalHotels = hotelDB.length;
             if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
@@ -581,6 +800,11 @@ router.get(
                   {
                     $unwind: {
                       path: "$rooms",
+                    },
+                  },
+                  {
+                    $match: {
+                      "rooms.sleeps": { $gte: totalGuests },
                     },
                   },
                   {
@@ -647,6 +871,35 @@ router.get(
                     "address.state": state.toString().toUpperCase(),
                   },
                 },
+                {
+                  $unwind: {
+                    path: "$rooms",
+                  },
+                },
+                {
+                  $match: {
+                    "rooms.sleeps": { $gte: totalGuests },
+                  },
+                },
+                {
+                  $group: {
+                    _id: "$_id",
+                    root: { $mergeObjects: "$$ROOT" },
+                    rooms: { $push: "$rooms" },
+                  },
+                },
+                {
+                  $replaceRoot: {
+                    newRoot: {
+                      $mergeObjects: ["$root", "$$ROOT"],
+                    },
+                  },
+                },
+                {
+                  $project: {
+                    root: 0,
+                  },
+                },
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
@@ -682,6 +935,35 @@ router.get(
               {
                 $match: {
                   "address.city": city.toString().toUpperCase(),
+                },
+              },
+              {
+                $unwind: {
+                  path: "$rooms",
+                },
+              },
+              {
+                $match: {
+                  "rooms.sleeps": { $gte: totalGuests },
+                },
+              },
+              {
+                $group: {
+                  _id: "$_id",
+                  root: { $mergeObjects: "$$ROOT" },
+                  rooms: { $push: "$rooms" },
+                },
+              },
+              {
+                $replaceRoot: {
+                  newRoot: {
+                    $mergeObjects: ["$root", "$$ROOT"],
+                  },
+                },
+              },
+              {
+                $project: {
+                  root: 0,
                 },
               },
             ]);
@@ -723,6 +1005,11 @@ router.get(
                     },
                   },
                   {
+                    $match: {
+                      "rooms.sleeps": { $gte: totalGuests },
+                    },
+                  },
+                  {
                     $sort: {
                       "rooms.priceForOneNight": sortByPriceRule,
                     },
@@ -785,6 +1072,35 @@ router.get(
                     "address.city": city.toString().toUpperCase(),
                   },
                 },
+                {
+                  $unwind: {
+                    path: "$rooms",
+                  },
+                },
+                {
+                  $match: {
+                    "rooms.sleeps": { $gte: totalGuests },
+                  },
+                },
+                {
+                  $group: {
+                    _id: "$_id",
+                    root: { $mergeObjects: "$$ROOT" },
+                    rooms: { $push: "$rooms" },
+                  },
+                },
+                {
+                  $replaceRoot: {
+                    newRoot: {
+                      $mergeObjects: ["$root", "$$ROOT"],
+                    },
+                  },
+                },
+                {
+                  $project: {
+                    root: 0,
+                  },
+                },
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
@@ -820,6 +1136,35 @@ router.get(
               {
                 $match: {
                   "address.state": state.toString().toUpperCase(),
+                },
+              },
+              {
+                $unwind: {
+                  path: "$rooms",
+                },
+              },
+              {
+                $match: {
+                  "rooms.sleeps": { $gte: totalGuests },
+                },
+              },
+              {
+                $group: {
+                  _id: "$_id",
+                  root: { $mergeObjects: "$$ROOT" },
+                  rooms: { $push: "$rooms" },
+                },
+              },
+              {
+                $replaceRoot: {
+                  newRoot: {
+                    $mergeObjects: ["$root", "$$ROOT"],
+                  },
+                },
+              },
+              {
+                $project: {
+                  root: 0,
                 },
               },
             ]);
@@ -861,6 +1206,11 @@ router.get(
                     },
                   },
                   {
+                    $match: {
+                      "rooms.sleeps": { $gte: totalGuests },
+                    },
+                  },
+                  {
                     $sort: {
                       "rooms.priceForOneNight": sortByPriceRule,
                     },
@@ -923,6 +1273,35 @@ router.get(
                     "address.state": state.toString().toUpperCase(),
                   },
                 },
+                {
+                  $unwind: {
+                    path: "$rooms",
+                  },
+                },
+                {
+                  $match: {
+                    "rooms.sleeps": { $gte: totalGuests },
+                  },
+                },
+                {
+                  $group: {
+                    _id: "$_id",
+                    root: { $mergeObjects: "$$ROOT" },
+                    rooms: { $push: "$rooms" },
+                  },
+                },
+                {
+                  $replaceRoot: {
+                    newRoot: {
+                      $mergeObjects: ["$root", "$$ROOT"],
+                    },
+                  },
+                },
+                {
+                  $project: {
+                    root: 0,
+                  },
+                },
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
@@ -955,6 +1334,35 @@ router.get(
                 "address.state": state.toString().toUpperCase(),
               },
             },
+            {
+              $unwind: {
+                path: "$rooms",
+              },
+            },
+            {
+              $match: {
+                "rooms.sleeps": { $gte: totalGuests },
+              },
+            },
+            {
+              $group: {
+                _id: "$_id",
+                root: { $mergeObjects: "$$ROOT" },
+                rooms: { $push: "$rooms" },
+              },
+            },
+            {
+              $replaceRoot: {
+                newRoot: {
+                  $mergeObjects: ["$root", "$$ROOT"],
+                },
+              },
+            },
+            {
+              $project: {
+                root: 0,
+              },
+            },
           ]);
           const totalHotels = hotelsDB.length;
 
@@ -983,6 +1391,11 @@ router.get(
                 {
                   $unwind: {
                     path: "$rooms",
+                  },
+                },
+                {
+                  $match: {
+                    "rooms.sleeps": { $gte: totalGuests },
                   },
                 },
                 {
@@ -1037,6 +1450,35 @@ router.get(
                 $match: {
                   "address.city": city.toString().toUpperCase(),
                   "address.state": state.toString().toUpperCase(),
+                },
+              },
+              {
+                $unwind: {
+                  path: "$rooms",
+                },
+              },
+              {
+                $match: {
+                  "rooms.sleeps": { $gte: totalGuests },
+                },
+              },
+              {
+                $group: {
+                  _id: "$_id",
+                  root: { $mergeObjects: "$$ROOT" },
+                  rooms: { $push: "$rooms" },
+                },
+              },
+              {
+                $replaceRoot: {
+                  newRoot: {
+                    $mergeObjects: ["$root", "$$ROOT"],
+                  },
+                },
+              },
+              {
+                $project: {
+                  root: 0,
                 },
               },
               { $skip: perPage * page },
@@ -1066,6 +1508,35 @@ router.get(
                 "address.city": city.toString().toUpperCase(),
               },
             },
+            {
+              $unwind: {
+                path: "$rooms",
+              },
+            },
+            {
+              $match: {
+                "rooms.sleeps": { $gte: totalGuests },
+              },
+            },
+            {
+              $group: {
+                _id: "$_id",
+                root: { $mergeObjects: "$$ROOT" },
+                rooms: { $push: "$rooms" },
+              },
+            },
+            {
+              $replaceRoot: {
+                newRoot: {
+                  $mergeObjects: ["$root", "$$ROOT"],
+                },
+              },
+            },
+            {
+              $project: {
+                root: 0,
+              },
+            },
           ]);
 
           const totalHotels = hotelsDB.length;
@@ -1094,6 +1565,11 @@ router.get(
                 {
                   $unwind: {
                     path: "$rooms",
+                  },
+                },
+                {
+                  $match: {
+                    "rooms.sleeps": { $gte: totalGuests },
                   },
                 },
                 {
@@ -1149,6 +1625,35 @@ router.get(
                   "address.city": city.toString().toUpperCase(),
                 },
               },
+              {
+                $unwind: {
+                  path: "$rooms",
+                },
+              },
+              {
+                $match: {
+                  "rooms.sleeps": { $gte: totalGuests },
+                },
+              },
+              {
+                $group: {
+                  _id: "$_id",
+                  root: { $mergeObjects: "$$ROOT" },
+                  rooms: { $push: "$rooms" },
+                },
+              },
+              {
+                $replaceRoot: {
+                  newRoot: {
+                    $mergeObjects: ["$root", "$$ROOT"],
+                  },
+                },
+              },
+              {
+                $project: {
+                  root: 0,
+                },
+              },
               { $skip: perPage * page },
               { $limit: perPage },
             ]);
@@ -1174,6 +1679,35 @@ router.get(
             {
               $match: {
                 "address.state": state.toString().toUpperCase(),
+              },
+            },
+            {
+              $unwind: {
+                path: "$rooms",
+              },
+            },
+            {
+              $match: {
+                "rooms.sleeps": { $gte: totalGuests },
+              },
+            },
+            {
+              $group: {
+                _id: "$_id",
+                root: { $mergeObjects: "$$ROOT" },
+                rooms: { $push: "$rooms" },
+              },
+            },
+            {
+              $replaceRoot: {
+                newRoot: {
+                  $mergeObjects: ["$root", "$$ROOT"],
+                },
+              },
+            },
+            {
+              $project: {
+                root: 0,
               },
             },
           ]);
@@ -1202,6 +1736,11 @@ router.get(
                 {
                   $unwind: {
                     path: "$rooms",
+                  },
+                },
+                {
+                  $match: {
+                    "rooms.sleeps": { $gte: totalGuests },
                   },
                 },
                 {
@@ -1251,11 +1790,39 @@ router.get(
               return;
             }
           } else {
-            console.log("Executed");
             const hotels = await Hotel.aggregate([
               {
                 $match: {
                   "address.state": state.toString().toUpperCase(),
+                },
+              },
+              {
+                $unwind: {
+                  path: "$rooms",
+                },
+              },
+              {
+                $match: {
+                  "rooms.sleeps": { $gte: totalGuests },
+                },
+              },
+              {
+                $group: {
+                  _id: "$_id",
+                  root: { $mergeObjects: "$$ROOT" },
+                  rooms: { $push: "$rooms" },
+                },
+              },
+              {
+                $replaceRoot: {
+                  newRoot: {
+                    $mergeObjects: ["$root", "$$ROOT"],
+                  },
+                },
+              },
+              {
+                $project: {
+                  root: 0,
                 },
               },
               { $skip: perPage * page },
@@ -1316,6 +1883,35 @@ router.get(
                 maxDistance: defaultMeterRange,
               },
             },
+            {
+              $unwind: {
+                path: "$rooms",
+              },
+            },
+            {
+              $match: {
+                "rooms.sleeps": { $gte: totalGuests },
+              },
+            },
+            {
+              $group: {
+                _id: "$_id",
+                root: { $mergeObjects: "$$ROOT" },
+                rooms: { $push: "$rooms" },
+              },
+            },
+            {
+              $replaceRoot: {
+                newRoot: {
+                  $mergeObjects: ["$root", "$$ROOT"],
+                },
+              },
+            },
+            {
+              $project: {
+                root: 0,
+              },
+            },
           ]);
           let totalHotels = hotelsDB.length;
           if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
@@ -1348,6 +1944,11 @@ router.get(
                 {
                   $unwind: {
                     path: "$rooms",
+                  },
+                },
+                {
+                  $match: {
+                    "rooms.sleeps": { $gte: totalGuests },
                   },
                 },
                 {
@@ -1411,6 +2012,35 @@ router.get(
                   maxDistance: defaultMeterRange,
                 },
               },
+              {
+                $unwind: {
+                  path: "$rooms",
+                },
+              },
+              {
+                $match: {
+                  "rooms.sleeps": { $gte: totalGuests },
+                },
+              },
+              {
+                $group: {
+                  _id: "$_id",
+                  root: { $mergeObjects: "$$ROOT" },
+                  rooms: { $push: "$rooms" },
+                },
+              },
+              {
+                $replaceRoot: {
+                  newRoot: {
+                    $mergeObjects: ["$root", "$$ROOT"],
+                  },
+                },
+              },
+              {
+                $project: {
+                  root: 0,
+                },
+              },
               { $skip: perPage * page },
               { $limit: perPage },
             ]);
@@ -1443,6 +2073,35 @@ router.get(
                 maxDistance: rangeInMeter,
               },
             },
+            {
+              $unwind: {
+                path: "$rooms",
+              },
+            },
+            {
+              $match: {
+                "rooms.sleeps": { $gte: totalGuests },
+              },
+            },
+            {
+              $group: {
+                _id: "$_id",
+                root: { $mergeObjects: "$$ROOT" },
+                rooms: { $push: "$rooms" },
+              },
+            },
+            {
+              $replaceRoot: {
+                newRoot: {
+                  $mergeObjects: ["$root", "$$ROOT"],
+                },
+              },
+            },
+            {
+              $project: {
+                root: 0,
+              },
+            },
           ]);
           let totalHotels = hotelsDB.length;
           if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
@@ -1473,6 +2132,11 @@ router.get(
                 {
                   $unwind: {
                     path: "$rooms",
+                  },
+                },
+                {
+                  $match: {
+                    "rooms.sleeps": { $gte: totalGuests },
                   },
                 },
                 {
@@ -1536,6 +2200,35 @@ router.get(
                   maxDistance: rangeInMeter,
                 },
               },
+              {
+                $unwind: {
+                  path: "$rooms",
+                },
+              },
+              {
+                $match: {
+                  "rooms.sleeps": { $gte: totalGuests },
+                },
+              },
+              {
+                $group: {
+                  _id: "$_id",
+                  root: { $mergeObjects: "$$ROOT" },
+                  rooms: { $push: "$rooms" },
+                },
+              },
+              {
+                $replaceRoot: {
+                  newRoot: {
+                    $mergeObjects: ["$root", "$$ROOT"],
+                  },
+                },
+              },
+              {
+                $project: {
+                  root: 0,
+                },
+              },
               { $skip: perPage * page },
               { $limit: perPage },
             ]);
@@ -1558,7 +2251,38 @@ router.get(
 
       //No Filter No Geo Query //completed testing
       else {
-        const totalHotels = await Hotel.find().countDocuments();
+        const hotelsDB = await Hotel.aggregate([
+          {
+            $unwind: {
+              path: "$rooms",
+            },
+          },
+          {
+            $match: {
+              "rooms.sleeps": { $gte: totalGuests },
+            },
+          },
+          {
+            $group: {
+              _id: "$_id",
+              root: { $mergeObjects: "$$ROOT" },
+              rooms: { $push: "$rooms" },
+            },
+          },
+          {
+            $replaceRoot: {
+              newRoot: {
+                $mergeObjects: ["$root", "$$ROOT"],
+              },
+            },
+          },
+          {
+            $project: {
+              root: 0,
+            },
+          },
+        ]);
+        let totalHotels = hotelsDB.length;
         if (page >= Math.ceil(totalHotels / perPage)) {
           page = 0;
         }
@@ -1580,6 +2304,11 @@ router.get(
               {
                 $unwind: {
                   path: "$rooms",
+                },
+              },
+              {
+                $match: {
+                  "rooms.sleeps": { $gte: totalGuests },
                 },
               },
               {
@@ -1632,10 +2361,40 @@ router.get(
 
         //No sorting
         else {
-          const hotels = await Hotel.find()
-            // @ts-ignore
-            .skip(perPage * page)
-            .limit(perPage);
+          const hotels = await Hotel.aggregate([
+            {
+              $unwind: {
+                path: "$rooms",
+              },
+            },
+            {
+              $match: {
+                "rooms.sleeps": { $gte: totalGuests },
+              },
+            },
+            {
+              $group: {
+                _id: "$_id",
+                root: { $mergeObjects: "$$ROOT" },
+                rooms: { $push: "$rooms" },
+              },
+            },
+            {
+              $replaceRoot: {
+                newRoot: {
+                  $mergeObjects: ["$root", "$$ROOT"],
+                },
+              },
+            },
+            {
+              $project: {
+                root: 0,
+              },
+            },
+            { $skip: perPage * page },
+            { $limit: perPage },
+          ]);
+          await transformObject(hotels);
           if (hotels.length === 0) {
             throw new BadRequestError("No Hotels Found");
           }
@@ -1655,6 +2414,7 @@ router.get(
 const transformObject = (hotels: Array<any>) => {
   for (let i = 0; i < hotels.length; i++) {
     if (hotels[i].rooms) {
+      hotels[i].totalRoomsAvailable = hotels[i].rooms.length;
       for (let j = 0; j < hotels[i].rooms.length; j++) {
         hotels[i].rooms[j].id = hotels[i].rooms[j]._id;
         delete hotels[i].rooms[j]._id;
