@@ -27,9 +27,9 @@ interface HotelAttrs {
   internet: [typeof booleanAndTitleObject];
   parking: [typeof booleanAndTitleObject];
   outdoorSwimmingPool: [typeof booleanAndTitleObject];
-  languagesSpoken: [String];
-  description: String;
-  images: [String];
+  languagesSpoken: [string];
+  description: string;
+  images: [string];
 }
 
 //An interface that describes the properties that a hotel model has
@@ -57,9 +57,9 @@ interface HotelDoc extends mongoose.Document {
   internet: [typeof booleanAndTitleObject];
   parking: [typeof booleanAndTitleObject];
   outdoorSwimmingPool: [typeof booleanAndTitleObject];
-  languagesSpoken: [String];
-  description: String;
-  images: [String];
+  languagesSpoken: [string];
+  description: string;
+  images: [string];
 }
 
 const hotelSchema = new mongoose.Schema(
@@ -138,6 +138,6 @@ hotelSchema.statics.build = (attrs: HotelAttrs) => {
   return new Hotel(attrs);
 };
 
-const Hotel = mongoose.model<HotelDoc, HotelModel>("hotels", hotelSchema);
+const Hotel = mongoose.model<HotelDoc, HotelModel>("Hotel", hotelSchema);
 
 export { Hotel };

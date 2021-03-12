@@ -4,7 +4,6 @@ import { json } from "express";
 //all routes imports
 import { signupRouter } from "./routes/auth/users/signup";
 import { signInRouter } from "./routes/auth/users/signin";
-import { createHotelRouter } from "./routes/hotel/sAdmin/createHotel";
 import { getHotelByID } from "./routes/hotel/getHotelByID";
 import { getAllHotelsRouter } from "./routes/hotel/getAllHotels";
 import { searchHotelByStateRouter } from "./routes/hotel/searchHotel";
@@ -20,6 +19,9 @@ import { superAdminSignOutRouter } from "./routes/auth/superAdmins/signout";
 import { superAdminChangePasswordRouter } from "./routes/auth/superAdmins/changePassword";
 import { superAdminRequestOTPRouter } from "./routes/auth/superAdmins/requestOTP";
 import { superAdminVerifyOTPAndChangePasswordRouter } from "./routes/auth/superAdmins/verifyOTPAndChangePassword";
+
+import { superAdminCreateBookingRouter } from "./routes/hotel/sAdmin/createBookingSAdmin";
+import { superAdminCreateHotelRouter } from "./routes/hotel/sAdmin/createHotel";
 import cookieSession from "cookie-session";
 
 const RateLimit = require("express-rate-limit");
@@ -43,7 +45,6 @@ app.use(limiter);
 app.set("trust proxy", true);
 app.use(signupRouter);
 app.use(signInRouter);
-app.use(createHotelRouter);
 app.use(getHotelByID);
 app.use(getAllHotelsRouter);
 app.use(searchHotelByStateRouter);
@@ -54,12 +55,15 @@ app.use(verifyAuthRouter);
 
 //super admin
 app.use(superAdminSignupRouter);
+app.use(superAdminCreateHotelRouter);
 app.use(superAdminSignInRouter);
 app.use(superAdminSignOutRouter);
 app.use(superAdminChangePasswordRouter);
 app.use(superAdminRequestOTPRouter);
 app.use(superAdminRequestOTPRouter);
 app.use(superAdminVerifyOTPAndChangePasswordRouter);
+
+app.use(superAdminCreateBookingRouter);
 
 app.use(errorhandler);
 

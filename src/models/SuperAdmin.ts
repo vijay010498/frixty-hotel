@@ -86,7 +86,7 @@ SuperAdminSchema.statics.build = (attrs: SuperAdminAttrs) => {
 };
 
 const SuperAdmin = mongoose.model<SuperAdminDoc, SuperAdminModel>(
-  "superAdmins",
+  "Superadmin",
   SuperAdminSchema
 );
 

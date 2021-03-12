@@ -4,11 +4,15 @@ import * as _ from "lodash";
 import { validateRequest } from "../../../errors";
 import { Hotel } from "../../../models/Hotel";
 import { BadRequestError } from "../../../errors";
+import { requireSuperAdmin } from "../../../errors/middleware/SAdmin/require-super-admin";
 
-const router = express.Router();
+const router = express.Router({
+  caseSensitive: true,
+});
 
 router.post(
-  "/api/v1/sadmin/createhotel",
+  "/api/v1/sAdmin/createHotel",
+  requireSuperAdmin,
   [],
   validateRequest,
   async (req: Request, res: Response) => {
@@ -77,4 +81,4 @@ router.post(
   }
 );
 
-export { router as createHotelRouter };
+export { router as superAdminCreateHotelRouter };
