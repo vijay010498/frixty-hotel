@@ -1,5 +1,4 @@
 import express, { Request, Response } from "express";
-import { body, param, query } from "express-validator";
 import { BadRequestError, validateRequest } from "../../errors";
 import { Hotel } from "../../models/Hotel";
 
@@ -196,6 +195,9 @@ router.get(
                   { $skip: perPage * page },
                   { $limit: perPage },
                 ]);
+
+                await transformObject(hotels);
+
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
@@ -229,6 +231,7 @@ router.get(
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
+              await transformObject(hotels);
 
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
@@ -331,6 +334,9 @@ router.get(
                   { $skip: perPage * page },
                   { $limit: perPage },
                 ]);
+
+                await transformObject(hotels);
+
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
@@ -362,6 +368,9 @@ router.get(
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
+
+              await transformObject(hotels);
+
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
@@ -463,6 +472,9 @@ router.get(
                   { $skip: perPage * page },
                   { $limit: perPage },
                 ]);
+
+                await transformObject(hotels);
+
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
@@ -494,6 +506,9 @@ router.get(
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
+
+              await transformObject(hotels);
+
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
@@ -600,6 +615,9 @@ router.get(
                   { $skip: perPage * page },
                   { $limit: perPage },
                 ]);
+
+                await transformObject(hotels);
+
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
@@ -632,6 +650,8 @@ router.get(
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
+
+              await transformObject(hotels);
 
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
@@ -734,6 +754,9 @@ router.get(
                   { $skip: perPage * page },
                   { $limit: perPage },
                 ]);
+
+                await transformObject(hotels);
+
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
@@ -765,6 +788,8 @@ router.get(
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
+
+              await transformObject(hotels);
 
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
@@ -867,6 +892,9 @@ router.get(
                   { $skip: perPage * page },
                   { $limit: perPage },
                 ]);
+
+                await transformObject(hotels);
+
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
@@ -898,6 +926,8 @@ router.get(
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
+
+              await transformObject(hotels);
 
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
@@ -987,6 +1017,9 @@ router.get(
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
+
+              await transformObject(hotels);
+
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
@@ -1009,6 +1042,8 @@ router.get(
               { $skip: perPage * page },
               { $limit: perPage },
             ]);
+
+            await transformObject(hotels);
 
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
@@ -1093,6 +1128,9 @@ router.get(
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
+
+              await transformObject(hotels);
+
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
@@ -1114,6 +1152,8 @@ router.get(
               { $skip: perPage * page },
               { $limit: perPage },
             ]);
+
+            await transformObject(hotels);
 
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
@@ -1196,6 +1236,9 @@ router.get(
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
+
+              await transformObject(hotels);
+
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
@@ -1208,6 +1251,7 @@ router.get(
               return;
             }
           } else {
+            console.log("Executed");
             const hotels = await Hotel.aggregate([
               {
                 $match: {
@@ -1217,6 +1261,8 @@ router.get(
               { $skip: perPage * page },
               { $limit: perPage },
             ]);
+
+            await transformObject(hotels);
 
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
@@ -1336,6 +1382,9 @@ router.get(
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
+
+              await transformObject(hotels);
+
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
@@ -1365,6 +1414,8 @@ router.get(
               { $skip: perPage * page },
               { $limit: perPage },
             ]);
+
+            await transformObject(hotels);
 
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
@@ -1456,6 +1507,9 @@ router.get(
                 { $skip: perPage * page },
                 { $limit: perPage },
               ]);
+
+              await transformObject(hotels);
+
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
@@ -1485,6 +1539,8 @@ router.get(
               { $skip: perPage * page },
               { $limit: perPage },
             ]);
+
+            await transformObject(hotels);
 
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
@@ -1559,6 +1615,8 @@ router.get(
               { $limit: perPage },
             ]);
 
+            await transformObject(hotels);
+
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
             }
@@ -1593,5 +1651,30 @@ router.get(
     }
   }
 );
+
+const transformObject = (hotels: Array<any>) => {
+  for (let i = 0; i < hotels.length; i++) {
+    if (hotels[i].rooms) {
+      for (let j = 0; j < hotels[i].rooms.length; j++) {
+        hotels[i].rooms[j].id = hotels[i].rooms[j]._id;
+        delete hotels[i].rooms[j]._id;
+      }
+    }
+    if (hotels[i].distanceToReach) {
+      hotels[i].distanceToReach = parseFloat(
+        (hotels[i].distanceToReach / 1000).toFixed(2)
+      );
+    }
+    hotels[i].id = hotels[i]._id;
+    delete hotels[i]._id;
+    delete hotels[i].__v;
+    const createdDateIso = hotels[i].createdAt;
+    delete hotels[i].createdAt;
+    hotels[i].createdAt = createdDateIso.getTime();
+    const updatedAtISO = hotels[i].updatedAt;
+    delete hotels[i].updatedAt;
+    hotels[i].updatedAt = updatedAtISO.getTime();
+  }
+};
 
 export { router as searchHotelByStateRouter };
