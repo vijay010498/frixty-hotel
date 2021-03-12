@@ -74,6 +74,7 @@ router.get(
     if (isFilterBy) {
       const city = req.query.city;
       const state = req.query.state;
+
       if (city === undefined && state === undefined) {
         throw new BadRequestError(
           "City or State Must Be Given If filter is enabled. Otherwise set is_Filter_By = 'false'"
