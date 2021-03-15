@@ -13,13 +13,13 @@ import { changePasswordRouter } from "./routes/auth/users/changePassword";
 import { verifyAuthRouter } from "./routes/auth/users/verifyAuth";
 
 //super admin
-import { superAdminSignupRouter } from "./routes/auth/superAdmins/signup";
-import { superAdminSignInRouter } from "./routes/auth/superAdmins/signin";
-import { superAdminSignOutRouter } from "./routes/auth/superAdmins/signout";
-import { superAdminChangePasswordRouter } from "./routes/auth/superAdmins/changePassword";
-import { superAdminRequestOTPRouter } from "./routes/auth/superAdmins/requestOTP";
-import { superAdminVerifyOTPAndChangePasswordRouter } from "./routes/auth/superAdmins/verifyOTPAndChangePassword";
-
+import { superAdminSignupRouter } from "./routes/auth/sAdmin/signup";
+import { superAdminSignInRouter } from "./routes/auth/sAdmin/signin";
+import { superAdminSignOutRouter } from "./routes/auth/sAdmin/signout";
+import { superAdminChangePasswordRouter } from "./routes/auth/sAdmin/changePassword";
+import { superAdminRequestOTPRouter } from "./routes/auth/sAdmin/requestOTP";
+import { superAdminVerifyOTPAndChangePasswordRouter } from "./routes/auth/sAdmin/verifyOTPAndChangePassword";
+import { superAdminUpdateGatewayChargesRouter } from "./routes/config/sAdmin/UpdateGatewayCharge";
 import { superAdminCreateBookingRouter } from "./routes/hotel/sAdmin/createBookingSAdmin";
 import { superAdminCreateHotelRouter } from "./routes/hotel/sAdmin/createHotel";
 import cookieSession from "cookie-session";
@@ -62,7 +62,7 @@ app.use(superAdminChangePasswordRouter);
 app.use(superAdminRequestOTPRouter);
 app.use(superAdminRequestOTPRouter);
 app.use(superAdminVerifyOTPAndChangePasswordRouter);
-
+app.use(superAdminUpdateGatewayChargesRouter);
 app.use(superAdminCreateBookingRouter);
 
 app.use(errorhandler);

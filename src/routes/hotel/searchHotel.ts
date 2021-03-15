@@ -1,13 +1,15 @@
 import express, { Request, Response } from "express";
 import { BadRequestError, validateRequest } from "../../errors";
 import { Hotel } from "../../models/Hotel";
-import { convert, exchangeRates } from "exchange-rates-api";
+import { exchangeRates } from "exchange-rates-api";
 import { SupportedCurrencies } from "../../models/enums/supportedCurrencies";
+import { GatewayCharge } from "../../models/GatewayCharges";
 
 const router = express.Router();
 const defaultMeterRange = 5 * 1000; //default nearBy distance is 5KM or 5000 meter
 const perPage = 10; //
 const defaultCurrency = "MYR";
+let gatewayChargesForHotelPercentage: number;
 let currencyRates = {};
 let requestedCurrency: string;
 
@@ -16,6 +18,18 @@ router.get(
   [],
   validateRequest,
   async (req: Request, res: Response) => {
+    //get Gateway charges percentage
+    try {
+      const gatewayCharges = await GatewayCharge.find({}).limit(1);
+      gatewayCharges.length === 0
+        ? (gatewayChargesForHotelPercentage = 5)
+        : (gatewayChargesForHotelPercentage = gatewayCharges[0].percentage);
+    } catch (err) {
+      console.error(err);
+      res.status(403).send(err);
+      return;
+    }
+
     //currency query param
     // @ts-ignore
     requestedCurrency = req.query.currency || defaultCurrency;
@@ -44,7 +58,7 @@ router.get(
     // @ts-ignore
     let page = parseInt(req.query.page) || 0;
     // @ts-ignore
-    const totalGuests = parseInt(req.query.totalGuests) || 2;
+    const totalGuests = parseInt(req.query.totalGuests) || 1;
     let isSortBy = false;
     let isFilterBy = false;
     let isGeoQuery = false;
@@ -2449,8 +2463,16 @@ const transformObject = async (hotels: Array<any>) => {
       for (let j = 0; j < hotels[i].rooms.length; j++) {
         hotels[i].rooms[j].id = hotels[i].rooms[j]._id;
         delete hotels[i].rooms[j]._id;
+
+        //add gateway charges to hotel room price
+        hotels[i].rooms[j].priceForOneNight += await Math.ceil(
+          (gatewayChargesForHotelPercentage / 100) *
+            hotels[i].rooms[j].priceForOneNight
+        );
+
+        //price conversion
         // @ts-ignore
-        hotels[i].rooms[j].priceForOneNight = Math.floor(
+        hotels[i].rooms[j].priceForOneNight = await Math.floor(
           hotels[i].rooms[j].priceForOneNight / // @ts-ignore
             currencyRates[hotels[i].homeCurrency].toFixed(2)
         );
