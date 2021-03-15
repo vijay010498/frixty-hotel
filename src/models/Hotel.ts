@@ -6,6 +6,7 @@ import { roomsObject } from "./objectModels/roomsObject";
 import { titleAdditionalPayObject } from "./objectModels/titleAdditionalPayObject";
 import { booleanObject } from "./objectModels/booleanObject";
 import { booleanAndTitleObject } from "./objectModels/booleanAndTitleObject";
+import { SupportedCurrencies } from "./enums/supportedCurrencies";
 
 //Interface that describes the properties that are required to create a new Hotel
 interface HotelAttrs {
@@ -30,6 +31,7 @@ interface HotelAttrs {
   languagesSpoken: [string];
   description: string;
   images: [string];
+  homeCurrency: SupportedCurrencies;
 }
 
 //An interface that describes the properties that a hotel model has
@@ -60,6 +62,7 @@ interface HotelDoc extends mongoose.Document {
   languagesSpoken: [string];
   description: string;
   images: [string];
+  homeCurrency: SupportedCurrencies;
 }
 
 const hotelSchema = new mongoose.Schema(
@@ -87,6 +90,11 @@ const hotelSchema = new mongoose.Schema(
         type: [Number],
         required: true,
       },
+    },
+    homeCurrency: {
+      type: String,
+      required: true,
+      enum: Object.values(SupportedCurrencies),
     },
     outdoors: [titleAdditionalPayObject],
     pets: booleanObject,

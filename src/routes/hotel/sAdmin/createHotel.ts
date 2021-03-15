@@ -38,6 +38,7 @@ router.post(
       languagesSpoken,
       description,
       images,
+      homeCurrency,
     } = req.body;
 
     const existingHotel = await Hotel.findOne({ name: name.toUpperCase() });
@@ -68,6 +69,7 @@ router.post(
         spa: spa,
         description,
         images,
+        homeCurrency,
       });
       await hotel.save();
 
