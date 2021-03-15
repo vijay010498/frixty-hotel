@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import { addressObject } from "./objectModels/addressObject";
 import { roomsObject } from "./objectModels/roomsObject";
 
+import { titleObject } from "./objectModels/titleObject";
+
 //Booking.com features
 import { titleAdditionalPayObject } from "./objectModels/titleAdditionalPayObject";
 import { booleanObject } from "./objectModels/booleanObject";
@@ -14,23 +16,10 @@ interface HotelAttrs {
   address: typeof addressObject;
   rooms: [typeof roomsObject];
   location: {};
-  outdoors: [typeof titleAdditionalPayObject];
-  pets: [typeof booleanObject];
-  general: [typeof titleAdditionalPayObject];
-  activities: [typeof titleAdditionalPayObject];
-  frontDeskServices: [typeof titleAdditionalPayObject];
-  foodAndDrink: [typeof titleAdditionalPayObject];
-  entertainmentAndFamilyServices: [typeof titleAdditionalPayObject];
-  cleaningServices: [typeof titleAdditionalPayObject];
-  businessFacilities: [typeof titleAdditionalPayObject];
-  safetyAndSecurity: [typeof titleAdditionalPayObject];
-  spa: [typeof titleAdditionalPayObject];
-  internet: [typeof booleanAndTitleObject];
-  parking: [typeof booleanAndTitleObject];
-  outdoorSwimmingPool: [typeof booleanAndTitleObject];
   languagesSpoken: [string];
   description: string;
   images: [string];
+  amenities: [typeof titleObject];
   homeCurrency: SupportedCurrencies;
 }
 
@@ -45,23 +34,10 @@ interface HotelDoc extends mongoose.Document {
   address: typeof addressObject;
   rooms: [typeof roomsObject];
   location: {};
-  outdoors: [typeof titleAdditionalPayObject];
-  pets: [typeof booleanObject];
-  general: [typeof titleAdditionalPayObject];
-  activities: [typeof titleAdditionalPayObject];
-  frontDeskServices: [typeof titleAdditionalPayObject];
-  foodAndDrink: [typeof titleAdditionalPayObject];
-  entertainmentAndFamilyServices: [typeof titleAdditionalPayObject];
-  cleaningServices: [typeof titleAdditionalPayObject];
-  businessFacilities: [typeof titleAdditionalPayObject];
-  safetyAndSecurity: [typeof titleAdditionalPayObject];
-  spa: [typeof titleAdditionalPayObject];
-  internet: [typeof booleanAndTitleObject];
-  parking: [typeof booleanAndTitleObject];
-  outdoorSwimmingPool: [typeof booleanAndTitleObject];
   languagesSpoken: [string];
   description: string;
   images: [string];
+  amenities: [typeof titleObject];
   homeCurrency: SupportedCurrencies;
 }
 
@@ -96,20 +72,7 @@ const hotelSchema = new mongoose.Schema(
       required: true,
       enum: Object.values(SupportedCurrencies),
     },
-    outdoors: [titleAdditionalPayObject],
-    pets: booleanObject,
-    general: [titleAdditionalPayObject],
-    activities: [titleAdditionalPayObject],
-    frontDeskServices: [titleAdditionalPayObject],
-    foodAndDrink: [titleAdditionalPayObject],
-    entertainmentAndFamilyServices: [titleAdditionalPayObject],
-    cleaningServices: [titleAdditionalPayObject],
-    businessFacilities: [titleAdditionalPayObject],
-    safetyAndSecurity: [titleAdditionalPayObject],
-    spa: [titleAdditionalPayObject],
-    internet: [booleanAndTitleObject],
-    parking: [booleanAndTitleObject],
-    outdoorSwimmingPool: [booleanAndTitleObject],
+    amenities: [titleObject],
     languagesSpoken: {
       type: [
         {

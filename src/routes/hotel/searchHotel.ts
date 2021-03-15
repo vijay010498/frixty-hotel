@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { BadRequestError, validateRequest } from "../../errors";
 import { Hotel } from "../../models/Hotel";
-import { exchangeRates } from "exchange-rates-api";
+import { convert, exchangeRates } from "exchange-rates-api";
 import { SupportedCurrencies } from "../../models/enums/supportedCurrencies";
 
 const router = express.Router();
@@ -16,22 +16,9 @@ router.get(
   [],
   validateRequest,
   async (req: Request, res: Response) => {
-    //first get currency exchange rates
-    try {
-      //simple cache
-      if (Object.getOwnPropertyNames(currencyRates).length === 0) {
-        console.log("Cache is null calling api again");
-        currencyRates = await exchangeRates().latest().base("MYR").fetch();
-      } else console.log("Exchange rates used from simple In-Memory cache ");
-    } catch (err) {
-      console.error(err);
-      res.status(403).send("Something Went wrong");
-    }
-
     //currency query param
     // @ts-ignore
     requestedCurrency = req.query.currency || defaultCurrency;
-
     //check if given currency is supported by us or not
     // @ts-ignore
     if (requestedCurrency !== defaultCurrency) {
@@ -41,6 +28,17 @@ router.get(
       ) {
         throw new BadRequestError(`${requestedCurrency} is not supported`);
       }
+    }
+
+    //first get currency exchange rates for user requested currency  - > user wants in INR , get one INR  = ? for all currency later divide from home currency of  hotel
+    try {
+      currencyRates = await exchangeRates()
+        .latest()
+        .base(requestedCurrency)
+        .fetch();
+    } catch (err) {
+      console.error(err);
+      res.status(403).send("Something Went wrong");
     }
 
     // @ts-ignore
@@ -2443,7 +2441,7 @@ router.get(
   }
 );
 
-const transformObject = (hotels: Array<any>) => {
+const transformObject = async (hotels: Array<any>) => {
   for (let i = 0; i < hotels.length; i++) {
     hotels[i].currency = requestedCurrency;
     if (hotels[i].rooms) {
@@ -2451,12 +2449,11 @@ const transformObject = (hotels: Array<any>) => {
       for (let j = 0; j < hotels[i].rooms.length; j++) {
         hotels[i].rooms[j].id = hotels[i].rooms[j]._id;
         delete hotels[i].rooms[j]._id;
-        if (requestedCurrency !== hotels[i].homeCurrency) {
-          hotels[i].rooms[j].priceForOneNight = convertCurrency(
-            requestedCurrency,
-            hotels[i].rooms[j].priceForOneNight
-          );
-        }
+        // @ts-ignore
+        hotels[i].rooms[j].priceForOneNight = Math.floor(
+          hotels[i].rooms[j].priceForOneNight / // @ts-ignore
+            currencyRates[hotels[i].homeCurrency].toFixed(2)
+        );
       }
     }
     if (hotels[i].distanceToReach) {
@@ -2473,139 +2470,6 @@ const transformObject = (hotels: Array<any>) => {
     const updatedAtISO = hotels[i].updatedAt;
     delete hotels[i].updatedAt;
     hotels[i].updatedAt = updatedAtISO.getTime();
-  }
-};
-
-const convertCurrency = function (currency: string, amount: number) {
-  switch (currency) {
-    case "AUD":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.AUD.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "GBP":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.GBP.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "BGN":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.BGN.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "CAD":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.CAD.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "CNY":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.CNY.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "HRK":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.HRK.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "CZK":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.CZK.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "DKK":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.DKK.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "EUR":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.EUR.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "HKD":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.HKD.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "HUF":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.HUF.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "ISK":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.ISK.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "IDR":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.IDR.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "INR":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.INR.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "ILS":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.ILS.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "JPY":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.JPY.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "MYR":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.MYR.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "MXN":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.MXN.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "NZD":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.NZD.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "NOK":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.NOK.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "PHP":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.PHP.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "PLN":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.PLN.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "RON":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.RON.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "RUB":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.RUB.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "SGD":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.SGD.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "ZAR":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.ZAR.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "KRW":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.KRW.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "SEK":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.SEK.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "CHF":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.CHF.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "THB":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.THB.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "TRY":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.TRY.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
-    case "USD":
-      // @ts-ignore
-      const oneMYRRate = currencyRates.USD.toFixed(2);
-      return Math.floor(amount * oneMYRRate);
   }
 };
 

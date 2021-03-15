@@ -1,3 +1,5 @@
+import { titleObject } from "./titleObject";
+
 const bedObject = {
   name: {
     type: String,
@@ -53,22 +55,7 @@ const roomsObject = {
     type: String,
     required: true,
   },
-  facilities: {
-    type: [
-      {
-        type: String,
-        uppercase: true,
-      },
-    ],
-  },
-  amenities: {
-    type: [
-      {
-        type: String,
-        uppercase: true,
-      },
-    ],
-  },
+  amenities: [titleObject],
   isRefundable: {
     type: Boolean,
     default: false,
