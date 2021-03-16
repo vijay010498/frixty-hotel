@@ -17,6 +17,7 @@ let requestedCurrency: string;
 
 let checkIn: string;
 let checkOut: string;
+let totalDays: number;
 
 router.get(
   "/api/v1/hotels/search",
@@ -33,6 +34,13 @@ router.get(
     checkIn = req.query.checkIn || today;
     // @ts-ignore
     checkOut = req.query.checkOut || tomorrow;
+
+    const checkInStr = new Date(checkIn);
+    const checkOutStr = new Date(checkOut);
+
+    totalDays =
+      (checkOutStr.getTime() - checkInStr.getTime()) / (1000 * 60 * 60 * 24);
+
     await checkCheckInAndCheckOutDateQuery(checkIn, checkOut);
 
     //get Gateway charges percentage
@@ -278,6 +286,9 @@ router.get(
                 res.status(200).send({
                   hotels: hotels,
                   totalHotels,
+                  checkIn,
+                  checkOut,
+                  totalDays,
                   page: page,
                   pages: Math.ceil(totalHotels / perPage),
                 });
@@ -341,6 +352,9 @@ router.get(
               res.status(200).send({
                 hotels,
                 totalHotels,
+                checkIn,
+                checkOut,
+                totalDays,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -480,6 +494,9 @@ router.get(
                 res.status(200).send({
                   hotels: hotels,
                   totalHotels,
+                  checkIn,
+                  checkOut,
+                  totalDays,
                   page: page,
                   pages: Math.ceil(totalHotels / perPage),
                 });
@@ -545,6 +562,9 @@ router.get(
                 hotels: hotels,
                 totalHotels,
                 page: page,
+                checkIn,
+                checkOut,
+                totalDays,
                 pages: Math.ceil(totalHotels / perPage),
               });
               return;
@@ -683,6 +703,9 @@ router.get(
                 res.status(200).send({
                   hotels: hotels,
                   totalHotels,
+                  checkIn,
+                  checkOut,
+                  totalDays,
                   page: page,
                   pages: Math.ceil(totalHotels / perPage),
                 });
@@ -747,6 +770,9 @@ router.get(
               res.status(200).send({
                 hotels: hotels,
                 totalHotels,
+                checkIn,
+                checkOut,
+                totalDays,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -891,6 +917,9 @@ router.get(
                 res.status(200).send({
                   hotels: hotels,
                   totalHotels,
+                  checkIn,
+                  checkOut,
+                  totalDays,
                   page: page,
                   pages: Math.ceil(totalHotels / perPage),
                 });
@@ -956,6 +985,9 @@ router.get(
               res.status(200).send({
                 hotels,
                 totalHotels,
+                checkIn,
+                checkOut,
+                totalDays,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -1095,6 +1127,9 @@ router.get(
                 res.status(200).send({
                   hotels: hotels,
                   totalHotels,
+                  checkIn,
+                  checkOut,
+                  totalDays,
                   page: page,
                   pages: Math.ceil(totalHotels / perPage),
                 });
@@ -1159,6 +1194,9 @@ router.get(
               res.status(200).send({
                 hotels,
                 totalHotels,
+                checkIn,
+                checkOut,
+                totalDays,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -1298,6 +1336,9 @@ router.get(
                 res.status(200).send({
                   hotels: hotels,
                   totalHotels,
+                  checkIn,
+                  checkOut,
+                  totalDays,
                   page: page,
                   pages: Math.ceil(totalHotels / perPage),
                 });
@@ -1362,6 +1403,9 @@ router.get(
               res.status(200).send({
                 hotels,
                 totalHotels,
+                checkIn,
+                checkOut,
+                totalDays,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -1488,6 +1532,9 @@ router.get(
               res.status(200).send({
                 hotels: hotels,
                 totalHotels,
+                checkIn,
+                checkOut,
+                totalDays,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -1543,6 +1590,9 @@ router.get(
             res.status(200).send({
               hotels: hotels,
               totalHotels,
+              checkIn,
+              checkOut,
+              totalDays,
               page: page,
               pages: Math.ceil(totalHotels / perPage),
             });
@@ -1664,6 +1714,9 @@ router.get(
               res.status(200).send({
                 hotels: hotels,
                 totalHotels,
+                checkIn,
+                checkOut,
+                totalDays,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -1718,6 +1771,9 @@ router.get(
             res.status(200).send({
               hotels: hotels,
               totalHotels,
+              checkIn,
+              checkOut,
+              totalDays,
               page: page,
               pages: Math.ceil(totalHotels / perPage),
             });
@@ -1837,6 +1893,9 @@ router.get(
               res.status(200).send({
                 hotels: hotels,
                 totalHotels,
+                checkIn,
+                checkOut,
+                totalDays,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -1891,6 +1950,9 @@ router.get(
             res.status(200).send({
               hotels: hotels,
               totalHotels,
+              checkIn,
+              checkOut,
+              totalDays,
               page: page,
               pages: Math.ceil(totalHotels / perPage),
             });
@@ -2048,6 +2110,9 @@ router.get(
               res.status(200).send({
                 hotels: hotels,
                 totalHotels,
+                checkIn,
+                checkOut,
+                totalDays,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -2109,6 +2174,9 @@ router.get(
             res.status(200).send({
               hotels,
               totalHotels,
+              checkIn,
+              checkOut,
+              totalDays,
               page: page,
               pages: Math.ceil(totalHotels / perPage),
             });
@@ -2237,6 +2305,9 @@ router.get(
               res.status(200).send({
                 hotels: hotels,
                 totalHotels,
+                checkIn,
+                checkOut,
+                totalDays,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -2299,6 +2370,9 @@ router.get(
             res.status(200).send({
               hotels,
               totalHotels,
+              checkIn,
+              checkOut,
+              totalDays,
               page: page,
               pages: Math.ceil(totalHotels / perPage),
             });
@@ -2411,6 +2485,9 @@ router.get(
             res.status(200).send({
               hotels: hotels,
               totalHotels,
+              checkIn,
+              checkOut,
+              totalDays,
               page: page,
               pages: Math.ceil(totalHotels / perPage),
             });
@@ -2462,6 +2539,9 @@ router.get(
           res.status(200).send({
             hotels: hotels,
             totalHotels,
+            checkIn,
+            checkOut,
+            totalDays,
             page: page,
             pages: Math.ceil(totalHotels / perPage),
           });
@@ -2557,6 +2637,8 @@ const transformObject = async (hotels: Array<any>) => {
         hotels[i].rooms[j].id = hotels[i].rooms[j]._id;
         delete hotels[i].rooms[j]._id;
 
+        //Multiply the room Price with totalDays
+        hotels[i].rooms[j].priceForOneNight *= totalDays;
         //add gateway charges to hotel room price
         hotels[i].rooms[j].priceForOneNight += await Math.ceil(
           (gatewayChargesForHotelPercentage / 100) *
