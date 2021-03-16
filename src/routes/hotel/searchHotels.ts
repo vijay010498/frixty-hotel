@@ -2626,7 +2626,7 @@ async function getCurrencyRates(res: Response) {
       .fetch();
   } catch (err) {
     console.error(err);
-    res.status(403).send("Something Went Wrong : Currency Rates");
+    res.status(403).send("Something Went Wrong");
   }
 }
 
