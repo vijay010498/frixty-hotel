@@ -155,11 +155,6 @@ router.get(
           if (city !== undefined && state !== undefined) {
             const hotelsDB = await Hotel.aggregate([
               {
-                $match: {
-                  isServiceable: true,
-                },
-              },
-              {
                 $geoNear: {
                   near: {
                     type: "Point",
@@ -167,6 +162,11 @@ router.get(
                   },
                   distanceField: "distanceToReach",
                   maxDistance: defaultMeterRange,
+                },
+              },
+              {
+                $match: {
+                  isServiceable: true,
                 },
               },
               {
@@ -225,11 +225,6 @@ router.get(
               if (isSortByPrice) {
                 const hotels = await Hotel.aggregate([
                   {
-                    $match: {
-                      isServiceable: true,
-                    },
-                  },
-                  {
                     $geoNear: {
                       near: {
                         type: "Point",
@@ -237,6 +232,11 @@ router.get(
                       },
                       distanceField: "distanceToReach",
                       maxDistance: defaultMeterRange,
+                    },
+                  },
+                  {
+                    $match: {
+                      isServiceable: true,
                     },
                   },
                   {
@@ -310,11 +310,6 @@ router.get(
             } else {
               const hotels = await Hotel.aggregate([
                 {
-                  $match: {
-                    isServiceable: true,
-                  },
-                },
-                {
                   $geoNear: {
                     near: {
                       type: "Point",
@@ -322,6 +317,11 @@ router.get(
                     },
                     distanceField: "distanceToReach",
                     maxDistance: defaultMeterRange,
+                  },
+                },
+                {
+                  $match: {
+                    isServiceable: true,
                   },
                 },
                 {
@@ -386,11 +386,6 @@ router.get(
           else if (city !== undefined) {
             const hotelsDB = await Hotel.aggregate([
               {
-                $match: {
-                  isServiceable: true,
-                },
-              },
-              {
                 $geoNear: {
                   near: {
                     type: "Point",
@@ -398,6 +393,11 @@ router.get(
                   },
                   distanceField: "distanceToReach",
                   maxDistance: defaultMeterRange,
+                },
+              },
+              {
+                $match: {
+                  isServiceable: true,
                 },
               },
               {
@@ -454,11 +454,6 @@ router.get(
               if (isSortByPrice) {
                 const hotels = await Hotel.aggregate([
                   {
-                    $match: {
-                      isServiceable: true,
-                    },
-                  },
-                  {
                     $geoNear: {
                       near: {
                         type: "Point",
@@ -466,6 +461,11 @@ router.get(
                       },
                       distanceField: "distanceToReach",
                       maxDistance: defaultMeterRange,
+                    },
+                  },
+                  {
+                    $match: {
+                      isServiceable: true,
                     },
                   },
                   {
@@ -538,11 +538,6 @@ router.get(
             } else {
               const hotels = await Hotel.aggregate([
                 {
-                  $match: {
-                    isServiceable: true,
-                  },
-                },
-                {
                   $geoNear: {
                     near: {
                       type: "Point",
@@ -550,6 +545,11 @@ router.get(
                     },
                     distanceField: "distanceToReach",
                     maxDistance: defaultMeterRange,
+                  },
+                },
+                {
+                  $match: {
+                    isServiceable: true,
                   },
                 },
                 {
@@ -615,11 +615,6 @@ router.get(
           else if (state !== undefined) {
             const hotelsDB = await Hotel.aggregate([
               {
-                $match: {
-                  isServiceable: true,
-                },
-              },
-              {
                 $geoNear: {
                   near: {
                     type: "Point",
@@ -627,6 +622,11 @@ router.get(
                   },
                   distanceField: "distanceToReach",
                   maxDistance: defaultMeterRange,
+                },
+              },
+              {
+                $match: {
+                  isServiceable: true,
                 },
               },
               {
@@ -683,11 +683,6 @@ router.get(
               if (isSortByPrice) {
                 const hotels = await Hotel.aggregate([
                   {
-                    $match: {
-                      isServiceable: true,
-                    },
-                  },
-                  {
                     $geoNear: {
                       near: {
                         type: "Point",
@@ -695,6 +690,11 @@ router.get(
                       },
                       distanceField: "distanceToReach",
                       maxDistance: defaultMeterRange,
+                    },
+                  },
+                  {
+                    $match: {
+                      isServiceable: true,
                     },
                   },
                   {
@@ -767,11 +767,6 @@ router.get(
             } else {
               const hotels = await Hotel.aggregate([
                 {
-                  $match: {
-                    isServiceable: true,
-                  },
-                },
-                {
                   $geoNear: {
                     near: {
                       type: "Point",
@@ -779,6 +774,11 @@ router.get(
                     },
                     distanceField: "distanceToReach",
                     maxDistance: defaultMeterRange,
+                  },
+                },
+                {
+                  $match: {
+                    isServiceable: true,
                   },
                 },
                 {
@@ -848,11 +848,6 @@ router.get(
           if (city !== undefined && state !== undefined) {
             const hotelDB = await Hotel.aggregate([
               {
-                $match: {
-                  isServiceable: true,
-                },
-              },
-              {
                 $geoNear: {
                   near: {
                     type: "Point",
@@ -860,6 +855,11 @@ router.get(
                   },
                   distanceField: "distanceToReach",
                   maxDistance: rangeInMeter,
+                },
+              },
+              {
+                $match: {
+                  isServiceable: true,
                 },
               },
               {
@@ -916,11 +916,6 @@ router.get(
               if (isSortByPrice) {
                 const hotels = await Hotel.aggregate([
                   {
-                    $match: {
-                      isServiceable: true,
-                    },
-                  },
-                  {
                     $geoNear: {
                       near: {
                         type: "Point",
@@ -928,6 +923,11 @@ router.get(
                       },
                       distanceField: "distanceToReach",
                       maxDistance: rangeInMeter,
+                    },
+                  },
+                  {
+                    $match: {
+                      isServiceable: true,
                     },
                   },
                   {
@@ -1001,11 +1001,6 @@ router.get(
             } else {
               const hotels = await Hotel.aggregate([
                 {
-                  $match: {
-                    isServiceable: true,
-                  },
-                },
-                {
                   $geoNear: {
                     near: {
                       type: "Point",
@@ -1013,6 +1008,11 @@ router.get(
                     },
                     distanceField: "distanceToReach",
                     maxDistance: rangeInMeter,
+                  },
+                },
+                {
+                  $match: {
+                    isServiceable: true,
                   },
                 },
                 {
@@ -1079,11 +1079,6 @@ router.get(
           else if (city !== undefined) {
             const hotelsDB = await Hotel.aggregate([
               {
-                $match: {
-                  isServiceable: true,
-                },
-              },
-              {
                 $geoNear: {
                   near: {
                     type: "Point",
@@ -1091,6 +1086,11 @@ router.get(
                   },
                   distanceField: "distanceToReach",
                   maxDistance: rangeInMeter,
+                },
+              },
+              {
+                $match: {
+                  isServiceable: true,
                 },
               },
               {
@@ -1147,11 +1147,6 @@ router.get(
               if (isSortByPrice) {
                 const hotels = await Hotel.aggregate([
                   {
-                    $match: {
-                      isServiceable: true,
-                    },
-                  },
-                  {
                     $geoNear: {
                       near: {
                         type: "Point",
@@ -1159,6 +1154,11 @@ router.get(
                       },
                       distanceField: "distanceToReach",
                       maxDistance: rangeInMeter,
+                    },
+                  },
+                  {
+                    $match: {
+                      isServiceable: true,
                     },
                   },
                   {
@@ -1231,11 +1231,6 @@ router.get(
             } else {
               const hotels = await Hotel.aggregate([
                 {
-                  $match: {
-                    isServiceable: true,
-                  },
-                },
-                {
                   $geoNear: {
                     near: {
                       type: "Point",
@@ -1243,6 +1238,11 @@ router.get(
                     },
                     distanceField: "distanceToReach",
                     maxDistance: rangeInMeter,
+                  },
+                },
+                {
+                  $match: {
+                    isServiceable: true,
                   },
                 },
                 {
@@ -1308,11 +1308,6 @@ router.get(
           else if (state !== undefined) {
             const hotelsDB = await Hotel.aggregate([
               {
-                $match: {
-                  isServiceable: true,
-                },
-              },
-              {
                 $geoNear: {
                   near: {
                     type: "Point",
@@ -1320,6 +1315,11 @@ router.get(
                   },
                   distanceField: "distanceToReach",
                   maxDistance: rangeInMeter,
+                },
+              },
+              {
+                $match: {
+                  isServiceable: true,
                 },
               },
               {
@@ -1376,11 +1376,6 @@ router.get(
               if (isSortByPrice) {
                 const hotels = await Hotel.aggregate([
                   {
-                    $match: {
-                      isServiceable: true,
-                    },
-                  },
-                  {
                     $geoNear: {
                       near: {
                         type: "Point",
@@ -1388,6 +1383,11 @@ router.get(
                       },
                       distanceField: "distanceToReach",
                       maxDistance: rangeInMeter,
+                    },
+                  },
+                  {
+                    $match: {
+                      isServiceable: true,
                     },
                   },
                   {
@@ -1460,11 +1460,6 @@ router.get(
             } else {
               const hotels = await Hotel.aggregate([
                 {
-                  $match: {
-                    isServiceable: true,
-                  },
-                },
-                {
                   $geoNear: {
                     near: {
                       type: "Point",
@@ -1472,6 +1467,11 @@ router.get(
                     },
                     distanceField: "distanceToReach",
                     maxDistance: rangeInMeter,
+                  },
+                },
+                {
+                  $match: {
+                    isServiceable: true,
                   },
                 },
                 {
@@ -2170,11 +2170,6 @@ router.get(
 
           const hotelsDB = await Hotel.aggregate([
             {
-              $match: {
-                isServiceable: true,
-              },
-            },
-            {
               $geoNear: {
                 near: {
                   type: "Point",
@@ -2182,6 +2177,11 @@ router.get(
                 },
                 distanceField: "distanceToReach",
                 maxDistance: defaultMeterRange,
+              },
+            },
+            {
+              $match: {
+                isServiceable: true,
               },
             },
             {
@@ -2234,11 +2234,6 @@ router.get(
             if (isSortByPrice) {
               const hotels = await Hotel.aggregate([
                 {
-                  $match: {
-                    isServiceable: true,
-                  },
-                },
-                {
                   $geoNear: {
                     near: {
                       type: "Point",
@@ -2246,6 +2241,11 @@ router.get(
                     },
                     distanceField: "distanceToReach",
                     maxDistance: defaultMeterRange,
+                  },
+                },
+                {
+                  $match: {
+                    isServiceable: true,
                   },
                 },
                 {
@@ -2316,11 +2316,6 @@ router.get(
           else {
             const hotels = await Hotel.aggregate([
               {
-                $match: {
-                  isServiceable: true,
-                },
-              },
-              {
                 $geoNear: {
                   near: {
                     type: "Point",
@@ -2328,6 +2323,11 @@ router.get(
                   },
                   distanceField: "distanceToReach",
                   maxDistance: defaultMeterRange,
+                },
+              },
+              {
+                $match: {
+                  isServiceable: true,
                 },
               },
               {
@@ -2388,11 +2388,6 @@ router.get(
         else {
           const hotelsDB = await Hotel.aggregate([
             {
-              $match: {
-                isServiceable: true,
-              },
-            },
-            {
               $geoNear: {
                 near: {
                   type: "Point",
@@ -2400,6 +2395,11 @@ router.get(
                 },
                 distanceField: "distanceToReach",
                 maxDistance: rangeInMeter,
+              },
+            },
+            {
+              $match: {
+                isServiceable: true,
               },
             },
             {
@@ -2450,11 +2450,6 @@ router.get(
             if (isSortByPrice) {
               const hotels = await Hotel.aggregate([
                 {
-                  $match: {
-                    isServiceable: true,
-                  },
-                },
-                {
                   $geoNear: {
                     near: {
                       type: "Point",
@@ -2462,6 +2457,11 @@ router.get(
                     },
                     distanceField: "distanceToReach",
                     maxDistance: rangeInMeter,
+                  },
+                },
+                {
+                  $match: {
+                    isServiceable: true,
                   },
                 },
                 {
@@ -2532,11 +2532,6 @@ router.get(
           else {
             const hotels = await Hotel.aggregate([
               {
-                $match: {
-                  isServiceable: true,
-                },
-              },
-              {
                 $geoNear: {
                   near: {
                     type: "Point",
@@ -2544,6 +2539,11 @@ router.get(
                   },
                   distanceField: "distanceToReach",
                   maxDistance: rangeInMeter,
+                },
+              },
+              {
+                $match: {
+                  isServiceable: true,
                 },
               },
               {
