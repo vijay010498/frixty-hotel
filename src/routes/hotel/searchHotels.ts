@@ -4,61 +4,55 @@ import { Hotel } from "../../models/Hotel";
 import { exchangeRates } from "exchange-rates-api";
 import { SupportedCurrencies } from "../../models/enums/supportedCurrencies";
 import { GatewayCharge } from "../../models/GatewayCharges";
+import { Booking } from "../../models/Booking";
 
 const router = express.Router();
 const defaultMeterRange = 5 * 1000; //default nearBy distance is 5KM or 5000 meter
 const perPage = 10; //
 const defaultCurrency = "MYR";
+const defaultTotalGuests = 1;
 let gatewayChargesForHotelPercentage: number;
 let currencyRates = {};
 let requestedCurrency: string;
+
+let checkIn: string;
+let checkOut: string;
 
 router.get(
   "/api/v1/hotels/search",
   [],
   validateRequest,
   async (req: Request, res: Response) => {
-    //get Gateway charges percentage
-    try {
-      const gatewayCharges = await GatewayCharge.find({}).limit(1);
-      gatewayCharges.length === 0
-        ? (gatewayChargesForHotelPercentage = 5)
-        : (gatewayChargesForHotelPercentage = gatewayCharges[0].percentage);
-    } catch (err) {
-      console.error(err);
-      res.status(403).send(err);
-      return;
-    }
+    const today = new Date().toISOString().slice(0, 10);
+    const tomorrow = new Date(Date.now() + 3600 * 1000 * 24)
+      .toISOString()
+      .slice(0, 10);
 
-    //currency query param
+    //check for checkin and check out dates
+    // @ts-ignore
+    checkIn = req.query.checkIn || today;
+    // @ts-ignore
+    checkOut = req.query.checkOut || tomorrow;
+    await checkCheckInAndCheckOutDateQuery(checkIn, checkOut);
+
+    //get Gateway charges percentage
+    await getGatewayCharges(res);
+
     // @ts-ignore
     requestedCurrency = req.query.currency || defaultCurrency;
     //check if given currency is supported by us or not
-    // @ts-ignore
-    if (requestedCurrency !== defaultCurrency) {
-      if (
-        // @ts-ignore
-        Object.values(SupportedCurrencies).indexOf(requestedCurrency) === -1
-      ) {
-        throw new BadRequestError(`${requestedCurrency} is not supported`);
-      }
-    }
+    if (requestedCurrency !== defaultCurrency)
+      await checkRequestedCurrency(requestedCurrency);
 
-    //first get currency exchange rates for user requested currency  - > user wants in INR , get one INR  = ? for all currency later divide from home currency of  hotel
-    try {
-      currencyRates = await exchangeRates()
-        .latest()
-        .base(requestedCurrency)
-        .fetch();
-    } catch (err) {
-      console.error(err);
-      res.status(403).send("Something Went wrong");
-    }
+    //first get currency exchange rates for user requested currency
+    // - > user wants in INR , get one INR  = ? for all currency
+    // later divide from home currency of  hotel
+    await getCurrencyRates(res);
 
     // @ts-ignore
     let page = parseInt(req.query.page) || 0;
     // @ts-ignore
-    const totalGuests = parseInt(req.query.totalGuests) || 1;
+    const totalGuests = parseInt(req.query.totalGuests) || defaultTotalGuests;
     let isSortBy = false;
     let isFilterBy = false;
     let isGeoQuery = false;
@@ -106,7 +100,6 @@ router.get(
         }
         priceCount++;
       }
-
       //This is to ensure each sort param can be given once
       if (priceCount > 1) {
         throw new BadRequestError(
@@ -277,6 +270,7 @@ router.get(
                 ]);
 
                 await transformObject(hotels);
+                await checkBookingDetails(hotels);
 
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
@@ -340,7 +334,7 @@ router.get(
                 { $limit: perPage },
               ]);
               await transformObject(hotels);
-
+              await checkBookingDetails(hotels);
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
@@ -478,6 +472,7 @@ router.get(
                 ]);
 
                 await transformObject(hotels);
+                await checkBookingDetails(hotels);
 
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
@@ -541,6 +536,7 @@ router.get(
               ]);
 
               await transformObject(hotels);
+              await checkBookingDetails(hotels);
 
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
@@ -679,6 +675,7 @@ router.get(
                 ]);
 
                 await transformObject(hotels);
+                await checkBookingDetails(hotels);
 
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
@@ -742,6 +739,7 @@ router.get(
               ]);
 
               await transformObject(hotels);
+              await checkBookingDetails(hotels);
 
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
@@ -885,6 +883,7 @@ router.get(
                 ]);
 
                 await transformObject(hotels);
+                await checkBookingDetails(hotels);
 
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
@@ -949,6 +948,7 @@ router.get(
               ]);
 
               await transformObject(hotels);
+              await checkBookingDetails(hotels);
 
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
@@ -1087,6 +1087,7 @@ router.get(
                 ]);
 
                 await transformObject(hotels);
+                await checkBookingDetails(hotels);
 
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
@@ -1150,6 +1151,7 @@ router.get(
               ]);
 
               await transformObject(hotels);
+              await checkBookingDetails(hotels);
 
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
@@ -1288,6 +1290,7 @@ router.get(
                 ]);
 
                 await transformObject(hotels);
+                await checkBookingDetails(hotels);
 
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
@@ -1351,6 +1354,7 @@ router.get(
               ]);
 
               await transformObject(hotels);
+              await checkBookingDetails(hotels);
 
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
@@ -1476,6 +1480,7 @@ router.get(
               ]);
 
               await transformObject(hotels);
+              await checkBookingDetails(hotels);
 
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
@@ -1530,6 +1535,7 @@ router.get(
             ]);
 
             await transformObject(hotels);
+            await checkBookingDetails(hotels);
 
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
@@ -1650,6 +1656,7 @@ router.get(
               ]);
 
               await transformObject(hotels);
+              await checkBookingDetails(hotels);
 
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
@@ -1703,6 +1710,7 @@ router.get(
             ]);
 
             await transformObject(hotels);
+            await checkBookingDetails(hotels);
 
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
@@ -1821,6 +1829,7 @@ router.get(
               ]);
 
               await transformObject(hotels);
+              await checkBookingDetails(hotels);
 
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
@@ -1874,6 +1883,7 @@ router.get(
             ]);
 
             await transformObject(hotels);
+            await checkBookingDetails(hotels);
 
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
@@ -2029,6 +2039,7 @@ router.get(
               ]);
 
               await transformObject(hotels);
+              await checkBookingDetails(hotels);
 
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
@@ -2090,6 +2101,7 @@ router.get(
             ]);
 
             await transformObject(hotels);
+            await checkBookingDetails(hotels);
 
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
@@ -2217,6 +2229,7 @@ router.get(
               ]);
 
               await transformObject(hotels);
+              await checkBookingDetails(hotels);
 
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
@@ -2278,6 +2291,7 @@ router.get(
             ]);
 
             await transformObject(hotels);
+            await checkBookingDetails(hotels);
 
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
@@ -2389,6 +2403,7 @@ router.get(
             ]);
 
             await transformObject(hotels);
+            await checkBookingDetails(hotels);
 
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
@@ -2438,7 +2453,9 @@ router.get(
             { $skip: perPage * page },
             { $limit: perPage },
           ]);
+
           await transformObject(hotels);
+          await checkBookingDetails(hotels);
           if (hotels.length === 0) {
             throw new BadRequestError("No Hotels Found");
           }
@@ -2454,6 +2471,82 @@ router.get(
     }
   }
 );
+
+const checkBookingDetails = async (hotels: Array<any>) => {
+  let hotelsIds = [];
+  let roomIds = [];
+  let checkInArr = checkIn.split(",");
+  let checkOutArr = checkOut.split(",");
+  for (let i = 0; i < hotels.length; i++) {
+    hotelsIds.push(hotels[i].id);
+    for (let j = 0; j < hotels[i].rooms.length; j++) {
+      roomIds.push(hotels[i].rooms[j].id);
+    }
+  }
+
+  try {
+    const bookingsChecked = await Booking.aggregate([
+      {
+        $match: {
+          $and: [{ hotelId: { $in: hotelsIds } }, { roomId: { $in: roomIds } }],
+        },
+      },
+      {
+        $addFields: {
+          stringCheckInDate: {
+            $dateToString: {
+              date: "$bookingDetails.checkInDateTime",
+              format: "%Y-%m-%d",
+            },
+          },
+          stringCheckOutDate: {
+            $dateToString: {
+              date: "$bookingDetails.checkOutDateTime",
+              format: "%Y-%m-%d",
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          $and: [
+            {
+              $or: [
+                { stringCheckInDate: { $in: checkInArr } },
+                { stringCheckOutDate: { $in: checkOutArr } },
+              ],
+            },
+            { "bookingDetails.bookingStatus": { $eq: "confirmed" } },
+          ],
+        },
+      },
+    ]);
+
+    //execute only any data found in bookings collection
+    if (bookingsChecked.length > 0) {
+      //Now remove the rooms from this array
+      for (let i = 0; i < hotels.length; i++) {
+        for (let j = 0; j < hotels[i].rooms.length; j++) {
+          for (let k = 0; k < bookingsChecked.length; k++) {
+            if (
+              hotels[i].rooms[j].id.toString() ===
+              bookingsChecked[k].roomId.toString()
+            ) {
+              console.log(
+                ` Match Found ${hotels[i].id}  ${hotels[i].rooms[j].id} ${bookingsChecked[k].roomId} `
+              );
+              delete hotels[i].rooms[j];
+              // @ts-ignore
+            }
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    return;
+  }
+};
 
 const transformObject = async (hotels: Array<any>) => {
   for (let i = 0; i < hotels.length; i++) {
@@ -2495,4 +2588,46 @@ const transformObject = async (hotels: Array<any>) => {
   }
 };
 
-export { router as searchHotelByStateRouter };
+async function checkCheckInAndCheckOutDateQuery(
+  checkIn: string,
+  checkOut: string
+) {
+  if (checkIn.split("").length !== 10 || checkOut.split("").length !== 10) {
+    throw new BadRequestError(
+      "CheckIn or CheckOut Date format must be YYYY-MM-DD"
+    );
+  }
+}
+async function getGatewayCharges(res: Response) {
+  try {
+    const gatewayCharges = await GatewayCharge.find({}).limit(1);
+    gatewayCharges.length === 0
+      ? (gatewayChargesForHotelPercentage = 5)
+      : (gatewayChargesForHotelPercentage = gatewayCharges[0].percentage);
+  } catch (err) {
+    console.error(err);
+    res.status(403).send(err);
+    return;
+  }
+}
+
+async function checkRequestedCurrency(requestedCurrency: string) {
+  // @ts-ignore
+  if (Object.values(SupportedCurrencies).indexOf(requestedCurrency) === -1) {
+    throw new BadRequestError(`${requestedCurrency} is not supported`);
+  }
+}
+
+async function getCurrencyRates(res: Response) {
+  try {
+    currencyRates = await exchangeRates()
+      .latest()
+      .base(requestedCurrency)
+      .fetch();
+  } catch (err) {
+    console.error(err);
+    res.status(403).send("Something Went Wrong : Currency Rates");
+  }
+}
+
+export { router as searchHotelRouter };

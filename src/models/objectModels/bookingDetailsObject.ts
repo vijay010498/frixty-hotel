@@ -1,5 +1,6 @@
 import { BookingStatus } from "../enums/booking-status";
 import mongoose from "mongoose";
+import { SupportedCurrencies } from "../enums/supportedCurrencies";
 
 const bookingDetailsObject = {
   bookingStatus: {
@@ -34,6 +35,11 @@ const bookingDetailsObject = {
       },
       totalPayment: {
         type: Number,
+        required: true,
+      },
+      paymentCurrency: {
+        type: String,
+        enum: Object.values(SupportedCurrencies),
         required: true,
       },
     },
