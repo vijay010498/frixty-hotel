@@ -4,10 +4,6 @@ import { roomsObject } from "./objectModels/roomsObject";
 
 import { titleObject } from "./objectModels/titleObject";
 
-//Booking.com features
-import { titleAdditionalPayObject } from "./objectModels/titleAdditionalPayObject";
-import { booleanObject } from "./objectModels/booleanObject";
-import { booleanAndTitleObject } from "./objectModels/booleanAndTitleObject";
 import { SupportedCurrencies } from "./enums/supportedCurrencies";
 
 //Interface that describes the properties that are required to create a new Hotel
@@ -39,6 +35,7 @@ interface HotelDoc extends mongoose.Document {
   images: [string];
   amenities: [typeof titleObject];
   homeCurrency: SupportedCurrencies;
+  isServiceable: Boolean;
 }
 
 const hotelSchema = new mongoose.Schema(
@@ -85,6 +82,11 @@ const hotelSchema = new mongoose.Schema(
     images: {
       type: [String],
       required: true,
+    },
+    isServiceable: {
+      type: Boolean,
+      default: false,
+      index: true,
     },
   },
   {

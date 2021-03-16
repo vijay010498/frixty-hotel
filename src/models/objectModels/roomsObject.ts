@@ -64,6 +64,11 @@ const roomsObject = {
   images: {
     type: [String],
   },
+  isServiceable: {
+    type: Boolean,
+    default: false,
+    index: true,
+  },
 };
 
 export { roomsObject };

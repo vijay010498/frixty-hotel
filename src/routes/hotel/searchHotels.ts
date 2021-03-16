@@ -155,6 +155,11 @@ router.get(
           if (city !== undefined && state !== undefined) {
             const hotelsDB = await Hotel.aggregate([
               {
+                $match: {
+                  isServiceable: true,
+                },
+              },
+              {
                 $geoNear: {
                   near: {
                     type: "Point",
@@ -178,6 +183,7 @@ router.get(
               {
                 $match: {
                   "rooms.sleeps": { $gte: totalGuests },
+                  isServiceable: true,
                 },
               },
               {
@@ -219,6 +225,11 @@ router.get(
               if (isSortByPrice) {
                 const hotels = await Hotel.aggregate([
                   {
+                    $match: {
+                      isServiceable: true,
+                    },
+                  },
+                  {
                     $geoNear: {
                       near: {
                         type: "Point",
@@ -242,6 +253,7 @@ router.get(
                   {
                     $match: {
                       "rooms.sleeps": { $gte: totalGuests },
+                      isServiceable: true,
                     },
                   },
                   {
@@ -289,6 +301,7 @@ router.get(
                   checkIn,
                   checkOut,
                   totalDays,
+                  totalGuests,
                   page: page,
                   pages: Math.ceil(totalHotels / perPage),
                 });
@@ -296,6 +309,11 @@ router.get(
               }
             } else {
               const hotels = await Hotel.aggregate([
+                {
+                  $match: {
+                    isServiceable: true,
+                  },
+                },
                 {
                   $geoNear: {
                     near: {
@@ -320,6 +338,7 @@ router.get(
                 {
                   $match: {
                     "rooms.sleeps": { $gte: totalGuests },
+                    isServiceable: true,
                   },
                 },
                 {
@@ -355,6 +374,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -365,6 +385,11 @@ router.get(
           //Only city
           else if (city !== undefined) {
             const hotelsDB = await Hotel.aggregate([
+              {
+                $match: {
+                  isServiceable: true,
+                },
+              },
               {
                 $geoNear: {
                   near: {
@@ -388,6 +413,7 @@ router.get(
               {
                 $match: {
                   "rooms.sleeps": { $gte: totalGuests },
+                  isServiceable: true,
                 },
               },
               {
@@ -427,6 +453,11 @@ router.get(
               //check for different Sorting
               if (isSortByPrice) {
                 const hotels = await Hotel.aggregate([
+                  {
+                    $match: {
+                      isServiceable: true,
+                    },
+                  },
                   {
                     $geoNear: {
                       near: {
@@ -450,6 +481,7 @@ router.get(
                   {
                     $match: {
                       "rooms.sleeps": { $gte: totalGuests },
+                      isServiceable: true,
                     },
                   },
                   {
@@ -497,6 +529,7 @@ router.get(
                   checkIn,
                   checkOut,
                   totalDays,
+                  totalGuests,
                   page: page,
                   pages: Math.ceil(totalHotels / perPage),
                 });
@@ -504,6 +537,11 @@ router.get(
               }
             } else {
               const hotels = await Hotel.aggregate([
+                {
+                  $match: {
+                    isServiceable: true,
+                  },
+                },
                 {
                   $geoNear: {
                     near: {
@@ -527,6 +565,7 @@ router.get(
                 {
                   $match: {
                     "rooms.sleeps": { $gte: totalGuests },
+                    isServiceable: true,
                   },
                 },
                 {
@@ -565,6 +604,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalGuests,
                 pages: Math.ceil(totalHotels / perPage),
               });
               return;
@@ -574,6 +614,11 @@ router.get(
           //search by only state
           else if (state !== undefined) {
             const hotelsDB = await Hotel.aggregate([
+              {
+                $match: {
+                  isServiceable: true,
+                },
+              },
               {
                 $geoNear: {
                   near: {
@@ -597,6 +642,7 @@ router.get(
               {
                 $match: {
                   "rooms.sleeps": { $gte: totalGuests },
+                  isServiceable: true,
                 },
               },
               {
@@ -637,6 +683,11 @@ router.get(
               if (isSortByPrice) {
                 const hotels = await Hotel.aggregate([
                   {
+                    $match: {
+                      isServiceable: true,
+                    },
+                  },
+                  {
                     $geoNear: {
                       near: {
                         type: "Point",
@@ -659,6 +710,7 @@ router.get(
                   {
                     $match: {
                       "rooms.sleeps": { $gte: totalGuests },
+                      isServiceable: true,
                     },
                   },
                   {
@@ -706,6 +758,7 @@ router.get(
                   checkIn,
                   checkOut,
                   totalDays,
+                  totalGuests,
                   page: page,
                   pages: Math.ceil(totalHotels / perPage),
                 });
@@ -713,6 +766,11 @@ router.get(
               }
             } else {
               const hotels = await Hotel.aggregate([
+                {
+                  $match: {
+                    isServiceable: true,
+                  },
+                },
                 {
                   $geoNear: {
                     near: {
@@ -736,6 +794,7 @@ router.get(
                 {
                   $match: {
                     "rooms.sleeps": { $gte: totalGuests },
+                    isServiceable: true,
                   },
                 },
                 {
@@ -773,6 +832,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -787,6 +847,11 @@ router.get(
           //city and state
           if (city !== undefined && state !== undefined) {
             const hotelDB = await Hotel.aggregate([
+              {
+                $match: {
+                  isServiceable: true,
+                },
+              },
               {
                 $geoNear: {
                   near: {
@@ -811,6 +876,7 @@ router.get(
               {
                 $match: {
                   "rooms.sleeps": { $gte: totalGuests },
+                  isServiceable: true,
                 },
               },
               {
@@ -850,6 +916,11 @@ router.get(
               if (isSortByPrice) {
                 const hotels = await Hotel.aggregate([
                   {
+                    $match: {
+                      isServiceable: true,
+                    },
+                  },
+                  {
                     $geoNear: {
                       near: {
                         type: "Point",
@@ -873,6 +944,7 @@ router.get(
                   {
                     $match: {
                       "rooms.sleeps": { $gte: totalGuests },
+                      isServiceable: true,
                     },
                   },
                   {
@@ -920,6 +992,7 @@ router.get(
                   checkIn,
                   checkOut,
                   totalDays,
+                  totalGuests,
                   page: page,
                   pages: Math.ceil(totalHotels / perPage),
                 });
@@ -927,6 +1000,11 @@ router.get(
               }
             } else {
               const hotels = await Hotel.aggregate([
+                {
+                  $match: {
+                    isServiceable: true,
+                  },
+                },
                 {
                   $geoNear: {
                     near: {
@@ -951,6 +1029,7 @@ router.get(
                 {
                   $match: {
                     "rooms.sleeps": { $gte: totalGuests },
+                    isServiceable: true,
                   },
                 },
                 {
@@ -988,6 +1067,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -998,6 +1078,11 @@ router.get(
           //Only city
           else if (city !== undefined) {
             const hotelsDB = await Hotel.aggregate([
+              {
+                $match: {
+                  isServiceable: true,
+                },
+              },
               {
                 $geoNear: {
                   near: {
@@ -1021,6 +1106,7 @@ router.get(
               {
                 $match: {
                   "rooms.sleeps": { $gte: totalGuests },
+                  isServiceable: true,
                 },
               },
               {
@@ -1061,6 +1147,11 @@ router.get(
               if (isSortByPrice) {
                 const hotels = await Hotel.aggregate([
                   {
+                    $match: {
+                      isServiceable: true,
+                    },
+                  },
+                  {
                     $geoNear: {
                       near: {
                         type: "Point",
@@ -1083,6 +1174,7 @@ router.get(
                   {
                     $match: {
                       "rooms.sleeps": { $gte: totalGuests },
+                      isServiceable: true,
                     },
                   },
                   {
@@ -1130,6 +1222,7 @@ router.get(
                   checkIn,
                   checkOut,
                   totalDays,
+                  totalGuests,
                   page: page,
                   pages: Math.ceil(totalHotels / perPage),
                 });
@@ -1137,6 +1230,11 @@ router.get(
               }
             } else {
               const hotels = await Hotel.aggregate([
+                {
+                  $match: {
+                    isServiceable: true,
+                  },
+                },
                 {
                   $geoNear: {
                     near: {
@@ -1160,6 +1258,7 @@ router.get(
                 {
                   $match: {
                     "rooms.sleeps": { $gte: totalGuests },
+                    isServiceable: true,
                   },
                 },
                 {
@@ -1197,6 +1296,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -1207,6 +1307,11 @@ router.get(
           //search by only state
           else if (state !== undefined) {
             const hotelsDB = await Hotel.aggregate([
+              {
+                $match: {
+                  isServiceable: true,
+                },
+              },
               {
                 $geoNear: {
                   near: {
@@ -1230,6 +1335,7 @@ router.get(
               {
                 $match: {
                   "rooms.sleeps": { $gte: totalGuests },
+                  isServiceable: true,
                 },
               },
               {
@@ -1270,6 +1376,11 @@ router.get(
               if (isSortByPrice) {
                 const hotels = await Hotel.aggregate([
                   {
+                    $match: {
+                      isServiceable: true,
+                    },
+                  },
+                  {
                     $geoNear: {
                       near: {
                         type: "Point",
@@ -1292,6 +1403,7 @@ router.get(
                   {
                     $match: {
                       "rooms.sleeps": { $gte: totalGuests },
+                      isServiceable: true,
                     },
                   },
                   {
@@ -1339,6 +1451,7 @@ router.get(
                   checkIn,
                   checkOut,
                   totalDays,
+                  totalGuests,
                   page: page,
                   pages: Math.ceil(totalHotels / perPage),
                 });
@@ -1346,6 +1459,11 @@ router.get(
               }
             } else {
               const hotels = await Hotel.aggregate([
+                {
+                  $match: {
+                    isServiceable: true,
+                  },
+                },
                 {
                   $geoNear: {
                     near: {
@@ -1369,6 +1487,7 @@ router.get(
                 {
                   $match: {
                     "rooms.sleeps": { $gte: totalGuests },
+                    isServiceable: true,
                   },
                 },
                 {
@@ -1406,6 +1525,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -1422,6 +1542,11 @@ router.get(
           const hotelsDB = await Hotel.aggregate([
             {
               $match: {
+                isServiceable: true,
+              },
+            },
+            {
+              $match: {
                 "address.city": city.toString().toUpperCase(),
                 "address.state": state.toString().toUpperCase(),
               },
@@ -1434,6 +1559,7 @@ router.get(
             {
               $match: {
                 "rooms.sleeps": { $gte: totalGuests },
+                isServiceable: true,
               },
             },
             {
@@ -1476,6 +1602,11 @@ router.get(
               const hotels = await Hotel.aggregate([
                 {
                   $match: {
+                    isServiceable: true,
+                  },
+                },
+                {
+                  $match: {
                     "address.city": city.toString().toUpperCase(),
                     "address.state": state.toString().toUpperCase(),
                   },
@@ -1488,6 +1619,7 @@ router.get(
                 {
                   $match: {
                     "rooms.sleeps": { $gte: totalGuests },
+                    isServiceable: true,
                   },
                 },
                 {
@@ -1535,6 +1667,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -1542,6 +1675,11 @@ router.get(
             }
           } else {
             const hotels = await Hotel.aggregate([
+              {
+                $match: {
+                  isServiceable: true,
+                },
+              },
               {
                 $match: {
                   "address.city": city.toString().toUpperCase(),
@@ -1556,6 +1694,7 @@ router.get(
               {
                 $match: {
                   "rooms.sleeps": { $gte: totalGuests },
+                  isServiceable: true,
                 },
               },
               {
@@ -1593,6 +1732,7 @@ router.get(
               checkIn,
               checkOut,
               totalDays,
+              totalGuests,
               page: page,
               pages: Math.ceil(totalHotels / perPage),
             });
@@ -1605,6 +1745,11 @@ router.get(
           const hotelsDB = await Hotel.aggregate([
             {
               $match: {
+                isServiceable: true,
+              },
+            },
+            {
+              $match: {
                 "address.city": city.toString().toUpperCase(),
               },
             },
@@ -1616,6 +1761,7 @@ router.get(
             {
               $match: {
                 "rooms.sleeps": { $gte: totalGuests },
+                isServiceable: true,
               },
             },
             {
@@ -1657,6 +1803,11 @@ router.get(
             //check for different sorting
             if (isSortByPrice) {
               const hotels = await Hotel.aggregate([
+                {
+                  $match: {
+                    isServiceable: true,
+                  },
+                },
                 {
                   $match: {
                     "address.city": city.toString().toUpperCase(),
@@ -1670,6 +1821,7 @@ router.get(
                 {
                   $match: {
                     "rooms.sleeps": { $gte: totalGuests },
+                    isServiceable: true,
                   },
                 },
                 {
@@ -1717,6 +1869,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -1724,6 +1877,11 @@ router.get(
             }
           } else {
             const hotels = await Hotel.aggregate([
+              {
+                $match: {
+                  isServiceable: true,
+                },
+              },
               {
                 $match: {
                   "address.city": city.toString().toUpperCase(),
@@ -1737,6 +1895,7 @@ router.get(
               {
                 $match: {
                   "rooms.sleeps": { $gte: totalGuests },
+                  isServiceable: true,
                 },
               },
               {
@@ -1774,6 +1933,7 @@ router.get(
               checkIn,
               checkOut,
               totalDays,
+              totalGuests,
               page: page,
               pages: Math.ceil(totalHotels / perPage),
             });
@@ -1784,6 +1944,11 @@ router.get(
         //search by only state
         else if (state !== undefined) {
           const hotelsDB = await Hotel.aggregate([
+            {
+              $match: {
+                isServiceable: true,
+              },
+            },
             {
               $match: {
                 "address.state": state.toString().toUpperCase(),
@@ -1797,6 +1962,7 @@ router.get(
             {
               $match: {
                 "rooms.sleeps": { $gte: totalGuests },
+                isServiceable: true,
               },
             },
             {
@@ -1838,6 +2004,11 @@ router.get(
               const hotels = await Hotel.aggregate([
                 {
                   $match: {
+                    isServiceable: true,
+                  },
+                },
+                {
+                  $match: {
                     "address.state": state.toString().toUpperCase(),
                   },
                 },
@@ -1849,6 +2020,7 @@ router.get(
                 {
                   $match: {
                     "rooms.sleeps": { $gte: totalGuests },
+                    isServiceable: true,
                   },
                 },
                 {
@@ -1896,6 +2068,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -1903,6 +2076,11 @@ router.get(
             }
           } else {
             const hotels = await Hotel.aggregate([
+              {
+                $match: {
+                  isServiceable: true,
+                },
+              },
               {
                 $match: {
                   "address.state": state.toString().toUpperCase(),
@@ -1916,6 +2094,7 @@ router.get(
               {
                 $match: {
                   "rooms.sleeps": { $gte: totalGuests },
+                  isServiceable: true,
                 },
               },
               {
@@ -1953,6 +2132,7 @@ router.get(
               checkIn,
               checkOut,
               totalDays,
+              totalGuests,
               page: page,
               pages: Math.ceil(totalHotels / perPage),
             });
@@ -1990,6 +2170,11 @@ router.get(
 
           const hotelsDB = await Hotel.aggregate([
             {
+              $match: {
+                isServiceable: true,
+              },
+            },
+            {
               $geoNear: {
                 near: {
                   type: "Point",
@@ -2007,6 +2192,7 @@ router.get(
             {
               $match: {
                 "rooms.sleeps": { $gte: totalGuests },
+                isServiceable: true,
               },
             },
             {
@@ -2048,6 +2234,11 @@ router.get(
             if (isSortByPrice) {
               const hotels = await Hotel.aggregate([
                 {
+                  $match: {
+                    isServiceable: true,
+                  },
+                },
+                {
                   $geoNear: {
                     near: {
                       type: "Point",
@@ -2065,6 +2256,7 @@ router.get(
                 {
                   $match: {
                     "rooms.sleeps": { $gte: totalGuests },
+                    isServiceable: true,
                   },
                 },
                 {
@@ -2113,6 +2305,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -2122,6 +2315,11 @@ router.get(
           //without sorting
           else {
             const hotels = await Hotel.aggregate([
+              {
+                $match: {
+                  isServiceable: true,
+                },
+              },
               {
                 $geoNear: {
                   near: {
@@ -2140,6 +2338,7 @@ router.get(
               {
                 $match: {
                   "rooms.sleeps": { $gte: totalGuests },
+                  isServiceable: true,
                 },
               },
               {
@@ -2177,6 +2376,7 @@ router.get(
               checkIn,
               checkOut,
               totalDays,
+              totalGuests,
               page: page,
               pages: Math.ceil(totalHotels / perPage),
             });
@@ -2187,6 +2387,11 @@ router.get(
         //Geo Query with given range //completed testing
         else {
           const hotelsDB = await Hotel.aggregate([
+            {
+              $match: {
+                isServiceable: true,
+              },
+            },
             {
               $geoNear: {
                 near: {
@@ -2205,6 +2410,7 @@ router.get(
             {
               $match: {
                 "rooms.sleeps": { $gte: totalGuests },
+                isServiceable: true,
               },
             },
             {
@@ -2244,6 +2450,11 @@ router.get(
             if (isSortByPrice) {
               const hotels = await Hotel.aggregate([
                 {
+                  $match: {
+                    isServiceable: true,
+                  },
+                },
+                {
                   $geoNear: {
                     near: {
                       type: "Point",
@@ -2261,6 +2472,7 @@ router.get(
                 {
                   $match: {
                     "rooms.sleeps": { $gte: totalGuests },
+                    isServiceable: true,
                   },
                 },
                 {
@@ -2308,6 +2520,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / perPage),
               });
@@ -2318,6 +2531,11 @@ router.get(
           //without sort //completed testing
           else {
             const hotels = await Hotel.aggregate([
+              {
+                $match: {
+                  isServiceable: true,
+                },
+              },
               {
                 $geoNear: {
                   near: {
@@ -2336,6 +2554,7 @@ router.get(
               {
                 $match: {
                   "rooms.sleeps": { $gte: totalGuests },
+                  isServiceable: true,
                 },
               },
               {
@@ -2373,6 +2592,7 @@ router.get(
               checkIn,
               checkOut,
               totalDays,
+              totalGuests,
               page: page,
               pages: Math.ceil(totalHotels / perPage),
             });
@@ -2385,6 +2605,16 @@ router.get(
       else {
         const hotelsDB = await Hotel.aggregate([
           {
+            $match: {
+              isServiceable: true,
+            },
+          },
+          {
+            $match: {
+              isServiceable: true,
+            },
+          },
+          {
             $unwind: {
               path: "$rooms",
             },
@@ -2392,6 +2622,7 @@ router.get(
           {
             $match: {
               "rooms.sleeps": { $gte: totalGuests },
+              isServiceable: true,
             },
           },
           {
@@ -2434,6 +2665,16 @@ router.get(
           if (isSortByPrice) {
             const hotels = await Hotel.aggregate([
               {
+                $match: {
+                  isServiceable: true,
+                },
+              },
+              {
+                $match: {
+                  isServiceable: true,
+                },
+              },
+              {
                 $unwind: {
                   path: "$rooms",
                 },
@@ -2441,6 +2682,7 @@ router.get(
               {
                 $match: {
                   "rooms.sleeps": { $gte: totalGuests },
+                  isServiceable: true,
                 },
               },
               {
@@ -2488,6 +2730,7 @@ router.get(
               checkIn,
               checkOut,
               totalDays,
+              totalGuests,
               page: page,
               pages: Math.ceil(totalHotels / perPage),
             });
@@ -2499,6 +2742,11 @@ router.get(
         else {
           const hotels = await Hotel.aggregate([
             {
+              $match: {
+                isServiceable: true,
+              },
+            },
+            {
               $unwind: {
                 path: "$rooms",
               },
@@ -2506,6 +2754,7 @@ router.get(
             {
               $match: {
                 "rooms.sleeps": { $gte: totalGuests },
+                isServiceable: true,
               },
             },
             {
@@ -2542,6 +2791,7 @@ router.get(
             checkIn,
             checkOut,
             totalDays,
+            totalGuests,
             page: page,
             pages: Math.ceil(totalHotels / perPage),
           });
@@ -2615,8 +2865,7 @@ const checkBookingDetails = async (hotels: Array<any>) => {
               console.log(
                 ` Match Found ${hotels[i].id}  ${hotels[i].rooms[j].id} ${bookingsChecked[k].roomId} `
               );
-              delete hotels[i].rooms[j];
-              // @ts-ignore
+              hotels[i].rooms.splice(j, 1);
             }
           }
         }
@@ -2653,6 +2902,12 @@ const transformObject = async (hotels: Array<any>) => {
         );
       }
     }
+    //No rooms in that hotel so remove the hotel from array
+    if (hotels[i].rooms.length === 0) {
+      hotels.splice(i, 1);
+    }
+
+    //Distance conversion from meter to km
     if (hotels[i].distanceToReach) {
       hotels[i].distanceToReach = parseFloat(
         (hotels[i].distanceToReach / 1000).toFixed(2)
