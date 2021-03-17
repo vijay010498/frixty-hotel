@@ -35,9 +35,9 @@ router.get(
     // @ts-ignore
     checkOut = req.query.checkOut || tomorrow;
 
+    //To Calculate total days
     const checkInStr = new Date(checkIn);
     const checkOutStr = new Date(checkOut);
-
     totalDays =
       (checkOutStr.getTime() - checkInStr.getTime()) / (1000 * 60 * 60 * 24);
 
@@ -2871,6 +2871,10 @@ const checkBookingDetails = async (hotels: Array<any>) => {
         }
       }
     }
+    //update total rooms available after all checking
+    for (let i = 0; i < hotels.length; i++) {
+      hotels[i].totalRoomAvailable = hotels[i].rooms.length;
+    }
   } catch (err) {
     console.error(err);
     return;
@@ -2879,9 +2883,7 @@ const checkBookingDetails = async (hotels: Array<any>) => {
 
 const transformObject = async (hotels: Array<any>) => {
   for (let i = 0; i < hotels.length; i++) {
-    hotels[i].currency = requestedCurrency;
     if (hotels[i].rooms) {
-      hotels[i].totalRoomsAvailable = hotels[i].rooms.length;
       for (let j = 0; j < hotels[i].rooms.length; j++) {
         hotels[i].rooms[j].id = hotels[i].rooms[j]._id;
         delete hotels[i].rooms[j]._id;
@@ -2902,7 +2904,6 @@ const transformObject = async (hotels: Array<any>) => {
         }
 
         //price conversion
-        // @ts-ignore
         hotels[i].rooms[j].priceForOneNight = await Math.floor(
           hotels[i].rooms[j].priceForOneNight / // @ts-ignore
             currencyRates[hotels[i].homeCurrency].toFixed(2)
@@ -2928,12 +2929,13 @@ const transformObject = async (hotels: Array<any>) => {
       hotels.splice(i, 1);
     }
 
-    //Distance conversion from meter to km
+    //Distance conversion from meter to km only if geo query is enable
     if (hotels[i].distanceToReach) {
       hotels[i].distanceToReach = parseFloat(
         (hotels[i].distanceToReach / 1000).toFixed(2)
       );
     }
+    hotels[i].currency = requestedCurrency;
     hotels[i].id = hotels[i]._id;
     delete hotels[i]._id;
     delete hotels[i].__v;
