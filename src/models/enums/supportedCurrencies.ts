@@ -7,6 +7,7 @@ export enum SupportedCurrencies {
   BritishPoundSterline = "GBP",
   Euro = "EUR",
   MalaysianRinggit = "MYR",
+  IndianRupee = "INR",
 
   /*BrazilianReal = "BRL",
   BulgarianLev = "BGN",
