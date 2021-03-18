@@ -1,7 +1,7 @@
 import express from "express";
 import "express-async-errors";
 import { json } from "express";
-import cors from "cors";
+
 //all routes imports
 import { signupRouter } from "./routes/auth/users/signup";
 import { signInRouter } from "./routes/auth/users/signin";
@@ -42,7 +42,6 @@ app.use(
     secure: process.env.NODE_ENV === "production",
   })
 );
-app.use(cors());
 app.use(limiter);
 app.set("trust proxy", true);
 app.use(signupRouter);
