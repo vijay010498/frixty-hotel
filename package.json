@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start": "ts-node-dev src/index.ts",
-    "dev": "ts-node-dev src/index.ts"
+    "dev": "ts-node-dev src/index.ts",
+    "heroku-postbuild" : "NPM_CONFIG_PRODUCTION=false npm install --prefix sadmin && npm run build --prefix sadmin"
   },
   "keywords": [],
   "author": "",
