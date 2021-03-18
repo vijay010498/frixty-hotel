@@ -47,14 +47,6 @@ app.use(
 );
 app.use(limiter);
 app.set("trust proxy", true);
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static("sadmin/build"));
-
-  const path = require("path");
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "sadmin", "build", "index.html"));
-  });
-}
 app.use(signupRouter);
 app.use(signInRouter);
 app.use(getHotelByID);
@@ -81,4 +73,7 @@ app.use(SuperAdminGetExchangeRouter);
 
 app.use(errorhandler);
 
+app.all("*", async (req, res) => {
+  throw new NotFoundError();
+});
 export { app };
