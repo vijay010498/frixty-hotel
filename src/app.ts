@@ -1,7 +1,7 @@
 import express from "express";
 import "express-async-errors";
 import { json } from "express";
-
+import cookieParser from "cookie-parser";
 //all routes imports
 import { signupRouter } from "./routes/auth/users/signup";
 import { signInRouter } from "./routes/auth/users/signin";
@@ -23,6 +23,8 @@ import { superAdminVerifyOTPAndChangePasswordRouter } from "./routes/auth/sAdmin
 import { superAdminUpdateGatewayChargesRouter } from "./routes/config/sAdmin/UpdateGatewayCharge";
 import { superAdminCreateBookingRouter } from "./routes/hotel/sAdmin/createBookingSAdmin";
 import { superAdminCreateHotelRouter } from "./routes/hotel/sAdmin/createHotel";
+import { superAdminVerifyAuth } from "./routes/auth/sAdmin/verifySAdmin";
+import { SuperAdminGetExchangeRouter } from "./routes/auth/sAdmin/getCurrencyRates";
 import cookieSession from "cookie-session";
 
 const RateLimit = require("express-rate-limit");
@@ -36,6 +38,7 @@ const limiter = new RateLimit({
 
 const app = express();
 app.use(json());
+app.use(cookieParser());
 app.use(
   cookieSession({
     signed: false,
@@ -44,6 +47,14 @@ app.use(
 );
 app.use(limiter);
 app.set("trust proxy", true);
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("sadmin/build"));
+
+  const path = require("path");
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "sadmin", "build", "index.html"));
+  });
+}
 app.use(signupRouter);
 app.use(signInRouter);
 app.use(getHotelByID);
@@ -65,10 +76,9 @@ app.use(superAdminRequestOTPRouter);
 app.use(superAdminVerifyOTPAndChangePasswordRouter);
 app.use(superAdminUpdateGatewayChargesRouter);
 app.use(superAdminCreateBookingRouter);
+app.use(superAdminVerifyAuth);
+app.use(SuperAdminGetExchangeRouter);
 
 app.use(errorhandler);
 
-app.all("*", async (req, res) => {
-  throw new NotFoundError();
-});
 export { app };

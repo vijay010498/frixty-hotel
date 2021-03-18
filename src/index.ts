@@ -21,6 +21,7 @@ const start = async () => {
       throw new Error("JWTEXPIRETIME must be defined");
     }
   }
+
   try {
     await mongoose.connect(keys.mongoURI, {
       useNewUrlParser: true,
