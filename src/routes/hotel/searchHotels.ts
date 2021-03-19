@@ -7,7 +7,7 @@ import { GatewayCharge } from "../../models/GatewayCharges";
 import { Booking } from "../../models/Booking";
 
 const router = express.Router();
-const defaultMeterRange = 5 * 1000; //default nearBy distance is 5KM or 5000 meter
+const defaultMeterRange = 50 * 1000; //default nearBy distance is 50KM or 500000 meter
 const perPage = 10; //
 const defaultCurrency = "MYR";
 const defaultTotalGuests = 1;
