@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 import { signupRouter } from "./routes/auth/users/signup";
 import { signInRouter } from "./routes/auth/users/signin";
 import { getHotelByID } from "./routes/hotel/getHotelByID";
-import { getAllHotelsRouter } from "./routes/hotel/getAllHotels";
+import { getAllHotelsRouter } from "./routes/hotel/sAdmin/getAllHotels";
 import { searchHotelRouter } from "./routes/hotel/searchHotels";
 import { requestOTPRouter } from "./routes/auth/users/requestOTP";
 import { verifyOTPRouter } from "./routes/auth/users/verifyOTPAndChangePassword";

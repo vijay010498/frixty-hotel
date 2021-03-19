@@ -9,7 +9,7 @@ const router = express.Router({
 });
 
 router.post(
-  "/api/v1/sAdmin/createBooking",
+  "/api/secure/sAdmin/createBooking",
   requireSuperAdmin,
   [],
   validateRequest,

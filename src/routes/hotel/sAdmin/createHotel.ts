@@ -11,7 +11,7 @@ const router = express.Router({
 });
 
 router.post(
-  "/api/v1/sAdmin/createHotel",
+  "/api/secure/sAdmin/createHotel",
   requireSuperAdmin,
   [],
   validateRequest,
