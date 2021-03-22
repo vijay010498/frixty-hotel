@@ -52,4 +52,4 @@ router.patch(
   }
 );
 
-export { router as superAdminUpdateGatewayChargesRouter };
+export { router as superAdminConfigRouter };

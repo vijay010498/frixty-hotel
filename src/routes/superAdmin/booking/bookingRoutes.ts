@@ -48,4 +48,4 @@ router.post(
   }
 );
 
-export { router as superAdminCreateBookingRouter };
+export { router as superAdminBookingRouter };

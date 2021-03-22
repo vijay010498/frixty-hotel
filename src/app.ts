@@ -3,28 +3,16 @@ import "express-async-errors";
 import { json } from "express";
 import cookieParser from "cookie-parser";
 //all routes imports
-import { signupRouter } from "./routes/auth/users/signup";
-import { signInRouter } from "./routes/auth/users/signin";
-import { getHotelByID } from "./routes/hotel/getHotelByID";
-import { getAllHotelsRouter } from "./routes/hotel/sAdmin/getAllHotels";
-import { searchHotelRouter } from "./routes/hotel/searchHotels";
-import { requestOTPRouter } from "./routes/auth/users/requestOTP";
-import { verifyOTPRouter } from "./routes/auth/users/verifyOTPAndChangePassword";
-import { changePasswordRouter } from "./routes/auth/users/changePassword";
-import { verifyAuthRouter } from "./routes/auth/users/verifyAuth";
+import { userAuthRouter } from "./routes/users/auth/authRoutes";
+import { getHotelByID } from "./routes/users/hotel/getHotelByID";
+import { searchHotelRouter } from "./routes/users/hotel/searchHotel";
 
 //super admin
-import { superAdminSignupRouter } from "./routes/auth/sAdmin/signup";
-import { superAdminSignInRouter } from "./routes/auth/sAdmin/signin";
-import { superAdminSignOutRouter } from "./routes/auth/sAdmin/signout";
-import { superAdminChangePasswordRouter } from "./routes/auth/sAdmin/changePassword";
-import { superAdminRequestOTPRouter } from "./routes/auth/sAdmin/requestOTP";
-import { superAdminVerifyOTPAndChangePasswordRouter } from "./routes/auth/sAdmin/verifyOTPAndChangePassword";
-import { superAdminUpdateGatewayChargesRouter } from "./routes/config/sAdmin/UpdateGatewayCharge";
-import { superAdminCreateBookingRouter } from "./routes/hotel/sAdmin/createBookingSAdmin";
-import { superAdminCreateHotelRouter } from "./routes/hotel/sAdmin/createHotel";
-import { superAdminVerifyAuth } from "./routes/auth/sAdmin/verifySAdmin";
-import { SuperAdminGetExchangeRouter } from "./routes/auth/sAdmin/getCurrencyRates";
+import { superAdminConfigRouter } from "./routes/superAdmin/config/configRoutes";
+import { superAdminBookingRouter } from "./routes/superAdmin/booking/bookingRoutes";
+import { SuperAdminGeneralRouter } from "./routes/superAdmin/general/generalRoutes";
+import { superAdminAuthRoutes } from "./routes/superAdmin/auth/authRoutes";
+import { superAdminHotelRouter } from "./routes/superAdmin/hotel/hotelRoutes";
 import cookieSession from "cookie-session";
 
 const RateLimit = require("express-rate-limit");
@@ -47,29 +35,17 @@ app.use(
 );
 app.use(limiter);
 app.set("trust proxy", true);
-app.use(signupRouter);
-app.use(signInRouter);
+
+app.use(userAuthRouter);
 app.use(getHotelByID);
-app.use(getAllHotelsRouter);
 app.use(searchHotelRouter);
-app.use(requestOTPRouter);
-app.use(verifyOTPRouter);
-app.use(changePasswordRouter);
-app.use(verifyAuthRouter);
 
 //super admin
-app.use(superAdminSignupRouter);
-app.use(superAdminCreateHotelRouter);
-app.use(superAdminSignInRouter);
-app.use(superAdminSignOutRouter);
-app.use(superAdminChangePasswordRouter);
-app.use(superAdminRequestOTPRouter);
-app.use(superAdminRequestOTPRouter);
-app.use(superAdminVerifyOTPAndChangePasswordRouter);
-app.use(superAdminUpdateGatewayChargesRouter);
-app.use(superAdminCreateBookingRouter);
-app.use(superAdminVerifyAuth);
-app.use(SuperAdminGetExchangeRouter);
+app.use(superAdminAuthRoutes);
+app.use(superAdminHotelRouter);
+app.use(superAdminConfigRouter);
+app.use(superAdminBookingRouter);
+app.use(SuperAdminGeneralRouter);
 
 app.use(errorhandler);
 

@@ -33,4 +33,4 @@ router.get(
   }
 );
 
-export { router as SuperAdminGetExchangeRouter };
+export { router as SuperAdminGeneralRouter };

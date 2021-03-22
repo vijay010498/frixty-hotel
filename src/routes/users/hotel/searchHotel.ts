@@ -1,10 +1,10 @@
 import express, { Request, Response } from "express";
-import { BadRequestError, validateRequest } from "../../errors";
-import { Hotel } from "../../models/Hotel";
+import { BadRequestError, validateRequest } from "../../../errors";
+import { Hotel } from "../../../models/Hotel";
 import { exchangeRates } from "exchange-rates-api";
-import { SupportedCurrencies } from "../../models/enums/supportedCurrencies";
-import { GatewayCharge } from "../../models/GatewayCharges";
-import { Booking } from "../../models/Booking";
+import { SupportedCurrencies } from "../../../models/enums/supportedCurrencies";
+import { GatewayCharge } from "../../../models/GatewayCharges";
+import { Booking } from "../../../models/Booking";
 
 const router = express.Router();
 const defaultMeterRange = 50 * 1000; //default nearBy distance is 50KM or 500000 meter
@@ -143,6 +143,10 @@ router.get(
         if (rangeKM !== undefined) {
           // @ts-ignore
           rangeKM = parseFloat(req.query.range);
+          // @ts-ignore
+          if (rangeKM < 0 || !rangeKM) {
+            throw new BadRequestError("Range Must be valid");
+          }
           //convert km to meter
           // @ts-ignore
           rangeInMeter = rangeKM * 1000;
@@ -2159,6 +2163,10 @@ router.get(
         if (rangeKM !== undefined) {
           // @ts-ignore
           rangeKM = parseFloat(req.query.range);
+          // @ts-ignore
+          if (rangeKM < 0 || !rangeKM) {
+            throw new BadRequestError("Range Must be valid");
+          }
           //convert km to meter
           // @ts-ignore
           rangeInMeter = rangeKM * 1000;

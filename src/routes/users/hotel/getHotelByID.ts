@@ -1,13 +1,17 @@
 import express, { Request, Response } from "express";
 import { body, param } from "express-validator";
 
-import { BadRequestError, NotFoundError, validateRequest } from "../../errors";
-import { Hotel } from "../../models/Hotel";
+import {
+  BadRequestError,
+  NotFoundError,
+  validateRequest,
+} from "../../../errors";
+import { Hotel } from "../../../models/Hotel";
 import { exchangeRates } from "exchange-rates-api";
-import { SupportedCurrencies } from "../../models/enums/supportedCurrencies";
-import { GatewayCharge } from "../../models/GatewayCharges";
-import { Booking } from "../../models/Booking";
-import { checkHotelExists } from "../../errors/middleware/hotel-exists";
+import { SupportedCurrencies } from "../../../models/enums/supportedCurrencies";
+import { GatewayCharge } from "../../../models/GatewayCharges";
+import { Booking } from "../../../models/Booking";
+import { checkHotelExists } from "../../../errors/middleware/hotel-exists";
 import mongoose from "mongoose";
 
 const router = express.Router();
