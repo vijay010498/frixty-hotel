@@ -15,6 +15,7 @@ import { superAdminAuthRoutes } from "./routes/superAdmin/auth/authRoutes";
 import { superAdminAdminRouter } from "./routes/superAdmin/admin/adminRoutes";
 import { superAdminHotelRouter } from "./routes/superAdmin/hotel/hotelRoutes";
 import { superAdminUploadRouter } from "./routes/superAdmin/upload/uploadRoutes";
+import { superAdminSubscriptionRouter } from "./routes/superAdmin/subscription/subscriptionRoutes";
 import cookieSession from "cookie-session";
 
 const RateLimit = require("express-rate-limit");
@@ -50,6 +51,7 @@ app.use(superAdminBookingRouter);
 app.use(SuperAdminGeneralRouter);
 app.use(superAdminAdminRouter);
 app.use(superAdminUploadRouter);
+app.use(superAdminSubscriptionRouter);
 app.use(errorhandler);
 app.all("*", async (req, res) => {
   throw new NotFoundError();
