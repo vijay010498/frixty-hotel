@@ -41,9 +41,12 @@ router.get(
       (err: any, url: any) => {
         if (err) {
           console.log(err);
+          res.status(403).send(err);
+          return;
         }
         console.log(key, url);
         res.send({ key, url });
+        return;
       }
     );
   }

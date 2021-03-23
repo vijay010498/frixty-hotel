@@ -6,6 +6,8 @@ module.exports = {
   JWTEXPIRETIME: process.env.JWTEXPIRETIME,
   jwtSuperAdminKey: process.env.jwtSuperAdminKey,
   JWTEXPIRETIMESUPERADMIN: process.env.JWTEXPIRETIMESUPERADMIN,
+  awsAccessKeyId: process.env.awsAccessKeyId,
+  awsSecretKeyId: process.env.awsSecretKeyId,
 };
 
 //mongodb+srv://vijay:V07Dm5Diwkz95eIj@cluster0.p1weg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
