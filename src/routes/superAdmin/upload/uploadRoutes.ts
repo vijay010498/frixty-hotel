@@ -39,6 +39,7 @@ router.get(
         Key: key,
       },
       (err: any, url: any) => {
+        console.log(key, url);
         res.send({ key, url });
       }
     );
