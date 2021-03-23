@@ -39,7 +39,7 @@ router.post(
         document: `${ADMIN_BUCKET}/${document}`,
         imageUrl: `${ADMIN_BUCKET}/${imageUrl}`,
         password: account.password,
-        phoneNumber: account.password,
+        phoneNumber: account.phonenumber,
       });
       await admin.save();
       res.status(200).send(admin);
@@ -64,6 +64,28 @@ router.get(
       hotelId,
     });
     return;
+  }
+);
+router.get(
+  "/api/secure/sAdmin/getAllAdmins",
+  requireSuperAdmin,
+  [],
+  validateRequest,
+  async (req: Request, res: Response) => {
+    try {
+      const admins = await Admin.find();
+      if (admins.length === 0) {
+        res.status(403).send({});
+        return;
+      }
+      res.status(200).send({
+        admins,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(403).send(err);
+      return;
+    }
   }
 );
 

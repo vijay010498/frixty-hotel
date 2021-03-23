@@ -4,7 +4,8 @@ const AWS = require("aws-sdk");
 const uuid = require("uuid");
 import { requireSuperAdmin } from "../../../errors/middleware/SAdmin/require-super-admin";
 import express, { Request, Response } from "express";
-import { validateRequest } from "../../../errors";
+import { BadRequestError, validateRequest } from "../../../errors";
+import { Admin } from "../../../models/Admin";
 const keys = require("../../../config/keys");
 const S3 = new AWS.S3({
   accessKeyId: keys.awsAccessKeyId,
@@ -44,11 +45,11 @@ router.get(
           res.status(403).send(err);
           return;
         }
-        console.log(key, url);
         res.send({ key, url });
         return;
       }
     );
   }
 );
+
 export { router as superAdminUploadRouter };
