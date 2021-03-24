@@ -4,15 +4,21 @@ import { addressObject } from "./objectModels/addressObject";
 
 interface AdminAttrs {
   _id: mongoose.Types.ObjectId;
-  email: string;
-  password: string;
-  fullName: string;
-  phoneNumber: string;
-  imageUrl: string;
-  document: string;
   hotelId: mongoose.Types.ObjectId;
   hotelName: string;
   hotelAddress: typeof addressObject;
+  email: string;
+  password: string;
+  companyName: string;
+  ownerName: string;
+  contactNumber: string;
+  whatsappNumber: string;
+  emergencyContactNumber: string;
+  ssmNumber: string;
+  passportNumber: string;
+  adminImageUrl: string;
+  ssmCopyUrl: string;
+  companyNameBoardImageUrl: string;
 }
 interface AdminModel extends mongoose.Model<AdminDoc> {
   build(attrs: AdminAttrs): AdminDoc;
@@ -20,21 +26,43 @@ interface AdminModel extends mongoose.Model<AdminDoc> {
 
 interface AdminDoc extends mongoose.Document {
   _id: mongoose.Types.ObjectId;
-  email: string;
-  password: string;
-  fullName: string;
-  phoneNumber: string;
-  imageUrl: string;
-  document: string;
   hotelId: mongoose.Types.ObjectId;
   hotelName: string;
   hotelAddress: typeof addressObject;
+  email: string;
+  password: string;
+  companyName: string;
+  ownerName: string;
+  contactNumber: string;
+  whatsappNumber: string;
+  emergencyContactNumber: string;
+  ssmNumber: string;
+  passportNumber: string;
+  adminImageUrl: string;
+  ssmCopyUrl: string;
+  companyNameBoardImageUrl: string;
+  blocked: boolean;
 }
 
 const adminSchema = new mongoose.Schema(
   {
     _id: {
       type: mongoose.Types.ObjectId,
+      required: true,
+    },
+    blocked: {
+      type: Boolean,
+      default: false,
+    },
+    hotelId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Hotel",
+      required: true,
+    },
+    hotelAddress: addressObject,
+
+    hotelName: {
+      type: String,
       required: true,
     },
     email: {
@@ -47,25 +75,42 @@ const adminSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    fullName: {
+    companyName: {
       type: String,
       required: true,
     },
-    hotelAddress: addressObject,
-    phoneNumber: {
+    ownerName: {
       type: String,
       required: true,
-      index: true,
-      unique: true,
     },
-    imageUrl: String,
-    document: String,
-    hotelId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Hotel",
+    contactNumber: {
+      type: String,
       required: true,
     },
-    hotelName: {
+    whatsappNumber: {
+      type: String,
+      required: true,
+    },
+    emergencyContactNumber: {
+      type: String,
+    },
+    ssmNumber: {
+      type: String,
+      required: true,
+    },
+    passportNumber: {
+      type: String,
+      required: true,
+    },
+    adminImageUrl: {
+      type: String,
+      required: true,
+    },
+    ssmCopyUrl: {
+      type: String,
+      required: true,
+    },
+    companyNameBoardImageUrl: {
       type: String,
       required: true,
     },

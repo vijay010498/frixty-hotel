@@ -18,7 +18,15 @@ router.post(
   async (req: Request, res: Response) => {
     const ADMIN_BUCKET =
       "https://chill-in-admin-files.s3.ap-south-1.amazonaws.com";
-    const { account, hotel, imageUrl, document, adminId, hotelId } = req.body;
+    const {
+      account,
+      hotel,
+      adminImageUrl,
+      ssmCopyUrl,
+      adminId,
+      hotelId,
+      companyNameBoardImageUrl,
+    } = req.body;
     try {
       const hotelAddress = {
         street: hotel.hotelstreet,
@@ -28,18 +36,25 @@ router.post(
         pinCode: parseInt(hotel.hotelpincode),
         country: hotel.hotelcountry,
       };
-      const admin = Admin.build({
+
+      const admin = await Admin.build({
         _id: adminId,
+        adminImageUrl: `${ADMIN_BUCKET}/${adminImageUrl}`,
+        companyName: account.companyname,
+        companyNameBoardImageUrl: `${ADMIN_BUCKET}/${companyNameBoardImageUrl}`,
+        contactNumber: account.contactnumber,
         email: account.email,
-        fullName: account.fullname,
+        emergencyContactNumber: account.emergencycontactnumber || "",
         // @ts-ignore
-        hotelAddress,
+        hotelAddress: hotelAddress,
         hotelId: hotelId,
         hotelName: hotel.hotelname,
-        document: `${ADMIN_BUCKET}/${document}`,
-        imageUrl: `${ADMIN_BUCKET}/${imageUrl}`,
+        ownerName: account.ownername,
+        passportNumber: account.passportnumber,
         password: account.password,
-        phoneNumber: account.phonenumber,
+        ssmCopyUrl: `${ADMIN_BUCKET}/${ssmCopyUrl}`,
+        ssmNumber: account.ssmnumber,
+        whatsappNumber: account.whatsappnumber,
       });
       await admin.save();
       res.status(200).send(admin);
