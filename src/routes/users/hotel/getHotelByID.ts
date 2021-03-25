@@ -124,7 +124,7 @@ router.get(
 );
 async function sendResponse(res: Response, hotel: Array<any>) {
   res.status(200).send({
-    hotel,
+    hotel: hotel[0],
     checkIn,
     checkOut,
     totalDays,
