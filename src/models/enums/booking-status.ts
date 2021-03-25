@@ -1,10 +1,7 @@
 export enum BookingStatus {
-  //Booking created
+  //Booking created and Confirmed, completed
   Confirmed = "confirmed",
 
   //Booking Cancelled
   Cancelled = "cancelled",
-
-  //Booking Completed
-  Completed = "completed",
 }
