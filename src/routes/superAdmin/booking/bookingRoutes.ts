@@ -54,7 +54,14 @@ router.get(
   [],
   validateRequest,
   async (req: Request, res: Response) => {
-    const bookings = await Booking;
+    const bookings = await Booking.find();
+    if (bookings.length === 0) {
+      throw new BadRequestError("No Bookings Found");
+    }
+    res.status(200).send({
+      bookings,
+    });
+    return;
   }
 );
 

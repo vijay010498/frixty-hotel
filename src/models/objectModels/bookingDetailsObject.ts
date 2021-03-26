@@ -9,9 +9,23 @@ const bookingDetailsObject = {
     enum: Object.values(BookingStatus),
     index: true,
   },
-  totalPeopleStaying: {
+  totalGuests: {
     type: Number,
     required: true,
+  },
+  totalDays: {
+    type: Number,
+    required: true,
+  },
+  roomConfiguration: {
+    totalRooms: {
+      type: Number,
+      required: true,
+    },
+    totalGuestsPerRoom: {
+      type: Number,
+      required: true,
+    },
   },
   checkInDateTime: {
     type: mongoose.Schema.Types.Date, // UTC by default
