@@ -127,6 +127,7 @@ router.get(
     await transformObject(hotels);
     await checkBookingDetails(hotels);
     await createRoomConfig(hotels, totalGuests, selected_roomId);
+    await checkTotalGuestsDetails(hotels);
     if (hotels.length === 0 || !hotels[0].rooms) {
       throw new BadRequestError("Given request is not valid with this hotel");
     }
@@ -302,7 +303,6 @@ async function createRoomConfig(
     let totalRooms = 0;
     for (let i = 0; i < hotels.length; i++) {
       for (let j = 0; j < hotels[i].rooms.length; j++) {
-        //console.log(typeof hotels[i].rooms[j].id.toString());
         if (hotels[i].rooms[j].id.toString() === roomId) {
           if (
             totalGuests >
@@ -384,6 +384,9 @@ async function createRoomConfig(
       }
     }
   }
+}
+
+async function checkTotalGuestsDetails(hotels: Array<any>) {
   //
   for (let i = 0; i < hotels.length; i++) {
     await _.remove(hotels[i].rooms, function (room) {
