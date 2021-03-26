@@ -48,4 +48,14 @@ router.post(
   }
 );
 
+router.get(
+  "/api/secure/sAdmin/Bookings",
+  requireSuperAdmin,
+  [],
+  validateRequest,
+  async (req: Request, res: Response) => {
+    const bookings = await Booking;
+  }
+);
+
 export { router as superAdminBookingRouter };

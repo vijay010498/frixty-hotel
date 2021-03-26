@@ -397,6 +397,9 @@ async function checkTotalGuestsDetails(hotels: Array<any>) {
   await _.remove(hotels, function (hotel) {
     return hotel.rooms.length === 0;
   });
+  for (let i = 0; i < hotels.length; i++) {
+    hotels[i].totalRoomTypesAvailable = hotels[i].rooms.length;
+  }
 }
 function loopRoomConfig(totalRooms: number, sleeps: number) {
   let config = "";

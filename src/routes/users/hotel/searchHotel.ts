@@ -3002,6 +3002,7 @@ async function checkTotalGuestsDetails(hotels: Array<any>) {
     return hotel.rooms.length === 0;
   });
   for (let i = 0; i < hotels.length; i++) {
+    hotels[i].totalRoomTypesAvailable = hotels[i].rooms.length;
     for (let j = 0; j < hotels[i].rooms.length; j++) {
       totalRooms++;
     }
