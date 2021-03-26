@@ -15,9 +15,9 @@ import { checkHotelExists } from "../../../errors/middleware/hotel-exists";
 import mongoose from "mongoose";
 
 const router = express.Router();
-const defaultCurrency = "MYR";
-const defaultTotalGuests = 1;
-const defaultSortOrder = 1;
+const DEFAULT_CURRENCY = "MYR";
+const DEFAULT_TOTAL_GUESTS = 1;
+const DEFAULT_SORT_ORDER = 1;
 let gatewayChargesForHotelPercentage: number;
 let currencyRates = {};
 let requestedCurrency: string;
@@ -25,7 +25,9 @@ let checkIn: string;
 let checkOut: string;
 let totalDays: number;
 let totalGuests: number;
-let roomId: string;
+let rooms: number;
+let roomConfig: string;
+let selected_roomId: string;
 
 router.get(
   "/api/v1/hotel/:hotelId",
@@ -43,6 +45,13 @@ router.get(
     // @ts-ignore
     checkOut = req.query.checkOut || tomorrow;
 
+    //rooms config
+    // @ts-ignore
+    rooms = parseInt(req.query.rooms) || 0;
+    // @ts-ignore
+    selected_roomId = req.query.selected_roomId || "";
+    roomConfig = "";
+
     //To Calculate total days
     const checkInStr = new Date(checkIn);
     const checkOutStr = new Date(checkOut);
@@ -52,16 +61,19 @@ router.get(
     //get Gateway charges percentage
     await getGatewayCharges(res);
     // @ts-ignore
-    requestedCurrency = req.query.currency || defaultCurrency;
+    requestedCurrency = req.query.currency || DEFAULT_CURRENCY;
     //check if given currency is supported by us or not
-    if (requestedCurrency !== defaultCurrency)
+    if (requestedCurrency !== DEFAULT_CURRENCY)
       await checkRequestedCurrency(requestedCurrency);
     //first get currency exchange rates for user requested currency
     // - > user wants in INR , get one INR  = ? for all currency
     // later divide from home currency of  hotel
     await getCurrencyRates(res);
     // @ts-ignore
-    totalGuests = parseInt(req.query.totalGuests) || defaultTotalGuests;
+    totalGuests = parseInt(req.query.totalGuests) || DEFAULT_TOTAL_GUESTS;
+    if (totalGuests < 0) {
+      throw new BadRequestError("Not a valid room config");
+    }
 
     //first get hotel to get room Id for matching total guest
 
@@ -80,13 +92,14 @@ router.get(
       },
       {
         $match: {
-          "rooms.sleeps": { $gte: totalGuests },
+          //"rooms.sleeps": { $gte: totalGuests },
+          "rooms.sleeps": { $gte: 1 },
           isServiceable: true,
         },
       },
       {
         $sort: {
-          "rooms.priceForOneNight": defaultSortOrder,
+          "rooms.priceForOneNight": DEFAULT_SORT_ORDER,
         },
       },
       {
@@ -112,16 +125,15 @@ router.get(
 
     await transformObject(hotels);
     await checkBookingDetails(hotels);
-    if (hotels.length === 0) {
+    if (hotels.length === 0 || !hotels[0].rooms) {
       throw new BadRequestError("Given request is not valid with this hotel");
     }
-    if (hotels && hotels[0].rooms) {
-      roomId = hotels[0].rooms[0].id;
-    }
+    await createRoomConfig(hotels, totalGuests, selected_roomId);
     await sendResponse(res, hotels);
     return;
   }
 );
+
 async function sendResponse(res: Response, hotel: Array<any>) {
   res.status(200).send({
     hotel,
@@ -129,6 +141,9 @@ async function sendResponse(res: Response, hotel: Array<any>) {
     checkOut,
     totalDays,
     totalGuests,
+    rooms,
+    roomConfig,
+    selected_roomId,
   });
 }
 const checkBookingDetails = async (hotels: Array<any>) => {
@@ -191,10 +206,17 @@ const checkBookingDetails = async (hotels: Array<any>) => {
               hotels[i].rooms[j].id.toString() ===
               bookingsChecked[k].roomId.toString()
             ) {
-              console.log(
-                ` Match Found ${hotels[i].id}  ${hotels[i].rooms[j].id} ${bookingsChecked[k].roomId} `
-              );
-              hotels[i].rooms.splice(j, 1);
+              hotels[i].rooms[j].totalRooms -= 1;
+              if (hotels[i].rooms[j].totalRooms === 0) {
+                console.log(
+                  ` Match Found total rooms = 0  delete room itself ${hotels[i].id}  ${hotels[i].rooms[j].id} ${bookingsChecked[k].roomId} `
+                );
+                hotels[i].rooms.splice(j, 1);
+              } else {
+                console.log(
+                  ` Match Found minus 1 room ${hotels[i].id}  ${hotels[i].rooms[j].id} ${bookingsChecked[k].roomId} `
+                );
+              }
             }
           }
         }
@@ -210,6 +232,108 @@ const checkBookingDetails = async (hotels: Array<any>) => {
     return;
   }
 };
+async function createRoomConfig(
+  hotels: Array<any>,
+  totalGuests: number,
+  roomId: String
+) {
+  //room id given
+  if (roomId) {
+    //do checking for only selected room id
+    let totalRooms = 0;
+    for (let i = 0; i < hotels.length; i++) {
+      for (let j = 0; j < hotels[i].rooms.length; j++) {
+        //console.log(typeof hotels[i].rooms[j].id.toString());
+        if (hotels[i].rooms[j].id.toString() === roomId) {
+          if (
+            totalGuests >
+            hotels[i].rooms[j].sleeps * hotels[i].rooms[j].totalRooms
+          )
+            throw new BadRequestError("No valid Room Config");
+          if (hotels[i].rooms[j].sleeps === totalGuests) {
+            //if single room has sleeps of === totalGuests
+            totalRooms++;
+            selected_roomId = hotels[i].rooms[j].id;
+            rooms = 1;
+            roomConfig = `${totalRooms}-${
+              hotels[i].rooms[j].sleeps
+            }_${await loopRoomConfig(totalRooms, hotels[i].rooms[j].sleeps)}`;
+            return;
+          } else if (hotels[i].rooms[j].sleeps > totalGuests) {
+            totalRooms++;
+            selected_roomId = hotels[i].rooms[j].id;
+            rooms = 1;
+            roomConfig = `${totalRooms}-${
+              hotels[i].rooms[j].sleeps
+            }_${await loopRoomConfig(totalRooms, hotels[i].rooms[j].sleeps)}`;
+            return;
+          } else if (
+            hotels[i].rooms[j].sleeps * hotels[i].rooms[j].totalRooms >=
+            totalGuests
+          ) {
+            totalRooms = Math.ceil(totalGuests / hotels[i].rooms[j].sleeps);
+            selected_roomId = hotels[i].rooms[j].id;
+            rooms = totalRooms;
+            roomConfig = `${totalRooms}-${
+              hotels[i].rooms[j].sleeps
+            }_${await loopRoomConfig(totalRooms, hotels[i].rooms[j].sleeps)}`;
+            return;
+          }
+        }
+      }
+    }
+  } else {
+    let totalRooms = 0;
+    //possibly default room config so go through all rooms
+    for (let i = 0; i < hotels.length; i++) {
+      for (let j = 0; j < hotels[i].rooms.length; j++) {
+        if (hotels[i].rooms[j].sleeps === totalGuests) {
+          //if single room has sleeps of === totalGuests
+          totalRooms++;
+          selected_roomId = hotels[i].rooms[j].id;
+          rooms = 1;
+          roomConfig = `${totalRooms}-${
+            hotels[i].rooms[j].sleeps
+          }_${await loopRoomConfig(totalRooms, hotels[i].rooms[j].sleeps)}`;
+          return;
+        }
+      }
+      for (let j = 0; j < hotels[i].rooms.length; j++) {
+        if (hotels[i].rooms[j].sleeps > totalGuests) {
+          totalRooms++;
+          selected_roomId = hotels[i].rooms[j].id;
+          rooms = 1;
+          roomConfig = `${totalRooms}-${
+            hotels[i].rooms[j].sleeps
+          }_${await loopRoomConfig(totalRooms, hotels[i].rooms[j].sleeps)}`;
+          return;
+        }
+      }
+      for (let j = 0; j < hotels[i].rooms.length; j++) {
+        if (
+          hotels[i].rooms[j].sleeps * hotels[i].rooms[j].totalRooms >=
+          totalGuests
+        ) {
+          totalRooms = Math.ceil(totalGuests / hotels[i].rooms[j].sleeps);
+          selected_roomId = hotels[i].rooms[j].id;
+          rooms = totalRooms;
+          roomConfig = `${totalRooms}-${
+            hotels[i].rooms[j].sleeps
+          }_${await loopRoomConfig(totalRooms, hotels[i].rooms[j].sleeps)}`;
+          return;
+        }
+      }
+    }
+  }
+}
+function loopRoomConfig(totalRooms: number, sleeps: number) {
+  let config = "";
+  for (let i = 0; i < totalRooms; i++) {
+    i > 0 ? (config += "_") : null;
+    config += `${i + 1}-${sleeps}`;
+  }
+  return config;
+}
 
 const transformObject = async (hotels: Array<any>) => {
   for (let i = 0; i < hotels.length; i++) {

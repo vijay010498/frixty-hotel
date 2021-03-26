@@ -5,12 +5,12 @@ import { exchangeRates } from "exchange-rates-api";
 import { SupportedCurrencies } from "../../../models/enums/supportedCurrencies";
 import { GatewayCharge } from "../../../models/GatewayCharges";
 import { Booking } from "../../../models/Booking";
-
+import _ from "lodash";
 const router = express.Router();
-const defaultMeterRange = 50 * 1000; //default nearBy distance is 50KM or 500000 meter
-const perPage = 10; //
-const defaultCurrency = "MYR";
-const defaultTotalGuests = 1;
+const DEFAULT_METER_RANGE = 50 * 1000; //default nearBy distance is 50KM or 500000 meter
+const PER_PAGE = 10; //
+const DEFAULT_CURRENCY = "MYR";
+const DEFAULT_TOTAL_GUESTS = 1;
 let gatewayChargesForHotelPercentage: number;
 let currencyRates = {};
 let requestedCurrency: string;
@@ -18,6 +18,7 @@ let requestedCurrency: string;
 let checkIn: string;
 let checkOut: string;
 let totalDays: number;
+let totalGuests: number;
 
 router.get(
   "/api/v1/hotels/search",
@@ -47,9 +48,9 @@ router.get(
     await getGatewayCharges(res);
 
     // @ts-ignore
-    requestedCurrency = req.query.currency || defaultCurrency;
+    requestedCurrency = req.query.currency || DEFAULT_CURRENCY;
     //check if given currency is supported by us or not
-    if (requestedCurrency !== defaultCurrency)
+    if (requestedCurrency !== DEFAULT_CURRENCY)
       await checkRequestedCurrency(requestedCurrency);
 
     //first get currency exchange rates for user requested currency
@@ -60,7 +61,7 @@ router.get(
     // @ts-ignore
     let page = parseInt(req.query.page) || 0;
     // @ts-ignore
-    const totalGuests = parseInt(req.query.totalGuests) || defaultTotalGuests;
+    totalGuests = parseInt(req.query.totalGuests) || DEFAULT_TOTAL_GUESTS;
     let isSortBy = false;
     let isFilterBy = false;
     let isGeoQuery = false;
@@ -165,7 +166,7 @@ router.get(
                     coordinates: [longitude, latitude],
                   },
                   distanceField: "distanceToReach",
-                  maxDistance: defaultMeterRange,
+                  maxDistance: DEFAULT_METER_RANGE,
                 },
               },
               {
@@ -186,7 +187,7 @@ router.get(
               },
               {
                 $match: {
-                  "rooms.sleeps": { $gte: totalGuests },
+                  "rooms.sleeps": { $gte: 1 },
                   isServiceable: true,
                 },
               },
@@ -212,7 +213,7 @@ router.get(
             ]);
             const totalHotels = hotelsDB.length;
 
-            if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+            if (page >= Math.ceil(totalHotels / PER_PAGE) || page < 0) {
               page = 0;
             }
 
@@ -235,7 +236,7 @@ router.get(
                         coordinates: [longitude, latitude],
                       },
                       distanceField: "distanceToReach",
-                      maxDistance: defaultMeterRange,
+                      maxDistance: DEFAULT_METER_RANGE,
                     },
                   },
                   {
@@ -256,7 +257,7 @@ router.get(
                   },
                   {
                     $match: {
-                      "rooms.sleeps": { $gte: totalGuests },
+                      "rooms.sleeps": { $gte: 1 },
                       isServiceable: true,
                     },
                   },
@@ -289,25 +290,26 @@ router.get(
                       "rooms.priceForOneNight": sortByPriceRule,
                     },
                   },
-                  { $skip: perPage * page },
-                  { $limit: perPage },
+                  { $skip: PER_PAGE * page },
+                  { $limit: PER_PAGE },
                 ]);
 
                 await transformObject(hotels);
                 await checkBookingDetails(hotels);
 
+                await checkTotalGuestsDetails(hotels);
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
                 res.status(200).send({
                   hotels: hotels,
-                  totalHotels,
+                  totalHotels: hotels.length,
                   checkIn,
                   checkOut,
                   totalDays,
                   totalGuests,
                   page: page,
-                  pages: Math.ceil(totalHotels / perPage),
+                  pages: Math.ceil(totalHotels / PER_PAGE),
                 });
                 return;
               }
@@ -320,7 +322,7 @@ router.get(
                       coordinates: [longitude, latitude],
                     },
                     distanceField: "distanceToReach",
-                    maxDistance: defaultMeterRange,
+                    maxDistance: DEFAULT_METER_RANGE,
                   },
                 },
                 {
@@ -341,7 +343,7 @@ router.get(
                 },
                 {
                   $match: {
-                    "rooms.sleeps": { $gte: totalGuests },
+                    "rooms.sleeps": { $gte: 1 },
                     isServiceable: true,
                   },
                 },
@@ -364,23 +366,24 @@ router.get(
                     root: 0,
                   },
                 },
-                { $skip: perPage * page },
-                { $limit: perPage },
+                { $skip: PER_PAGE * page },
+                { $limit: PER_PAGE },
               ]);
               await transformObject(hotels);
               await checkBookingDetails(hotels);
+              await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
               res.status(200).send({
-                hotels,
-                totalHotels,
+                hotels: hotels,
+                totalHotels: hotels.length,
                 checkIn,
                 checkOut,
                 totalDays,
                 totalGuests,
                 page: page,
-                pages: Math.ceil(totalHotels / perPage),
+                pages: Math.ceil(totalHotels / PER_PAGE),
               });
               return;
             }
@@ -396,7 +399,7 @@ router.get(
                     coordinates: [longitude, latitude],
                   },
                   distanceField: "distanceToReach",
-                  maxDistance: defaultMeterRange,
+                  maxDistance: DEFAULT_METER_RANGE,
                 },
               },
               {
@@ -416,7 +419,7 @@ router.get(
               },
               {
                 $match: {
-                  "rooms.sleeps": { $gte: totalGuests },
+                  "rooms.sleeps": { $gte: 1 },
                   isServiceable: true,
                 },
               },
@@ -442,7 +445,7 @@ router.get(
             ]);
             const totalHotels = hotelsDB.length;
 
-            if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+            if (page >= Math.ceil(totalHotels / PER_PAGE) || page < 0) {
               page = 0;
             }
             if (isSortBy) {
@@ -464,7 +467,7 @@ router.get(
                         coordinates: [longitude, latitude],
                       },
                       distanceField: "distanceToReach",
-                      maxDistance: defaultMeterRange,
+                      maxDistance: DEFAULT_METER_RANGE,
                     },
                   },
                   {
@@ -484,7 +487,7 @@ router.get(
                   },
                   {
                     $match: {
-                      "rooms.sleeps": { $gte: totalGuests },
+                      "rooms.sleeps": { $gte: 1 },
                       isServiceable: true,
                     },
                   },
@@ -517,25 +520,25 @@ router.get(
                       "rooms.priceForOneNight": sortByPriceRule,
                     },
                   },
-                  { $skip: perPage * page },
-                  { $limit: perPage },
+                  { $skip: PER_PAGE * page },
+                  { $limit: PER_PAGE },
                 ]);
 
                 await transformObject(hotels);
                 await checkBookingDetails(hotels);
-
+                await checkTotalGuestsDetails(hotels);
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
                 res.status(200).send({
                   hotels: hotels,
-                  totalHotels,
+                  totalHotels: hotels.length,
                   checkIn,
                   checkOut,
                   totalDays,
                   totalGuests,
                   page: page,
-                  pages: Math.ceil(totalHotels / perPage),
+                  pages: Math.ceil(totalHotels / PER_PAGE),
                 });
                 return;
               }
@@ -548,7 +551,7 @@ router.get(
                       coordinates: [longitude, latitude],
                     },
                     distanceField: "distanceToReach",
-                    maxDistance: defaultMeterRange,
+                    maxDistance: DEFAULT_METER_RANGE,
                   },
                 },
                 {
@@ -568,7 +571,7 @@ router.get(
                 },
                 {
                   $match: {
-                    "rooms.sleeps": { $gte: totalGuests },
+                    "rooms.sleeps": { $gte: 1 },
                     isServiceable: true,
                   },
                 },
@@ -591,25 +594,26 @@ router.get(
                     root: 0,
                   },
                 },
-                { $skip: perPage * page },
-                { $limit: perPage },
+                { $skip: PER_PAGE * page },
+                { $limit: PER_PAGE },
               ]);
 
               await transformObject(hotels);
               await checkBookingDetails(hotels);
 
+              await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
               res.status(200).send({
                 hotels: hotels,
-                totalHotels,
-                page: page,
+                totalHotels: hotels.length,
                 checkIn,
                 checkOut,
                 totalDays,
                 totalGuests,
-                pages: Math.ceil(totalHotels / perPage),
+                page: page,
+                pages: Math.ceil(totalHotels / PER_PAGE),
               });
               return;
             }
@@ -625,7 +629,7 @@ router.get(
                     coordinates: [longitude, latitude],
                   },
                   distanceField: "distanceToReach",
-                  maxDistance: defaultMeterRange,
+                  maxDistance: DEFAULT_METER_RANGE,
                 },
               },
               {
@@ -645,7 +649,7 @@ router.get(
               },
               {
                 $match: {
-                  "rooms.sleeps": { $gte: totalGuests },
+                  "rooms.sleeps": { $gte: 1 },
                   isServiceable: true,
                 },
               },
@@ -671,7 +675,7 @@ router.get(
             ]);
             const totalHotels = hotelsDB.length;
 
-            if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+            if (page >= Math.ceil(totalHotels / PER_PAGE) || page < 0) {
               page = 0;
             }
             if (isSortBy) {
@@ -693,7 +697,7 @@ router.get(
                         coordinates: [longitude, latitude],
                       },
                       distanceField: "distanceToReach",
-                      maxDistance: defaultMeterRange,
+                      maxDistance: DEFAULT_METER_RANGE,
                     },
                   },
                   {
@@ -713,7 +717,7 @@ router.get(
                   },
                   {
                     $match: {
-                      "rooms.sleeps": { $gte: totalGuests },
+                      "rooms.sleeps": { $gte: 1 },
                       isServiceable: true,
                     },
                   },
@@ -746,25 +750,26 @@ router.get(
                       "rooms.priceForOneNight": sortByPriceRule,
                     },
                   },
-                  { $skip: perPage * page },
-                  { $limit: perPage },
+                  { $skip: PER_PAGE * page },
+                  { $limit: PER_PAGE },
                 ]);
 
                 await transformObject(hotels);
                 await checkBookingDetails(hotels);
 
+                await checkTotalGuestsDetails(hotels);
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
                 res.status(200).send({
                   hotels: hotels,
-                  totalHotels,
+                  totalHotels: hotels.length,
                   checkIn,
                   checkOut,
                   totalDays,
                   totalGuests,
                   page: page,
-                  pages: Math.ceil(totalHotels / perPage),
+                  pages: Math.ceil(totalHotels / PER_PAGE),
                 });
                 return;
               }
@@ -777,7 +782,7 @@ router.get(
                       coordinates: [longitude, latitude],
                     },
                     distanceField: "distanceToReach",
-                    maxDistance: defaultMeterRange,
+                    maxDistance: DEFAULT_METER_RANGE,
                   },
                 },
                 {
@@ -797,7 +802,7 @@ router.get(
                 },
                 {
                   $match: {
-                    "rooms.sleeps": { $gte: totalGuests },
+                    "rooms.sleeps": { $gte: 1 },
                     isServiceable: true,
                   },
                 },
@@ -820,25 +825,26 @@ router.get(
                     root: 0,
                   },
                 },
-                { $skip: perPage * page },
-                { $limit: perPage },
+                { $skip: PER_PAGE * page },
+                { $limit: PER_PAGE },
               ]);
 
               await transformObject(hotels);
               await checkBookingDetails(hotels);
 
+              await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
               res.status(200).send({
                 hotels: hotels,
-                totalHotels,
+                totalHotels: hotels.length,
                 checkIn,
                 checkOut,
                 totalDays,
                 totalGuests,
                 page: page,
-                pages: Math.ceil(totalHotels / perPage),
+                pages: Math.ceil(totalHotels / PER_PAGE),
               });
               return;
             }
@@ -879,7 +885,7 @@ router.get(
               },
               {
                 $match: {
-                  "rooms.sleeps": { $gte: totalGuests },
+                  "rooms.sleeps": { $gte: 1 },
                   isServiceable: true,
                 },
               },
@@ -904,7 +910,7 @@ router.get(
               },
             ]);
             const totalHotels = hotelDB.length;
-            if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+            if (page >= Math.ceil(totalHotels / PER_PAGE) || page < 0) {
               page = 0;
             }
             if (isSortBy) {
@@ -947,7 +953,7 @@ router.get(
                   },
                   {
                     $match: {
-                      "rooms.sleeps": { $gte: totalGuests },
+                      "rooms.sleeps": { $gte: 1 },
                       isServiceable: true,
                     },
                   },
@@ -980,25 +986,25 @@ router.get(
                       "rooms.priceForOneNight": sortByPriceRule,
                     },
                   },
-                  { $skip: perPage * page },
-                  { $limit: perPage },
+                  { $skip: PER_PAGE * page },
+                  { $limit: PER_PAGE },
                 ]);
 
                 await transformObject(hotels);
                 await checkBookingDetails(hotels);
-
+                await checkTotalGuestsDetails(hotels);
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
                 res.status(200).send({
                   hotels: hotels,
-                  totalHotels,
+                  totalHotels: hotels.length,
                   checkIn,
                   checkOut,
                   totalDays,
                   totalGuests,
                   page: page,
-                  pages: Math.ceil(totalHotels / perPage),
+                  pages: Math.ceil(totalHotels / PER_PAGE),
                 });
                 return;
               }
@@ -1032,7 +1038,7 @@ router.get(
                 },
                 {
                   $match: {
-                    "rooms.sleeps": { $gte: totalGuests },
+                    "rooms.sleeps": { $gte: 1 },
                     isServiceable: true,
                   },
                 },
@@ -1055,25 +1061,26 @@ router.get(
                     root: 0,
                   },
                 },
-                { $skip: perPage * page },
-                { $limit: perPage },
+                { $skip: PER_PAGE * page },
+                { $limit: PER_PAGE },
               ]);
 
               await transformObject(hotels);
               await checkBookingDetails(hotels);
 
+              await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
               res.status(200).send({
-                hotels,
-                totalHotels,
+                hotels: hotels,
+                totalHotels: hotels.length,
                 checkIn,
                 checkOut,
                 totalDays,
                 totalGuests,
                 page: page,
-                pages: Math.ceil(totalHotels / perPage),
+                pages: Math.ceil(totalHotels / PER_PAGE),
               });
               return;
             }
@@ -1109,7 +1116,7 @@ router.get(
               },
               {
                 $match: {
-                  "rooms.sleeps": { $gte: totalGuests },
+                  "rooms.sleeps": { $gte: 1 },
                   isServiceable: true,
                 },
               },
@@ -1135,7 +1142,7 @@ router.get(
             ]);
             const totalHotels = hotelsDB.length;
 
-            if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+            if (page >= Math.ceil(totalHotels / PER_PAGE) || page < 0) {
               page = 0;
             }
             if (isSortBy) {
@@ -1177,7 +1184,7 @@ router.get(
                   },
                   {
                     $match: {
-                      "rooms.sleeps": { $gte: totalGuests },
+                      "rooms.sleeps": { $gte: 1 },
                       isServiceable: true,
                     },
                   },
@@ -1210,25 +1217,25 @@ router.get(
                       "rooms.priceForOneNight": sortByPriceRule,
                     },
                   },
-                  { $skip: perPage * page },
-                  { $limit: perPage },
+                  { $skip: PER_PAGE * page },
+                  { $limit: PER_PAGE },
                 ]);
 
                 await transformObject(hotels);
                 await checkBookingDetails(hotels);
-
+                await checkTotalGuestsDetails(hotels);
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
                 res.status(200).send({
                   hotels: hotels,
-                  totalHotels,
+                  totalHotels: hotels.length,
                   checkIn,
                   checkOut,
                   totalDays,
                   totalGuests,
                   page: page,
-                  pages: Math.ceil(totalHotels / perPage),
+                  pages: Math.ceil(totalHotels / PER_PAGE),
                 });
                 return;
               }
@@ -1261,7 +1268,7 @@ router.get(
                 },
                 {
                   $match: {
-                    "rooms.sleeps": { $gte: totalGuests },
+                    "rooms.sleeps": { $gte: 1 },
                     isServiceable: true,
                   },
                 },
@@ -1284,25 +1291,26 @@ router.get(
                     root: 0,
                   },
                 },
-                { $skip: perPage * page },
-                { $limit: perPage },
+                { $skip: PER_PAGE * page },
+                { $limit: PER_PAGE },
               ]);
 
               await transformObject(hotels);
               await checkBookingDetails(hotels);
 
+              await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
               res.status(200).send({
-                hotels,
-                totalHotels,
+                hotels: hotels,
+                totalHotels: hotels.length,
                 checkIn,
                 checkOut,
                 totalDays,
                 totalGuests,
                 page: page,
-                pages: Math.ceil(totalHotels / perPage),
+                pages: Math.ceil(totalHotels / PER_PAGE),
               });
               return;
             }
@@ -1338,7 +1346,7 @@ router.get(
               },
               {
                 $match: {
-                  "rooms.sleeps": { $gte: totalGuests },
+                  "rooms.sleeps": { $gte: 1 },
                   isServiceable: true,
                 },
               },
@@ -1364,7 +1372,7 @@ router.get(
             ]);
             let totalHotels = hotelsDB.length;
 
-            if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+            if (page >= Math.ceil(totalHotels / PER_PAGE) || page < 0) {
               page = 0;
             }
             if (isSortBy) {
@@ -1406,7 +1414,7 @@ router.get(
                   },
                   {
                     $match: {
-                      "rooms.sleeps": { $gte: totalGuests },
+                      "rooms.sleeps": { $gte: 1 },
                       isServiceable: true,
                     },
                   },
@@ -1439,25 +1447,25 @@ router.get(
                       "rooms.priceForOneNight": sortByPriceRule,
                     },
                   },
-                  { $skip: perPage * page },
-                  { $limit: perPage },
+                  { $skip: PER_PAGE * page },
+                  { $limit: PER_PAGE },
                 ]);
 
                 await transformObject(hotels);
                 await checkBookingDetails(hotels);
-
+                await checkTotalGuestsDetails(hotels);
                 if (hotels.length === 0) {
                   throw new BadRequestError("No Hotels Found");
                 }
                 res.status(200).send({
                   hotels: hotels,
-                  totalHotels,
+                  totalHotels: hotels.length,
                   checkIn,
                   checkOut,
                   totalDays,
                   totalGuests,
                   page: page,
-                  pages: Math.ceil(totalHotels / perPage),
+                  pages: Math.ceil(totalHotels / PER_PAGE),
                 });
                 return;
               }
@@ -1490,7 +1498,7 @@ router.get(
                 },
                 {
                   $match: {
-                    "rooms.sleeps": { $gte: totalGuests },
+                    "rooms.sleeps": { $gte: 1 },
                     isServiceable: true,
                   },
                 },
@@ -1513,25 +1521,25 @@ router.get(
                     root: 0,
                   },
                 },
-                { $skip: perPage * page },
-                { $limit: perPage },
+                { $skip: PER_PAGE * page },
+                { $limit: PER_PAGE },
               ]);
 
               await transformObject(hotels);
               await checkBookingDetails(hotels);
-
+              await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
               res.status(200).send({
-                hotels,
-                totalHotels,
+                hotels: hotels,
+                totalHotels: hotels.length,
                 checkIn,
                 checkOut,
                 totalDays,
                 totalGuests,
                 page: page,
-                pages: Math.ceil(totalHotels / perPage),
+                pages: Math.ceil(totalHotels / PER_PAGE),
               });
               return;
             }
@@ -1562,7 +1570,7 @@ router.get(
             },
             {
               $match: {
-                "rooms.sleeps": { $gte: totalGuests },
+                "rooms.sleeps": { $gte: 1 },
                 isServiceable: true,
               },
             },
@@ -1588,7 +1596,7 @@ router.get(
           ]);
           const totalHotels = hotelsDB.length;
 
-          if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+          if (page >= Math.ceil(totalHotels / PER_PAGE) || page < 0) {
             page = 0;
           }
 
@@ -1622,7 +1630,7 @@ router.get(
                 },
                 {
                   $match: {
-                    "rooms.sleeps": { $gte: totalGuests },
+                    "rooms.sleeps": { $gte: 1 },
                     isServiceable: true,
                   },
                 },
@@ -1655,25 +1663,25 @@ router.get(
                     "rooms.priceForOneNight": sortByPriceRule,
                   },
                 },
-                { $skip: perPage * page },
-                { $limit: perPage },
+                { $skip: PER_PAGE * page },
+                { $limit: PER_PAGE },
               ]);
 
               await transformObject(hotels);
               await checkBookingDetails(hotels);
-
+              await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
               res.status(200).send({
                 hotels: hotels,
-                totalHotels,
+                totalHotels: hotels.length,
                 checkIn,
                 checkOut,
                 totalDays,
                 totalGuests,
                 page: page,
-                pages: Math.ceil(totalHotels / perPage),
+                pages: Math.ceil(totalHotels / PER_PAGE),
               });
               return;
             }
@@ -1697,7 +1705,7 @@ router.get(
               },
               {
                 $match: {
-                  "rooms.sleeps": { $gte: totalGuests },
+                  "rooms.sleeps": { $gte: 1 },
                   isServiceable: true,
                 },
               },
@@ -1720,25 +1728,26 @@ router.get(
                   root: 0,
                 },
               },
-              { $skip: perPage * page },
-              { $limit: perPage },
+              { $skip: PER_PAGE * page },
+              { $limit: PER_PAGE },
             ]);
 
             await transformObject(hotels);
             await checkBookingDetails(hotels);
 
+            await checkTotalGuestsDetails(hotels);
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
             }
             res.status(200).send({
               hotels: hotels,
-              totalHotels,
+              totalHotels: hotels.length,
               checkIn,
               checkOut,
               totalDays,
               totalGuests,
               page: page,
-              pages: Math.ceil(totalHotels / perPage),
+              pages: Math.ceil(totalHotels / PER_PAGE),
             });
             return;
           }
@@ -1764,7 +1773,7 @@ router.get(
             },
             {
               $match: {
-                "rooms.sleeps": { $gte: totalGuests },
+                "rooms.sleeps": { $gte: 1 },
                 isServiceable: true,
               },
             },
@@ -1791,7 +1800,7 @@ router.get(
 
           const totalHotels = hotelsDB.length;
 
-          if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+          if (page >= Math.ceil(totalHotels / PER_PAGE) || page < 0) {
             page = 0;
           }
 
@@ -1824,7 +1833,7 @@ router.get(
                 },
                 {
                   $match: {
-                    "rooms.sleeps": { $gte: totalGuests },
+                    "rooms.sleeps": { $gte: 1 },
                     isServiceable: true,
                   },
                 },
@@ -1857,25 +1866,25 @@ router.get(
                     "rooms.priceForOneNight": sortByPriceRule,
                   },
                 },
-                { $skip: perPage * page },
-                { $limit: perPage },
+                { $skip: PER_PAGE * page },
+                { $limit: PER_PAGE },
               ]);
 
               await transformObject(hotels);
               await checkBookingDetails(hotels);
-
+              await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
               res.status(200).send({
                 hotels: hotels,
-                totalHotels,
+                totalHotels: hotels.length,
                 checkIn,
                 checkOut,
                 totalDays,
                 totalGuests,
                 page: page,
-                pages: Math.ceil(totalHotels / perPage),
+                pages: Math.ceil(totalHotels / PER_PAGE),
               });
               return;
             }
@@ -1898,7 +1907,7 @@ router.get(
               },
               {
                 $match: {
-                  "rooms.sleeps": { $gte: totalGuests },
+                  "rooms.sleeps": { $gte: 1 },
                   isServiceable: true,
                 },
               },
@@ -1921,25 +1930,26 @@ router.get(
                   root: 0,
                 },
               },
-              { $skip: perPage * page },
-              { $limit: perPage },
+              { $skip: PER_PAGE * page },
+              { $limit: PER_PAGE },
             ]);
 
             await transformObject(hotels);
             await checkBookingDetails(hotels);
 
+            await checkTotalGuestsDetails(hotels);
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
             }
             res.status(200).send({
               hotels: hotels,
-              totalHotels,
+              totalHotels: hotels.length,
               checkIn,
               checkOut,
               totalDays,
               totalGuests,
               page: page,
-              pages: Math.ceil(totalHotels / perPage),
+              pages: Math.ceil(totalHotels / PER_PAGE),
             });
             return;
           }
@@ -1965,7 +1975,7 @@ router.get(
             },
             {
               $match: {
-                "rooms.sleeps": { $gte: totalGuests },
+                "rooms.sleeps": { $gte: 1 },
                 isServiceable: true,
               },
             },
@@ -1990,7 +2000,7 @@ router.get(
             },
           ]);
           const totalHotels = hotelsDB.length;
-          if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+          if (page >= Math.ceil(totalHotels / PER_PAGE) || page < 0) {
             page = 0;
           }
 
@@ -2023,7 +2033,7 @@ router.get(
                 },
                 {
                   $match: {
-                    "rooms.sleeps": { $gte: totalGuests },
+                    "rooms.sleeps": { $gte: 1 },
                     isServiceable: true,
                   },
                 },
@@ -2056,25 +2066,25 @@ router.get(
                     "rooms.priceForOneNight": sortByPriceRule,
                   },
                 },
-                { $skip: perPage * page },
-                { $limit: perPage },
+                { $skip: PER_PAGE * page },
+                { $limit: PER_PAGE },
               ]);
 
               await transformObject(hotels);
               await checkBookingDetails(hotels);
-
+              await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
               res.status(200).send({
                 hotels: hotels,
-                totalHotels,
+                totalHotels: hotels.length,
                 checkIn,
                 checkOut,
                 totalDays,
                 totalGuests,
                 page: page,
-                pages: Math.ceil(totalHotels / perPage),
+                pages: Math.ceil(totalHotels / PER_PAGE),
               });
               return;
             }
@@ -2097,7 +2107,7 @@ router.get(
               },
               {
                 $match: {
-                  "rooms.sleeps": { $gte: totalGuests },
+                  "rooms.sleeps": { $gte: 1 },
                   isServiceable: true,
                 },
               },
@@ -2120,25 +2130,26 @@ router.get(
                   root: 0,
                 },
               },
-              { $skip: perPage * page },
-              { $limit: perPage },
+              { $skip: PER_PAGE * page },
+              { $limit: PER_PAGE },
             ]);
 
             await transformObject(hotels);
             await checkBookingDetails(hotels);
 
+            await checkTotalGuestsDetails(hotels);
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
             }
             res.status(200).send({
               hotels: hotels,
-              totalHotels,
+              totalHotels: hotels.length,
               checkIn,
               checkOut,
               totalDays,
               totalGuests,
               page: page,
-              pages: Math.ceil(totalHotels / perPage),
+              pages: Math.ceil(totalHotels / PER_PAGE),
             });
             return;
           }
@@ -2184,7 +2195,7 @@ router.get(
                   coordinates: [longitude, latitude],
                 },
                 distanceField: "distanceToReach",
-                maxDistance: defaultMeterRange,
+                maxDistance: DEFAULT_METER_RANGE,
               },
             },
             {
@@ -2199,7 +2210,7 @@ router.get(
             },
             {
               $match: {
-                "rooms.sleeps": { $gte: totalGuests },
+                "rooms.sleeps": { $gte: 1 },
                 isServiceable: true,
               },
             },
@@ -2224,7 +2235,7 @@ router.get(
             },
           ]);
           let totalHotels = hotelsDB.length;
-          if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+          if (page >= Math.ceil(totalHotels / PER_PAGE) || page < 0) {
             page = 0;
           }
 
@@ -2248,7 +2259,7 @@ router.get(
                       coordinates: [longitude, latitude],
                     },
                     distanceField: "distanceToReach",
-                    maxDistance: defaultMeterRange,
+                    maxDistance: DEFAULT_METER_RANGE,
                   },
                 },
                 {
@@ -2263,7 +2274,7 @@ router.get(
                 },
                 {
                   $match: {
-                    "rooms.sleeps": { $gte: totalGuests },
+                    "rooms.sleeps": { $gte: 1 },
                     isServiceable: true,
                   },
                 },
@@ -2296,26 +2307,26 @@ router.get(
                     "rooms.priceForOneNight": sortByPriceRule,
                   },
                 },
-                { $skip: perPage * page },
-                { $limit: perPage },
+                { $skip: PER_PAGE * page },
+                { $limit: PER_PAGE },
               ]);
 
               await transformObject(hotels);
               await checkBookingDetails(hotels);
 
+              await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
-              // @ts-ignore
               res.status(200).send({
                 hotels: hotels,
-                totalHotels,
+                totalHotels: hotels.length,
                 checkIn,
                 checkOut,
                 totalDays,
                 totalGuests,
                 page: page,
-                pages: Math.ceil(totalHotels / perPage),
+                pages: Math.ceil(totalHotels / PER_PAGE),
               });
               return;
             }
@@ -2330,7 +2341,7 @@ router.get(
                     coordinates: [longitude, latitude],
                   },
                   distanceField: "distanceToReach",
-                  maxDistance: defaultMeterRange,
+                  maxDistance: DEFAULT_METER_RANGE,
                 },
               },
               {
@@ -2345,7 +2356,7 @@ router.get(
               },
               {
                 $match: {
-                  "rooms.sleeps": { $gte: totalGuests },
+                  "rooms.sleeps": { $gte: 1 },
                   isServiceable: true,
                 },
               },
@@ -2368,25 +2379,26 @@ router.get(
                   root: 0,
                 },
               },
-              { $skip: perPage * page },
-              { $limit: perPage },
+              { $skip: PER_PAGE * page },
+              { $limit: PER_PAGE },
             ]);
 
             await transformObject(hotels);
             await checkBookingDetails(hotels);
 
+            await checkTotalGuestsDetails(hotels);
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
             }
             res.status(200).send({
-              hotels,
-              totalHotels,
+              hotels: hotels,
+              totalHotels: hotels.length,
               checkIn,
               checkOut,
               totalDays,
               totalGuests,
               page: page,
-              pages: Math.ceil(totalHotels / perPage),
+              pages: Math.ceil(totalHotels / PER_PAGE),
             });
             return;
           }
@@ -2417,7 +2429,7 @@ router.get(
             },
             {
               $match: {
-                "rooms.sleeps": { $gte: totalGuests },
+                "rooms.sleeps": { $gte: 1 },
                 isServiceable: true,
               },
             },
@@ -2442,7 +2454,7 @@ router.get(
             },
           ]);
           let totalHotels = hotelsDB.length;
-          if (page >= Math.ceil(totalHotels / perPage) || page < 0) {
+          if (page >= Math.ceil(totalHotels / PER_PAGE) || page < 0) {
             page = 0;
           }
 
@@ -2479,7 +2491,7 @@ router.get(
                 },
                 {
                   $match: {
-                    "rooms.sleeps": { $gte: totalGuests },
+                    "rooms.sleeps": { $gte: 1 },
                     isServiceable: true,
                   },
                 },
@@ -2512,25 +2524,26 @@ router.get(
                     "rooms.priceForOneNight": sortByPriceRule,
                   },
                 },
-                { $skip: perPage * page },
-                { $limit: perPage },
+                { $skip: PER_PAGE * page },
+                { $limit: PER_PAGE },
               ]);
 
               await transformObject(hotels);
               await checkBookingDetails(hotels);
 
+              await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
                 throw new BadRequestError("No Hotels Found");
               }
               res.status(200).send({
                 hotels: hotels,
-                totalHotels,
+                totalHotels: hotels.length,
                 checkIn,
                 checkOut,
                 totalDays,
                 totalGuests,
                 page: page,
-                pages: Math.ceil(totalHotels / perPage),
+                pages: Math.ceil(totalHotels / PER_PAGE),
               });
               return;
             }
@@ -2561,7 +2574,7 @@ router.get(
               },
               {
                 $match: {
-                  "rooms.sleeps": { $gte: totalGuests },
+                  "rooms.sleeps": { $gte: 1 },
                   isServiceable: true,
                 },
               },
@@ -2584,25 +2597,25 @@ router.get(
                   root: 0,
                 },
               },
-              { $skip: perPage * page },
-              { $limit: perPage },
+              { $skip: PER_PAGE * page },
+              { $limit: PER_PAGE },
             ]);
 
             await transformObject(hotels);
             await checkBookingDetails(hotels);
-
+            await checkTotalGuestsDetails(hotels);
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
             }
             res.status(200).send({
-              hotels,
-              totalHotels,
+              hotels: hotels,
+              totalHotels: hotels.length,
               checkIn,
               checkOut,
               totalDays,
               totalGuests,
               page: page,
-              pages: Math.ceil(totalHotels / perPage),
+              pages: Math.ceil(totalHotels / PER_PAGE),
             });
             return;
           }
@@ -2629,7 +2642,7 @@ router.get(
           },
           {
             $match: {
-              "rooms.sleeps": { $gte: totalGuests },
+              "rooms.sleeps": { $gte: 1 },
               isServiceable: true,
             },
           },
@@ -2654,7 +2667,7 @@ router.get(
           },
         ]);
         let totalHotels = hotelsDB.length;
-        if (page >= Math.ceil(totalHotels / perPage)) {
+        if (page >= Math.ceil(totalHotels / PER_PAGE)) {
           page = 0;
         }
 
@@ -2689,7 +2702,7 @@ router.get(
               },
               {
                 $match: {
-                  "rooms.sleeps": { $gte: totalGuests },
+                  "rooms.sleeps": { $gte: 1 },
                   isServiceable: true,
                 },
               },
@@ -2722,25 +2735,25 @@ router.get(
                   "rooms.priceForOneNight": sortByPriceRule,
                 },
               },
-              { $skip: perPage * page },
-              { $limit: perPage },
+              { $skip: PER_PAGE * page },
+              { $limit: PER_PAGE },
             ]);
 
             await transformObject(hotels);
             await checkBookingDetails(hotels);
-
+            await checkTotalGuestsDetails(hotels);
             if (hotels.length === 0) {
               throw new BadRequestError("No Hotels Found");
             }
             res.status(200).send({
               hotels: hotels,
-              totalHotels,
+              totalHotels: hotels.length,
               checkIn,
               checkOut,
               totalDays,
               totalGuests,
               page: page,
-              pages: Math.ceil(totalHotels / perPage),
+              pages: Math.ceil(totalHotels / PER_PAGE),
             });
             return;
           }
@@ -2761,7 +2774,7 @@ router.get(
             },
             {
               $match: {
-                "rooms.sleeps": { $gte: totalGuests },
+                "rooms.sleeps": { $gte: 1 },
                 isServiceable: true,
               },
             },
@@ -2784,24 +2797,25 @@ router.get(
                 root: 0,
               },
             },
-            { $skip: perPage * page },
-            { $limit: perPage },
+            { $skip: PER_PAGE * page },
+            { $limit: PER_PAGE },
           ]);
 
           await transformObject(hotels);
           await checkBookingDetails(hotels);
+          await checkTotalGuestsDetails(hotels);
           if (hotels.length === 0) {
             throw new BadRequestError("No Hotels Found");
           }
           res.status(200).send({
             hotels: hotels,
-            totalHotels,
+            totalHotels: hotels.length,
             checkIn,
             checkOut,
             totalDays,
             totalGuests,
             page: page,
-            pages: Math.ceil(totalHotels / perPage),
+            pages: Math.ceil(totalHotels / PER_PAGE),
           });
           return;
         }
@@ -2809,7 +2823,68 @@ router.get(
     }
   }
 );
+const transformObject = async (hotels: Array<any>) => {
+  for (let i = 0; i < hotels.length; i++) {
+    if (hotels[i].rooms) {
+      for (let j = 0; j < hotels[i].rooms.length; j++) {
+        hotels[i].rooms[j].id = hotels[i].rooms[j]._id;
+        delete hotels[i].rooms[j]._id;
 
+        //add gateway charges to hotel room price
+        hotels[i].rooms[j].priceForOneNight += await Math.ceil(
+          (gatewayChargesForHotelPercentage / 100) *
+            hotels[i].rooms[j].priceForOneNight
+        );
+
+        //add discount logic
+        if (hotels[i].rooms[j].discount.isDiscount) {
+          //Yes There is some discount
+          hotels[i].rooms[j].priceForOneNight -= await Math.ceil(
+            (hotels[i].rooms[j].discount.discountPercentage / 100) *
+              hotels[i].rooms[j].priceForOneNight
+          );
+        }
+
+        //price conversion
+        hotels[i].rooms[j].priceForOneNight = await Math.floor(
+          hotels[i].rooms[j].priceForOneNight / // @ts-ignore
+            currencyRates[hotels[i].homeCurrency].toFixed(2)
+        );
+
+        //Multiply priceForOneNight with totalDays
+        hotels[i].rooms[j].price =
+          hotels[i].rooms[j].priceForOneNight * totalDays;
+
+        //added discounted amount if
+        if (hotels[i].rooms[j].discount.isDiscount) {
+          hotels[i].rooms[j].discount.totalDiscountAmount = await Math.ceil(
+            (hotels[i].rooms[j].discount.discountPercentage / 100) *
+              hotels[i].rooms[j].price
+          );
+        } else {
+          hotels[i].rooms[j].discount.totalDiscountAmount = 0;
+        }
+      }
+    }
+
+    //Distance conversion from meter to km only if geo query is enable
+    if (hotels[i].distanceToReach) {
+      hotels[i].distanceToReach = parseFloat(
+        (hotels[i].distanceToReach / 1000).toFixed(2)
+      );
+    }
+    hotels[i].currency = requestedCurrency;
+    hotels[i].id = hotels[i]._id;
+    delete hotels[i]._id;
+    delete hotels[i].__v;
+    const createdDateIso = hotels[i].createdAt;
+    delete hotels[i].createdAt;
+    hotels[i].createdAt = createdDateIso.getTime();
+    const updatedAtISO = hotels[i].updatedAt;
+    delete hotels[i].updatedAt;
+    hotels[i].updatedAt = updatedAtISO.getTime();
+  }
+};
 const checkBookingDetails = async (hotels: Array<any>) => {
   let hotelsIds = [];
   let roomIds = [];
@@ -2870,91 +2945,38 @@ const checkBookingDetails = async (hotels: Array<any>) => {
               hotels[i].rooms[j].id.toString() ===
               bookingsChecked[k].roomId.toString()
             ) {
-              console.log(
-                ` Match Found ${hotels[i].id}  ${hotels[i].rooms[j].id} ${bookingsChecked[k].roomId} `
-              );
-              hotels[i].rooms.splice(j, 1);
+              hotels[i].rooms[j].totalRooms -= 1;
+              if (hotels[i].rooms[j].totalRooms === 0) {
+                console.log(
+                  ` Match Found total rooms = 0  delete room itself ${hotels[i].id}  ${hotels[i].rooms[j].id} ${bookingsChecked[k].roomId} `
+                );
+                hotels[i].rooms.splice(j, 1);
+              } else {
+                console.log(
+                  ` Match Found minus 1 room ${hotels[i].id}  ${hotels[i].rooms[j].id} ${bookingsChecked[k].roomId} `
+                );
+              }
             }
           }
         }
       }
-    }
-    //update total rooms available after all checking
-    for (let i = 0; i < hotels.length; i++) {
-      hotels[i].totalRoomAvailable = hotels[i].rooms.length;
     }
   } catch (err) {
     console.error(err);
     return;
   }
 };
-
-const transformObject = async (hotels: Array<any>) => {
+async function checkTotalGuestsDetails(hotels: Array<any>) {
   for (let i = 0; i < hotels.length; i++) {
-    if (hotels[i].rooms) {
-      for (let j = 0; j < hotels[i].rooms.length; j++) {
-        hotels[i].rooms[j].id = hotels[i].rooms[j]._id;
-        delete hotels[i].rooms[j]._id;
-
-        //add gateway charges to hotel room price
-        hotels[i].rooms[j].priceForOneNight += await Math.ceil(
-          (gatewayChargesForHotelPercentage / 100) *
-            hotels[i].rooms[j].priceForOneNight
-        );
-
-        //add discount logic
-        if (hotels[i].rooms[j].discount.isDiscount) {
-          //Yes There is some discount
-          hotels[i].rooms[j].priceForOneNight -= await Math.ceil(
-            (hotels[i].rooms[j].discount.discountPercentage / 100) *
-              hotels[i].rooms[j].priceForOneNight
-          );
-        }
-
-        //price conversion
-        hotels[i].rooms[j].priceForOneNight = await Math.floor(
-          hotels[i].rooms[j].priceForOneNight / // @ts-ignore
-            currencyRates[hotels[i].homeCurrency].toFixed(2)
-        );
-
-        //Multiply priceForOneNight with totalDays
-        hotels[i].rooms[j].price =
-          hotels[i].rooms[j].priceForOneNight * totalDays;
-
-        //added discounted amount if
-        if (hotels[i].rooms[j].discount.isDiscount) {
-          hotels[i].rooms[j].discount.totalDiscountAmount = await Math.ceil(
-            (hotels[i].rooms[j].discount.discountPercentage / 100) *
-              hotels[i].rooms[j].price
-          );
-        } else {
-          hotels[i].rooms[j].discount.totalDiscountAmount = 0;
-        }
-      }
-    }
-    //No rooms in that hotel so remove the hotel from array
-    if (hotels[i].rooms.length === 0) {
-      hotels.splice(i, 1);
-    }
-
-    //Distance conversion from meter to km only if geo query is enable
-    if (hotels[i].distanceToReach) {
-      hotels[i].distanceToReach = parseFloat(
-        (hotels[i].distanceToReach / 1000).toFixed(2)
-      );
-    }
-    hotels[i].currency = requestedCurrency;
-    hotels[i].id = hotels[i]._id;
-    delete hotels[i]._id;
-    delete hotels[i].__v;
-    const createdDateIso = hotels[i].createdAt;
-    delete hotels[i].createdAt;
-    hotels[i].createdAt = createdDateIso.getTime();
-    const updatedAtISO = hotels[i].updatedAt;
-    delete hotels[i].updatedAt;
-    hotels[i].updatedAt = updatedAtISO.getTime();
+    _.remove(hotels[i].rooms, function (room) {
+      // @ts-ignore
+      return totalGuests > room.totalRooms * room.sleeps;
+    });
   }
-};
+  _.remove(hotels, function (hotel) {
+    return hotel.rooms.length === 0;
+  });
+}
 
 async function checkCheckInAndCheckOutDateQuery(
   checkIn: string,
