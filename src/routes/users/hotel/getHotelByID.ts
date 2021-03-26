@@ -13,6 +13,7 @@ import { GatewayCharge } from "../../../models/GatewayCharges";
 import { Booking } from "../../../models/Booking";
 import { checkHotelExists } from "../../../errors/middleware/hotel-exists";
 import mongoose from "mongoose";
+import _ from "lodash";
 
 const router = express.Router();
 const DEFAULT_CURRENCY = "MYR";
@@ -125,10 +126,11 @@ router.get(
 
     await transformObject(hotels);
     await checkBookingDetails(hotels);
+    await createRoomConfig(hotels, totalGuests, selected_roomId);
     if (hotels.length === 0 || !hotels[0].rooms) {
       throw new BadRequestError("Given request is not valid with this hotel");
     }
-    await createRoomConfig(hotels, totalGuests, selected_roomId);
+
     await sendResponse(res, hotels);
     return;
   }
@@ -146,6 +148,68 @@ async function sendResponse(res: Response, hotel: Array<any>) {
     selected_roomId,
   });
 }
+const transformObject = async (hotels: Array<any>) => {
+  for (let i = 0; i < hotels.length; i++) {
+    if (hotels[i].rooms) {
+      for (let j = 0; j < hotels[i].rooms.length; j++) {
+        hotels[i].rooms[j].id = hotels[i].rooms[j]._id;
+        delete hotels[i].rooms[j]._id;
+
+        //add gateway charges to hotel room price
+        hotels[i].rooms[j].priceForOneNight += await Math.ceil(
+          (gatewayChargesForHotelPercentage / 100) *
+            hotels[i].rooms[j].priceForOneNight
+        );
+
+        //add discount logic
+        if (hotels[i].rooms[j].discount.isDiscount) {
+          //Yes There is some discount
+          hotels[i].rooms[j].priceForOneNight -= await Math.ceil(
+            (hotels[i].rooms[j].discount.discountPercentage / 100) *
+              hotels[i].rooms[j].priceForOneNight
+          );
+        }
+
+        //price conversion
+        hotels[i].rooms[j].priceForOneNight = await Math.floor(
+          hotels[i].rooms[j].priceForOneNight / // @ts-ignore
+            currencyRates[hotels[i].homeCurrency].toFixed(2)
+        );
+
+        //Multiply priceForOneNight with totalDays
+        hotels[i].rooms[j].price =
+          hotels[i].rooms[j].priceForOneNight * totalDays;
+
+        //added discounted amount if
+        if (hotels[i].rooms[j].discount.isDiscount) {
+          hotels[i].rooms[j].discount.totalDiscountAmount = await Math.ceil(
+            (hotels[i].rooms[j].discount.discountPercentage / 100) *
+              hotels[i].rooms[j].price
+          );
+        } else {
+          hotels[i].rooms[j].discount.totalDiscountAmount = 0;
+        }
+      }
+    }
+
+    //Distance conversion from meter to km only if geo query is enable
+    if (hotels[i].distanceToReach) {
+      hotels[i].distanceToReach = parseFloat(
+        (hotels[i].distanceToReach / 1000).toFixed(2)
+      );
+    }
+    hotels[i].currency = requestedCurrency;
+    hotels[i].id = hotels[i]._id;
+    delete hotels[i]._id;
+    delete hotels[i].__v;
+    const createdDateIso = hotels[i].createdAt;
+    delete hotels[i].createdAt;
+    hotels[i].createdAt = createdDateIso.getTime();
+    const updatedAtISO = hotels[i].updatedAt;
+    delete hotels[i].updatedAt;
+    hotels[i].updatedAt = updatedAtISO.getTime();
+  }
+};
 const checkBookingDetails = async (hotels: Array<any>) => {
   let hotelsIds = [];
   let roomIds = [];
@@ -221,11 +285,6 @@ const checkBookingDetails = async (hotels: Array<any>) => {
           }
         }
       }
-    }
-
-    //update total rooms available after all checking
-    for (let i = 0; i < hotels.length; i++) {
-      hotels[i].totalRoomAvailable = hotels[i].rooms.length;
     }
   } catch (err) {
     console.error(err);
@@ -325,6 +384,16 @@ async function createRoomConfig(
       }
     }
   }
+  //
+  for (let i = 0; i < hotels.length; i++) {
+    await _.remove(hotels[i].rooms, function (room) {
+      // @ts-ignore
+      return totalGuests > room.totalRooms * room.sleeps;
+    });
+  }
+  await _.remove(hotels, function (hotel) {
+    return hotel.rooms.length === 0;
+  });
 }
 function loopRoomConfig(totalRooms: number, sleeps: number) {
   let config = "";
@@ -335,72 +404,6 @@ function loopRoomConfig(totalRooms: number, sleeps: number) {
   return config;
 }
 
-const transformObject = async (hotels: Array<any>) => {
-  for (let i = 0; i < hotels.length; i++) {
-    if (hotels[i].rooms) {
-      for (let j = 0; j < hotels[i].rooms.length; j++) {
-        hotels[i].rooms[j].id = hotels[i].rooms[j]._id;
-        delete hotels[i].rooms[j]._id;
-
-        //add gateway charges to hotel room price
-        hotels[i].rooms[j].priceForOneNight += await Math.ceil(
-          (gatewayChargesForHotelPercentage / 100) *
-            hotels[i].rooms[j].priceForOneNight
-        );
-
-        //add discount logic
-        if (hotels[i].rooms[j].discount.isDiscount) {
-          //Yes There is some discount
-          hotels[i].rooms[j].priceForOneNight -= await Math.ceil(
-            (hotels[i].rooms[j].discount.discountPercentage / 100) *
-              hotels[i].rooms[j].priceForOneNight
-          );
-        }
-
-        //price conversion
-        hotels[i].rooms[j].priceForOneNight = await Math.floor(
-          hotels[i].rooms[j].priceForOneNight / // @ts-ignore
-            currencyRates[hotels[i].homeCurrency].toFixed(2)
-        );
-
-        //Multiply priceForOneNight with totalDays
-        hotels[i].rooms[j].price =
-          hotels[i].rooms[j].priceForOneNight * totalDays;
-
-        //added discounted amount if
-        if (hotels[i].rooms[j].discount.isDiscount) {
-          hotels[i].rooms[j].discount.totalDiscountAmount = await Math.ceil(
-            (hotels[i].rooms[j].discount.discountPercentage / 100) *
-              hotels[i].rooms[j].price
-          );
-        } else {
-          hotels[i].rooms[j].discount.totalDiscountAmount = 0;
-        }
-      }
-    }
-    //No rooms in that hotel so remove the hotel from array
-    if (hotels[i].rooms.length === 0) {
-      hotels.splice(i, 1);
-    }
-
-    //Distance conversion from meter to km only if geo query is enable
-    if (hotels[i].distanceToReach) {
-      hotels[i].distanceToReach = parseFloat(
-        (hotels[i].distanceToReach / 1000).toFixed(2)
-      );
-    }
-    hotels[i].currency = requestedCurrency;
-    hotels[i].id = hotels[i]._id;
-    delete hotels[i]._id;
-    delete hotels[i].__v;
-    const createdDateIso = hotels[i].createdAt;
-    delete hotels[i].createdAt;
-    hotels[i].createdAt = createdDateIso.getTime();
-    const updatedAtISO = hotels[i].updatedAt;
-    delete hotels[i].updatedAt;
-    hotels[i].updatedAt = updatedAtISO.getTime();
-  }
-};
 async function checkCheckInAndCheckOutDateQuery(
   checkIn: string,
   checkOut: string

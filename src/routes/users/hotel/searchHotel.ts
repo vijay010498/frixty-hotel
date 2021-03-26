@@ -19,6 +19,7 @@ let checkIn: string;
 let checkOut: string;
 let totalDays: number;
 let totalGuests: number;
+let totalRooms: number;
 
 router.get(
   "/api/v1/hotels/search",
@@ -29,7 +30,7 @@ router.get(
     const tomorrow = new Date(Date.now() + 3600 * 1000 * 24)
       .toISOString()
       .slice(0, 10);
-
+    totalRooms = 0;
     //check for checkin and check out dates
     // @ts-ignore
     checkIn = req.query.checkIn || today;
@@ -307,6 +308,7 @@ router.get(
                   checkIn,
                   checkOut,
                   totalDays,
+                  totalRooms,
                   totalGuests,
                   page: page,
                   pages: Math.ceil(totalHotels / PER_PAGE),
@@ -382,6 +384,7 @@ router.get(
                 checkOut,
                 totalDays,
                 totalGuests,
+                totalRooms,
                 page: page,
                 pages: Math.ceil(totalHotels / PER_PAGE),
               });
@@ -536,6 +539,7 @@ router.get(
                   checkIn,
                   checkOut,
                   totalDays,
+                  totalRooms,
                   totalGuests,
                   page: page,
                   pages: Math.ceil(totalHotels / PER_PAGE),
@@ -611,6 +615,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalRooms,
                 totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / PER_PAGE),
@@ -767,6 +772,7 @@ router.get(
                   checkIn,
                   checkOut,
                   totalDays,
+                  totalRooms,
                   totalGuests,
                   page: page,
                   pages: Math.ceil(totalHotels / PER_PAGE),
@@ -842,6 +848,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalRooms,
                 totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / PER_PAGE),
@@ -1002,6 +1009,7 @@ router.get(
                   checkIn,
                   checkOut,
                   totalDays,
+                  totalRooms,
                   totalGuests,
                   page: page,
                   pages: Math.ceil(totalHotels / PER_PAGE),
@@ -1078,6 +1086,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalRooms,
                 totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / PER_PAGE),
@@ -1233,6 +1242,7 @@ router.get(
                   checkIn,
                   checkOut,
                   totalDays,
+                  totalRooms,
                   totalGuests,
                   page: page,
                   pages: Math.ceil(totalHotels / PER_PAGE),
@@ -1308,6 +1318,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalRooms,
                 totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / PER_PAGE),
@@ -1463,6 +1474,7 @@ router.get(
                   checkIn,
                   checkOut,
                   totalDays,
+                  totalRooms,
                   totalGuests,
                   page: page,
                   pages: Math.ceil(totalHotels / PER_PAGE),
@@ -1537,6 +1549,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalRooms,
                 totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / PER_PAGE),
@@ -1679,6 +1692,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalRooms,
                 totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / PER_PAGE),
@@ -1745,6 +1759,7 @@ router.get(
               checkIn,
               checkOut,
               totalDays,
+              totalRooms,
               totalGuests,
               page: page,
               pages: Math.ceil(totalHotels / PER_PAGE),
@@ -1882,6 +1897,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalRooms,
                 totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / PER_PAGE),
@@ -1947,6 +1963,7 @@ router.get(
               checkIn,
               checkOut,
               totalDays,
+              totalRooms,
               totalGuests,
               page: page,
               pages: Math.ceil(totalHotels / PER_PAGE),
@@ -2082,6 +2099,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalRooms,
                 totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / PER_PAGE),
@@ -2147,6 +2165,7 @@ router.get(
               checkIn,
               checkOut,
               totalDays,
+              totalRooms,
               totalGuests,
               page: page,
               pages: Math.ceil(totalHotels / PER_PAGE),
@@ -2324,6 +2343,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalRooms,
                 totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / PER_PAGE),
@@ -2396,6 +2416,7 @@ router.get(
               checkIn,
               checkOut,
               totalDays,
+              totalRooms,
               totalGuests,
               page: page,
               pages: Math.ceil(totalHotels / PER_PAGE),
@@ -2541,6 +2562,7 @@ router.get(
                 checkIn,
                 checkOut,
                 totalDays,
+                totalRooms,
                 totalGuests,
                 page: page,
                 pages: Math.ceil(totalHotels / PER_PAGE),
@@ -2613,6 +2635,7 @@ router.get(
               checkIn,
               checkOut,
               totalDays,
+              totalRooms,
               totalGuests,
               page: page,
               pages: Math.ceil(totalHotels / PER_PAGE),
@@ -2751,6 +2774,7 @@ router.get(
               checkIn,
               checkOut,
               totalDays,
+              totalRooms,
               totalGuests,
               page: page,
               pages: Math.ceil(totalHotels / PER_PAGE),
@@ -2814,6 +2838,7 @@ router.get(
             checkOut,
             totalDays,
             totalGuests,
+            totalRooms,
             page: page,
             pages: Math.ceil(totalHotels / PER_PAGE),
           });
@@ -2968,14 +2993,19 @@ const checkBookingDetails = async (hotels: Array<any>) => {
 };
 async function checkTotalGuestsDetails(hotels: Array<any>) {
   for (let i = 0; i < hotels.length; i++) {
-    _.remove(hotels[i].rooms, function (room) {
+    await _.remove(hotels[i].rooms, function (room) {
       // @ts-ignore
       return totalGuests > room.totalRooms * room.sleeps;
     });
   }
-  _.remove(hotels, function (hotel) {
+  await _.remove(hotels, function (hotel) {
     return hotel.rooms.length === 0;
   });
+  for (let i = 0; i < hotels.length; i++) {
+    for (let j = 0; j < hotels[i].rooms.length; j++) {
+      totalRooms++;
+    }
+  }
 }
 
 async function checkCheckInAndCheckOutDateQuery(
