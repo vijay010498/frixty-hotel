@@ -18,18 +18,32 @@ import { superAdminUploadRouter } from "./routes/superAdmin/upload/uploadRoutes"
 import { superAdminSubscriptionRouter } from "./routes/superAdmin/subscription/subscriptionRoutes";
 import { superAdminDashboardRouter } from "./routes/superAdmin/dashboard/dashboardRoutes";
 import cookieSession from "cookie-session";
-
-const RateLimit = require("express-rate-limit");
+const keys = require("./config/keys");
 //error handlers
 import { errorhandler } from "./errors";
 import { NotFoundError } from "./errors";
+const RateLimit = require("express-rate-limit");
+const RedisStore = require("rate-limit-redis");
+import redis from "redis";
+
+//redis client
+const client = redis.createClient({
+  port: 11470,
+  password: keys.redisPassword,
+  host: keys.redisHost,
+});
 const limiter = new RateLimit({
-  windowMs: 60 * 1000,
-  max: 25,
+  store: new RedisStore({
+    client: client,
+    prefix: "RL",
+    expiry: 60, // 60 seconds
+  }),
+  max: 50, // max 50 requests in 60 seconds
 });
 
 const app = express();
 app.use(json());
+//app.use(limiter);
 app.use(cookieParser());
 app.use(
   cookieSession({
@@ -37,7 +51,7 @@ app.use(
     secure: process.env.NODE_ENV === "production",
   })
 );
-app.use(limiter);
+
 app.set("trust proxy", true);
 
 app.use(userAuthRouter);
