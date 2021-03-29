@@ -14,6 +14,7 @@ import { Booking } from "../../../models/Booking";
 import { checkHotelExists } from "../../../errors/middleware/hotel-exists";
 import mongoose from "mongoose";
 import _ from "lodash";
+import moment from "moment";
 
 const router = express.Router();
 const DEFAULT_CURRENCY = "MYR";
@@ -214,15 +215,13 @@ const transformObject = async (hotels: Array<any>) => {
 const checkBookingDetails = async (hotels: Array<any>) => {
   let hotelsIds = [];
   let roomIds = [];
-  let checkInArr = checkIn.split(",");
-  let checkOutArr = checkOut.split(",");
   for (let i = 0; i < hotels.length; i++) {
     hotelsIds.push(hotels[i].id);
     for (let j = 0; j < hotels[i].rooms.length; j++) {
       roomIds.push(hotels[i].rooms[j].id);
     }
   }
-
+  const dateRange = await getDateRange(checkIn, checkOut);
   try {
     const bookingsChecked = await Booking.aggregate([
       {
@@ -251,8 +250,8 @@ const checkBookingDetails = async (hotels: Array<any>) => {
           $and: [
             {
               $or: [
-                { stringCheckInDate: { $in: checkInArr } },
-                { stringCheckOutDate: { $in: checkOutArr } },
+                { stringCheckInDate: { $in: dateRange } },
+                { stringCheckOutDate: { $in: dateRange } },
               ],
             },
             { "bookingDetails.bookingStatus": { $eq: "confirmed" } },
@@ -451,6 +450,21 @@ async function getCurrencyRates(res: Response) {
     console.error(err);
     res.status(403).send("Something Went Wrong");
   }
+}
+// @ts-ignore
+function getDateRange(startDate, endDate) {
+  startDate = moment(startDate);
+  endDate = moment(endDate);
+
+  let now = startDate,
+    dates = [];
+
+  while (now.isBefore(endDate) || now.isSame(endDate)) {
+    dates.push(now.format("YYYY-MM-DD"));
+    now.add(1, "days");
+  }
+
+  return dates;
 }
 
 export { router as getHotelByID };
