@@ -2882,7 +2882,7 @@ const transformObject = async (hotels: Array<any>, res: Response) => {
         delete hotels[i].rooms[j]._id;
 
         //add all charges and taxes
-        const charges = await getCharges(res);
+        /* const charges = await getCharges(res);
         if (charges && charges.length > 0) {
           for (let z = 0; z < charges.length; z++) {
             hotels[i].rooms[j].priceForOneNight += await Math.ceil(
@@ -2890,7 +2890,7 @@ const transformObject = async (hotels: Array<any>, res: Response) => {
                 hotels[i].rooms[j].priceForOneNight
             );
           }
-        }
+        }*/
 
         //add discount logic
         if (hotels[i].rooms[j].discount.isDiscount) {
