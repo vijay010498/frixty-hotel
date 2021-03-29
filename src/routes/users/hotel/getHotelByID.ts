@@ -29,6 +29,7 @@ let totalDays: number;
 let totalGuests: number;
 let rooms: number;
 let roomConfig: string;
+let totalAmount: number;
 let selected_roomId: string;
 
 router.get(
@@ -53,6 +54,7 @@ router.get(
     // @ts-ignore
     selected_roomId = req.query.selected_roomId || "";
     roomConfig = "";
+    totalAmount = 0.0;
 
     //To Calculate total days
     const checkInStr = new Date(checkIn);
@@ -146,6 +148,7 @@ async function sendResponse(res: Response, hotel: Array<any>) {
     totalDays,
     totalGuests,
     rooms,
+    totalAmount,
     roomConfig,
     selected_roomId,
   });
@@ -313,6 +316,7 @@ async function createRoomConfig(
             totalRooms++;
             selected_roomId = hotels[i].rooms[j].id;
             rooms = 1;
+            totalAmount = rooms * hotels[i].rooms[j].price;
             roomConfig = `${totalRooms}-${
               hotels[i].rooms[j].sleeps
             }_${await loopRoomConfig(totalRooms, hotels[i].rooms[j].sleeps)}`;
@@ -321,6 +325,7 @@ async function createRoomConfig(
             totalRooms++;
             selected_roomId = hotels[i].rooms[j].id;
             rooms = 1;
+            totalAmount = rooms * hotels[i].rooms[j].price;
             roomConfig = `${totalRooms}-${
               hotels[i].rooms[j].sleeps
             }_${await loopRoomConfig(totalRooms, hotels[i].rooms[j].sleeps)}`;
@@ -332,6 +337,7 @@ async function createRoomConfig(
             totalRooms = Math.ceil(totalGuests / hotels[i].rooms[j].sleeps);
             selected_roomId = hotels[i].rooms[j].id;
             rooms = totalRooms;
+            totalAmount = rooms * hotels[i].rooms[j].price;
             roomConfig = `${totalRooms}-${
               hotels[i].rooms[j].sleeps
             }_${await loopRoomConfig(totalRooms, hotels[i].rooms[j].sleeps)}`;
@@ -350,6 +356,7 @@ async function createRoomConfig(
           totalRooms++;
           selected_roomId = hotels[i].rooms[j].id;
           rooms = 1;
+          totalAmount = rooms * hotels[i].rooms[j].price;
           roomConfig = `${totalRooms}-${
             hotels[i].rooms[j].sleeps
           }_${await loopRoomConfig(totalRooms, hotels[i].rooms[j].sleeps)}`;
@@ -361,6 +368,7 @@ async function createRoomConfig(
           totalRooms++;
           selected_roomId = hotels[i].rooms[j].id;
           rooms = 1;
+          totalAmount = rooms * hotels[i].rooms[j].price;
           roomConfig = `${totalRooms}-${
             hotels[i].rooms[j].sleeps
           }_${await loopRoomConfig(totalRooms, hotels[i].rooms[j].sleeps)}`;
@@ -375,6 +383,7 @@ async function createRoomConfig(
           totalRooms = Math.ceil(totalGuests / hotels[i].rooms[j].sleeps);
           selected_roomId = hotels[i].rooms[j].id;
           rooms = totalRooms;
+          totalAmount = rooms * hotels[i].rooms[j].price;
           roomConfig = `${totalRooms}-${
             hotels[i].rooms[j].sleeps
           }_${await loopRoomConfig(totalRooms, hotels[i].rooms[j].sleeps)}`;
