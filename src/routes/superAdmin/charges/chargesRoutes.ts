@@ -33,4 +33,33 @@ router.post(
   }
 );
 
+router.get(
+  "/api/secure/sAdmin/charges",
+  requireSuperAdmin,
+  [],
+  validateRequest,
+  async (req: Request, res: Response) => {
+    const charges = await Charges.find();
+    if (charges.length === 0) {
+      throw new BadRequestError("No Charges Found");
+    }
+    res.status(200).send({
+      charges,
+    });
+    return;
+  }
+);
+
+router.delete(
+  "/api/secure/sAdmin/charges",
+  requireSuperAdmin,
+  [],
+  validateRequest,
+  async (req: Request, res: Response) => {
+    await Charges.findByIdAndDelete(req.query.chargeId);
+    res.status(200).send();
+    return;
+  }
+);
+
 export { router as superAdminChargesRouter };
