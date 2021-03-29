@@ -176,6 +176,7 @@ router.get(
               {
                 $match: {
                   isServiceable: true,
+                  isBlockedByAdmin: false,
                 },
               },
               {
@@ -246,6 +247,7 @@ router.get(
                   {
                     $match: {
                       isServiceable: true,
+                      isBlockedByAdmin: false,
                     },
                   },
                   {
@@ -333,6 +335,7 @@ router.get(
                 {
                   $match: {
                     isServiceable: true,
+                    isBlockedByAdmin: false,
                   },
                 },
                 {
@@ -411,6 +414,7 @@ router.get(
               {
                 $match: {
                   isServiceable: true,
+                  isBlockedByAdmin: false,
                 },
               },
               {
@@ -479,6 +483,7 @@ router.get(
                   {
                     $match: {
                       isServiceable: true,
+                      isBlockedByAdmin: false,
                     },
                   },
                   {
@@ -564,6 +569,7 @@ router.get(
                 {
                   $match: {
                     isServiceable: true,
+                    isBlockedByAdmin: false,
                   },
                 },
                 {
@@ -643,6 +649,7 @@ router.get(
               {
                 $match: {
                   isServiceable: true,
+                  isBlockedByAdmin: false,
                 },
               },
               {
@@ -711,6 +718,7 @@ router.get(
                   {
                     $match: {
                       isServiceable: true,
+                      isBlockedByAdmin: false,
                     },
                   },
                   {
@@ -797,6 +805,7 @@ router.get(
                 {
                   $match: {
                     isServiceable: true,
+                    isBlockedByAdmin: false,
                   },
                 },
                 {
@@ -880,6 +889,7 @@ router.get(
               {
                 $match: {
                   isServiceable: true,
+                  isBlockedByAdmin: false,
                 },
               },
               {
@@ -948,6 +958,7 @@ router.get(
                   {
                     $match: {
                       isServiceable: true,
+                      isBlockedByAdmin: false,
                     },
                   },
                   {
@@ -1034,6 +1045,7 @@ router.get(
                 {
                   $match: {
                     isServiceable: true,
+                    isBlockedByAdmin: false,
                   },
                 },
                 {
@@ -1114,6 +1126,7 @@ router.get(
               {
                 $match: {
                   isServiceable: true,
+                  isBlockedByAdmin: false,
                 },
               },
               {
@@ -1182,6 +1195,7 @@ router.get(
                   {
                     $match: {
                       isServiceable: true,
+                      isBlockedByAdmin: false,
                     },
                   },
                   {
@@ -1267,6 +1281,7 @@ router.get(
                 {
                   $match: {
                     isServiceable: true,
+                    isBlockedByAdmin: false,
                   },
                 },
                 {
@@ -1346,6 +1361,7 @@ router.get(
               {
                 $match: {
                   isServiceable: true,
+                  isBlockedByAdmin: false,
                 },
               },
               {
@@ -1414,6 +1430,7 @@ router.get(
                   {
                     $match: {
                       isServiceable: true,
+                      isBlockedByAdmin: false,
                     },
                   },
                   {
@@ -1499,6 +1516,7 @@ router.get(
                 {
                   $match: {
                     isServiceable: true,
+                    isBlockedByAdmin: false,
                   },
                 },
                 {
@@ -1571,6 +1589,7 @@ router.get(
             {
               $match: {
                 isServiceable: true,
+                isBlockedByAdmin: false,
               },
             },
             {
@@ -1631,6 +1650,7 @@ router.get(
                 {
                   $match: {
                     isServiceable: true,
+                    isBlockedByAdmin: false,
                   },
                 },
                 {
@@ -1707,6 +1727,7 @@ router.get(
               {
                 $match: {
                   isServiceable: true,
+                  isBlockedByAdmin: false,
                 },
               },
               {
@@ -1777,6 +1798,7 @@ router.get(
             {
               $match: {
                 isServiceable: true,
+                isBlockedByAdmin: false,
               },
             },
             {
@@ -1837,6 +1859,7 @@ router.get(
                 {
                   $match: {
                     isServiceable: true,
+                    isBlockedByAdmin: false,
                   },
                 },
                 {
@@ -1912,6 +1935,7 @@ router.get(
               {
                 $match: {
                   isServiceable: true,
+                  isBlockedByAdmin: false,
                 },
               },
               {
@@ -1981,6 +2005,7 @@ router.get(
             {
               $match: {
                 isServiceable: true,
+                isBlockedByAdmin: false,
               },
             },
             {
@@ -2039,6 +2064,7 @@ router.get(
                 {
                   $match: {
                     isServiceable: true,
+                    isBlockedByAdmin: false,
                   },
                 },
                 {
@@ -2114,6 +2140,7 @@ router.get(
               {
                 $match: {
                   isServiceable: true,
+                  isBlockedByAdmin: false,
                 },
               },
               {
@@ -2223,6 +2250,7 @@ router.get(
             {
               $match: {
                 isServiceable: true,
+                isBlockedByAdmin: false,
               },
             },
             {
@@ -2287,6 +2315,7 @@ router.get(
                 {
                   $match: {
                     isServiceable: true,
+                    isBlockedByAdmin: false,
                   },
                 },
                 {
@@ -2370,6 +2399,7 @@ router.get(
               {
                 $match: {
                   isServiceable: true,
+                  isBlockedByAdmin: false,
                 },
               },
               {
@@ -2444,6 +2474,7 @@ router.get(
             {
               $match: {
                 isServiceable: true,
+                isBlockedByAdmin: false,
               },
             },
             {
@@ -2506,6 +2537,7 @@ router.get(
                 {
                   $match: {
                     isServiceable: true,
+                    isBlockedByAdmin: false,
                   },
                 },
                 {
@@ -2590,6 +2622,7 @@ router.get(
               {
                 $match: {
                   isServiceable: true,
+                  isBlockedByAdmin: false,
                 },
               },
               {
@@ -2654,11 +2687,7 @@ router.get(
           {
             $match: {
               isServiceable: true,
-            },
-          },
-          {
-            $match: {
-              isServiceable: true,
+              isBlockedByAdmin: false,
             },
           },
           {
@@ -2714,11 +2743,7 @@ router.get(
               {
                 $match: {
                   isServiceable: true,
-                },
-              },
-              {
-                $match: {
-                  isServiceable: true,
+                  isBlockedByAdmin: false,
                 },
               },
               {
@@ -2792,6 +2817,7 @@ router.get(
             {
               $match: {
                 isServiceable: true,
+                isBlockedByAdmin: false,
               },
             },
             {

@@ -56,6 +56,7 @@ router.post(
         amenities,
         images,
         homeCurrency,
+        isBlockedByAdmin: false,
       });
       await hotel.save();
 

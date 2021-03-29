@@ -87,6 +87,7 @@ router.get(
           // @ts-ignore
           _id: mongoose.Types.ObjectId(req.params.hotelId),
           isServiceable: true,
+          isBlockedByAdmin: false,
         },
       },
       {
