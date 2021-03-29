@@ -1,15 +1,11 @@
 import express, { Request, Response } from "express";
-import { body, param } from "express-validator";
+import { param } from "express-validator";
 
-import {
-  BadRequestError,
-  NotFoundError,
-  validateRequest,
-} from "../../../errors";
+import { BadRequestError, validateRequest } from "../../../errors";
 import { Hotel } from "../../../models/Hotel";
 import { exchangeRates } from "exchange-rates-api";
 import { SupportedCurrencies } from "../../../models/enums/supportedCurrencies";
-import { GatewayCharge } from "../../../models/GatewayCharges";
+import { Charges } from "../../../models/Charges";
 import { Booking } from "../../../models/Booking";
 import { checkHotelExists } from "../../../errors/middleware/hotel-exists";
 import mongoose from "mongoose";
@@ -20,7 +16,6 @@ const router = express.Router();
 const DEFAULT_CURRENCY = "MYR";
 const DEFAULT_TOTAL_GUESTS = 1;
 const DEFAULT_SORT_ORDER = 1;
-let gatewayChargesForHotelPercentage: number;
 let currencyRates = {};
 let requestedCurrency: string;
 let checkIn: string;
@@ -62,8 +57,6 @@ router.get(
     totalDays =
       (checkOutStr.getTime() - checkInStr.getTime()) / (1000 * 60 * 60 * 24);
     await checkCheckInAndCheckOutDateQuery(checkIn, checkOut);
-    //get Gateway charges percentage
-    await getGatewayCharges(res);
     // @ts-ignore
     requestedCurrency = req.query.currency || DEFAULT_CURRENCY;
     //check if given currency is supported by us or not
@@ -128,7 +121,7 @@ router.get(
       },
     ]);
 
-    await transformObject(hotels);
+    await transformObject(hotels, res);
     await checkBookingDetails(hotels);
     await createRoomConfig(hotels, totalGuests, selected_roomId);
     await checkTotalGuestsDetails(hotels);
@@ -154,18 +147,23 @@ async function sendResponse(res: Response, hotel: Array<any>) {
     selected_roomId,
   });
 }
-const transformObject = async (hotels: Array<any>) => {
+const transformObject = async (hotels: Array<any>, res: Response) => {
   for (let i = 0; i < hotels.length; i++) {
     if (hotels[i].rooms) {
       for (let j = 0; j < hotels[i].rooms.length; j++) {
         hotels[i].rooms[j].id = hotels[i].rooms[j]._id;
         delete hotels[i].rooms[j]._id;
 
-        //add gateway charges to hotel room price
-        hotels[i].rooms[j].priceForOneNight += await Math.ceil(
-          (gatewayChargesForHotelPercentage / 100) *
-            hotels[i].rooms[j].priceForOneNight
-        );
+        //add all charges and taxes
+        const charges = await getCharges(res);
+        if (charges && charges.length > 0) {
+          for (let z = 0; z < charges.length; z++) {
+            hotels[i].rooms[j].priceForOneNight += await Math.ceil(
+              (charges[z].percentage / 100) *
+                hotels[i].rooms[j].priceForOneNight
+            );
+          }
+        }
 
         //add discount logic
         if (hotels[i].rooms[j].discount.isDiscount) {
@@ -430,12 +428,15 @@ async function checkCheckInAndCheckOutDateQuery(
   }
 }
 
-async function getGatewayCharges(res: Response) {
+async function getCharges(res: Response) {
   try {
-    const gatewayCharges = await GatewayCharge.find({}).limit(1);
-    gatewayCharges.length === 0
-      ? (gatewayChargesForHotelPercentage = 5)
-      : (gatewayChargesForHotelPercentage = gatewayCharges[0].percentage);
+    return await Charges.aggregate([
+      {
+        $match: {
+          isApplicable: true,
+        },
+      },
+    ]);
   } catch (err) {
     console.error(err);
     res.status(403).send(err);

@@ -8,7 +8,7 @@ import { getHotelByID } from "./routes/users/hotel/getHotelByID";
 import { searchHotelRouter } from "./routes/users/hotel/searchHotel";
 
 //super admin
-import { superAdminConfigRouter } from "./routes/superAdmin/config/configRoutes";
+
 import { superAdminBookingRouter } from "./routes/superAdmin/booking/bookingRoutes";
 import { SuperAdminGeneralRouter } from "./routes/superAdmin/general/generalRoutes";
 import { superAdminAuthRoutes } from "./routes/superAdmin/auth/authRoutes";
@@ -17,6 +17,7 @@ import { superAdminHotelRouter } from "./routes/superAdmin/hotel/hotelRoutes";
 import { superAdminUploadRouter } from "./routes/superAdmin/upload/uploadRoutes";
 import { superAdminSubscriptionRouter } from "./routes/superAdmin/subscription/subscriptionRoutes";
 import { superAdminDashboardRouter } from "./routes/superAdmin/dashboard/dashboardRoutes";
+import { superAdminChargesRouter } from "./routes/superAdmin/charges/chargesRoutes";
 import cookieSession from "cookie-session";
 const keys = require("./config/keys");
 //error handlers
@@ -61,13 +62,13 @@ app.use(searchHotelRouter);
 //super admin
 app.use(superAdminAuthRoutes);
 app.use(superAdminHotelRouter);
-app.use(superAdminConfigRouter);
 app.use(superAdminBookingRouter);
 app.use(SuperAdminGeneralRouter);
 app.use(superAdminAdminRouter);
 app.use(superAdminUploadRouter);
 app.use(superAdminSubscriptionRouter);
 app.use(superAdminDashboardRouter);
+app.use(superAdminChargesRouter);
 app.use(errorhandler);
 app.all("*", async (req, res) => {
   throw new NotFoundError();
