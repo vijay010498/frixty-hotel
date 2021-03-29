@@ -14,7 +14,7 @@ const DEFAULT_METER_RANGE = 50 * 1000; //default nearBy distance is 50KM or 5000
 const PER_PAGE = 10; //
 const DEFAULT_CURRENCY = "MYR";
 const DEFAULT_TOTAL_GUESTS = 1;
-let gatewayChargesForHotelPercentage: number;
+let totalExtraChargesPercentage = 0;
 let currencyRates = {};
 let requestedCurrency: string;
 
@@ -29,6 +29,8 @@ router.get(
   [],
   validateRequest,
   async (req: Request, res: Response) => {
+    //total Charges
+    await getCharges(res);
     const today = new Date().toISOString().slice(0, 10);
     const tomorrow = new Date(Date.now() + 3600 * 1000 * 24)
       .toISOString()
@@ -297,7 +299,7 @@ router.get(
                   { $limit: PER_PAGE },
                 ]);
 
-                await transformObject(hotels, res);
+                await transformObject(hotels);
                 await checkBookingDetails(hotels);
 
                 await checkTotalGuestsDetails(hotels);
@@ -374,7 +376,7 @@ router.get(
                 { $skip: PER_PAGE * page },
                 { $limit: PER_PAGE },
               ]);
-              await transformObject(hotels, res);
+              await transformObject(hotels);
               await checkBookingDetails(hotels);
               await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
@@ -532,7 +534,7 @@ router.get(
                   { $limit: PER_PAGE },
                 ]);
 
-                await transformObject(hotels, res);
+                await transformObject(hotels);
                 await checkBookingDetails(hotels);
                 await checkTotalGuestsDetails(hotels);
                 if (hotels.length === 0) {
@@ -608,7 +610,7 @@ router.get(
                 { $limit: PER_PAGE },
               ]);
 
-              await transformObject(hotels, res);
+              await transformObject(hotels);
               await checkBookingDetails(hotels);
 
               await checkTotalGuestsDetails(hotels);
@@ -767,7 +769,7 @@ router.get(
                   { $limit: PER_PAGE },
                 ]);
 
-                await transformObject(hotels, res);
+                await transformObject(hotels);
                 await checkBookingDetails(hotels);
 
                 await checkTotalGuestsDetails(hotels);
@@ -844,7 +846,7 @@ router.get(
                 { $limit: PER_PAGE },
               ]);
 
-              await transformObject(hotels, res);
+              await transformObject(hotels);
               await checkBookingDetails(hotels);
 
               await checkTotalGuestsDetails(hotels);
@@ -1008,7 +1010,7 @@ router.get(
                   { $limit: PER_PAGE },
                 ]);
 
-                await transformObject(hotels, res);
+                await transformObject(hotels);
                 await checkBookingDetails(hotels);
                 await checkTotalGuestsDetails(hotels);
                 if (hotels.length === 0) {
@@ -1085,7 +1087,7 @@ router.get(
                 { $limit: PER_PAGE },
               ]);
 
-              await transformObject(hotels, res);
+              await transformObject(hotels);
               await checkBookingDetails(hotels);
 
               await checkTotalGuestsDetails(hotels);
@@ -1244,7 +1246,7 @@ router.get(
                   { $limit: PER_PAGE },
                 ]);
 
-                await transformObject(hotels, res);
+                await transformObject(hotels);
                 await checkBookingDetails(hotels);
                 await checkTotalGuestsDetails(hotels);
                 if (hotels.length === 0) {
@@ -1320,7 +1322,7 @@ router.get(
                 { $limit: PER_PAGE },
               ]);
 
-              await transformObject(hotels, res);
+              await transformObject(hotels);
               await checkBookingDetails(hotels);
 
               await checkTotalGuestsDetails(hotels);
@@ -1479,7 +1481,7 @@ router.get(
                   { $limit: PER_PAGE },
                 ]);
 
-                await transformObject(hotels, res);
+                await transformObject(hotels);
                 await checkBookingDetails(hotels);
                 await checkTotalGuestsDetails(hotels);
                 if (hotels.length === 0) {
@@ -1555,7 +1557,7 @@ router.get(
                 { $limit: PER_PAGE },
               ]);
 
-              await transformObject(hotels, res);
+              await transformObject(hotels);
               await checkBookingDetails(hotels);
               await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
@@ -1700,7 +1702,7 @@ router.get(
                 { $limit: PER_PAGE },
               ]);
 
-              await transformObject(hotels, res);
+              await transformObject(hotels);
               await checkBookingDetails(hotels);
               await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
@@ -1767,7 +1769,7 @@ router.get(
               { $limit: PER_PAGE },
             ]);
 
-            await transformObject(hotels, res);
+            await transformObject(hotels);
             await checkBookingDetails(hotels);
 
             await checkTotalGuestsDetails(hotels);
@@ -1908,7 +1910,7 @@ router.get(
                 { $limit: PER_PAGE },
               ]);
 
-              await transformObject(hotels, res);
+              await transformObject(hotels);
               await checkBookingDetails(hotels);
               await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
@@ -1974,7 +1976,7 @@ router.get(
               { $limit: PER_PAGE },
             ]);
 
-            await transformObject(hotels, res);
+            await transformObject(hotels);
             await checkBookingDetails(hotels);
 
             await checkTotalGuestsDetails(hotels);
@@ -2113,7 +2115,7 @@ router.get(
                 { $limit: PER_PAGE },
               ]);
 
-              await transformObject(hotels, res);
+              await transformObject(hotels);
               await checkBookingDetails(hotels);
               await checkTotalGuestsDetails(hotels);
               if (hotels.length === 0) {
@@ -2179,7 +2181,7 @@ router.get(
               { $limit: PER_PAGE },
             ]);
 
-            await transformObject(hotels, res);
+            await transformObject(hotels);
             await checkBookingDetails(hotels);
 
             await checkTotalGuestsDetails(hotels);
@@ -2359,7 +2361,7 @@ router.get(
                 { $limit: PER_PAGE },
               ]);
 
-              await transformObject(hotels, res);
+              await transformObject(hotels);
               await checkBookingDetails(hotels);
 
               await checkTotalGuestsDetails(hotels);
@@ -2433,7 +2435,7 @@ router.get(
               { $limit: PER_PAGE },
             ]);
 
-            await transformObject(hotels, res);
+            await transformObject(hotels);
             await checkBookingDetails(hotels);
 
             await checkTotalGuestsDetails(hotels);
@@ -2581,7 +2583,7 @@ router.get(
                 { $limit: PER_PAGE },
               ]);
 
-              await transformObject(hotels, res);
+              await transformObject(hotels);
               await checkBookingDetails(hotels);
 
               await checkTotalGuestsDetails(hotels);
@@ -2656,7 +2658,7 @@ router.get(
               { $limit: PER_PAGE },
             ]);
 
-            await transformObject(hotels, res);
+            await transformObject(hotels);
             await checkBookingDetails(hotels);
             await checkTotalGuestsDetails(hotels);
             if (hotels.length === 0) {
@@ -2787,7 +2789,7 @@ router.get(
               { $limit: PER_PAGE },
             ]);
 
-            await transformObject(hotels, res);
+            await transformObject(hotels);
             await checkBookingDetails(hotels);
             await checkTotalGuestsDetails(hotels);
             if (hotels.length === 0) {
@@ -2851,7 +2853,7 @@ router.get(
             { $limit: PER_PAGE },
           ]);
 
-          await transformObject(hotels, res);
+          await transformObject(hotels);
           await checkBookingDetails(hotels);
           await checkTotalGuestsDetails(hotels);
           if (hotels.length === 0) {
@@ -2874,23 +2876,18 @@ router.get(
     }
   }
 );
-const transformObject = async (hotels: Array<any>, res: Response) => {
+const transformObject = async (hotels: Array<any>) => {
   for (let i = 0; i < hotels.length; i++) {
     if (hotels[i].rooms) {
       for (let j = 0; j < hotels[i].rooms.length; j++) {
         hotels[i].rooms[j].id = hotels[i].rooms[j]._id;
         delete hotels[i].rooms[j]._id;
 
-        //add all charges and taxes
-        /* const charges = await getCharges(res);
-        if (charges && charges.length > 0) {
-          for (let z = 0; z < charges.length; z++) {
-            hotels[i].rooms[j].priceForOneNight += await Math.ceil(
-              (charges[z].percentage / 100) *
-                hotels[i].rooms[j].priceForOneNight
-            );
-          }
-        }*/
+        //add total charges percentage
+        hotels[i].rooms[j].priceForOneNight += await Math.ceil(
+          (totalExtraChargesPercentage / 100) *
+            hotels[i].rooms[j].priceForOneNight
+        );
 
         //add discount logic
         if (hotels[i].rooms[j].discount.isDiscount) {
@@ -3051,13 +3048,21 @@ async function checkCheckInAndCheckOutDateQuery(
 }
 async function getCharges(res: Response) {
   try {
-    return await Charges.aggregate([
+    const charges = await Charges.aggregate([
       {
         $match: {
           isApplicable: true,
         },
       },
     ]);
+    let totalChargesPercentage = 0;
+    if (charges && charges.length > 0) {
+      for (let i = 0; i < charges.length; i++) {
+        totalChargesPercentage += charges[i].percentage;
+      }
+    }
+
+    totalExtraChargesPercentage = totalChargesPercentage;
   } catch (err) {
     console.error(err);
     res.status(403).send(err);
