@@ -48,9 +48,6 @@ router.get(
 
     await checkCheckInAndCheckOutDateQuery(checkIn, checkOut);
 
-    //get Gateway charges percentage
-    await getCharges(res);
-
     // @ts-ignore
     requestedCurrency = req.query.currency || DEFAULT_CURRENCY;
     //check if given currency is supported by us or not
