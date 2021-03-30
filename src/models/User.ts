@@ -75,6 +75,7 @@ const UserSchema = new mongoose.Schema(
     },
   }
 );
+UserSchema.index({ lastLocation: "2dsphere" });
 
 UserSchema.pre("save", async function (done) {
   if (this.isModified("password")) {
