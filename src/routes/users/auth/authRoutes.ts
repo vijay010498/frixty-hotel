@@ -47,7 +47,6 @@ router.post(
           algorithm: "HS512",
         }
       );
-      console.log(jwtAuthToken);
       res.status(201).send({
         user,
         auth: {
