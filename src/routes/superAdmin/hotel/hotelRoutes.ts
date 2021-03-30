@@ -38,6 +38,7 @@ router.post(
       amenities,
       images,
       homeCurrency,
+      propertyType,
     } = req.body;
 
     const existingHotel = await Hotel.findOne({ name: name.toUpperCase() });
@@ -56,6 +57,7 @@ router.post(
         amenities,
         images,
         homeCurrency,
+        propertyType,
         isBlockedByAdmin: false,
       });
       await hotel.save();
