@@ -2882,6 +2882,7 @@ const transformObject = async (hotels: Array<any>) => {
   for (let i = 0; i < hotels.length; i++) {
     if (hotels[i].rooms) {
       for (let j = 0; j < hotels[i].rooms.length; j++) {
+        let discountPercentage = 0;
         hotels[i].rooms[j].id = hotels[i].rooms[j]._id;
         delete hotels[i].rooms[j]._id;
 
@@ -2891,30 +2892,39 @@ const transformObject = async (hotels: Array<any>) => {
             hotels[i].rooms[j].priceForOneNight
         );
 
+        hotels[i].rooms[j].priceForOneNightWithoutDiscount =
+          hotels[i].rooms[j].priceForOneNight;
         //add discount logic
         if (hotels[i].rooms[j].discount.isDiscount) {
           //Yes There is some discount
-          hotels[i].rooms[j].priceForOneNight -= await Math.ceil(
-            (hotels[i].rooms[j].discount.discountPercentage / 100) *
-              hotels[i].rooms[j].priceForOneNight
-          );
+          discountPercentage = hotels[i].rooms[j].discount.discountPercentage;
+          hotels[i].rooms[j].priceForOneNight -=
+            (discountPercentage / 100) * hotels[i].rooms[j].priceForOneNight;
         }
 
         //price conversion
-        hotels[i].rooms[j].priceForOneNight = await Math.floor(
-          hotels[i].rooms[j].priceForOneNight / // @ts-ignore
-            currencyRates[hotels[i].homeCurrency].toFixed(2)
+        hotels[i].rooms[j].priceForOneNight = await convertPrice(
+          hotels[i].rooms[j].priceForOneNight,
+          hotels[i].homeCurrency
+        );
+
+        hotels[i].rooms[j].priceForOneNightWithoutDiscount = await convertPrice(
+          hotels[i].rooms[j].priceForOneNightWithoutDiscount,
+          hotels[i].homeCurrency
         );
 
         //Multiply priceForOneNight with totalDays
         hotels[i].rooms[j].price =
           hotels[i].rooms[j].priceForOneNight * totalDays;
 
+        hotels[i].rooms[j].priceWithoutDiscount =
+          hotels[i].rooms[j].priceForOneNightWithoutDiscount * totalDays;
+
         //added discounted amount if
         if (hotels[i].rooms[j].discount.isDiscount) {
-          hotels[i].rooms[j].discount.totalDiscountAmount = await Math.ceil(
+          hotels[i].rooms[j].discount.totalDiscountAmount = Math.ceil(
             (hotels[i].rooms[j].discount.discountPercentage / 100) *
-              hotels[i].rooms[j].price
+              hotels[i].rooms[j].priceWithoutDiscount
           );
         } else {
           hotels[i].rooms[j].discount.totalDiscountAmount = 0;
@@ -3105,6 +3115,10 @@ function getDateRange(startDate, endDate) {
   }
 
   return dates;
+}
+async function convertPrice(amountToConvert: number, currency: string) {
+  // @ts-ignore
+  return await Math.floor(amountToConvert / currencyRates[currency].toFixed(2));
 }
 
 export { router as searchHotelRouter };
