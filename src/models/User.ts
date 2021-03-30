@@ -7,6 +7,7 @@ interface UserAttrs {
   fullName: string;
   passportNumber: string;
   phoneNumber: string;
+  lastLocation: {};
 }
 
 interface UserModel extends mongoose.Model<UserDoc> {
@@ -19,6 +20,7 @@ interface UserDoc extends mongoose.Document {
   fullName: string;
   passportNumber: string;
   phoneNumber: string;
+  lastLocation: {};
 }
 
 const UserSchema = new mongoose.Schema(
@@ -44,6 +46,16 @@ const UserSchema = new mongoose.Schema(
     phoneNumber: {
       type: String,
       required: true,
+    },
+    lastLocation: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number],
+      },
     },
   },
   {

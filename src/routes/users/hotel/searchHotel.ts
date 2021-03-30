@@ -9,6 +9,7 @@ import _ from "lodash";
 import Moment from "moment";
 import { extendMoment } from "moment-range";
 import moment from "moment";
+import { updateUserLastLocation } from "../../../errors/middleware/users/updateUserLastLocation";
 const router = express.Router();
 const DEFAULT_METER_RANGE = 50 * 1000; //default nearBy distance is 50KM or 500000 meter
 const PER_PAGE = 10; //
@@ -28,6 +29,7 @@ router.get(
   "/api/v1/hotels/search",
   [],
   validateRequest,
+  updateUserLastLocation,
   async (req: Request, res: Response) => {
     //total Charges
     await getCharges(res);

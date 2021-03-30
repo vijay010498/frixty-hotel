@@ -31,6 +31,7 @@ router.post(
         fullName: fullName,
         passportNumber: passportNumber,
         phoneNumber: phoneNumber,
+        lastLocation: {},
       });
       await user.save();
 
