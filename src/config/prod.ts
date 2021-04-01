@@ -11,6 +11,8 @@ module.exports = {
   redisHost: process.env.redisHost,
   redisPassword: process.env.redisPassword,
   exchangeRatesApi: process.env.exchangeRatesApi,
+  jwtAdminKey: process.env.jwtAdminKey,
+  jwtAdminExpireTime: process.env.jwtAdminExpireTime,
 };
 
 //mongodb+srv://vijay:V07Dm5Diwkz95eIj@cluster0.p1weg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority

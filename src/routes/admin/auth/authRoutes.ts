@@ -1,21 +1,20 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import { Password } from "../../../services/auth/password";
-import { SuperAdmin } from "../../../models/SuperAdmin";
+import { Admin } from "../../../models/Admin";
 import { OTP } from "../../../models/OTP";
-import { requireSuperAdmin } from "../../../errors/middleware/SAdmin/require-super-admin";
-import jwt from "jsonwebtoken";
+import { requireAdmin } from "../../../errors/middleware/admin/require-admin";
 import { BadRequestError, validateRequest } from "../../../errors";
+import jwt from "jsonwebtoken";
 import MailService from "@sendgrid/mail";
 import { OTPService } from "../../../services/auth/OTPService";
 const keys = require("../../../config/keys");
-
 const router = express.Router({
   caseSensitive: true,
 });
 
 router.post(
-  "/api/secure/sAdmin/signIn",
+  "/api/secure/v1/admin/signIn",
   [
     body("email").isEmail().withMessage("Email must be valid"),
     body("password")
@@ -27,46 +26,45 @@ router.post(
   async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
-    const existingSuperAdmin = await SuperAdmin.findOne({ email: email });
-    if (!existingSuperAdmin) {
+    const existingAdmin = await Admin.findOne({ email: email });
+    if (!existingAdmin) {
       throw new BadRequestError("Invalid Credentials");
     }
 
     const passwordMatches = await Password.compare(
-      existingSuperAdmin.password,
+      existingAdmin.password,
       password
     );
     if (!passwordMatches) {
       throw new BadRequestError("Invalid Password");
     }
+
     try {
-      //Generate jwt and store in session
       const JWT = await jwt.sign(
         {
-          userId: existingSuperAdmin.id,
-          email: existingSuperAdmin.email,
+          userId: existingAdmin.id,
+          email: existingAdmin.email,
+          hotelId: existingAdmin.hotelId,
         },
-        keys.jwtSuperAdminKey,
+        keys.jwtAdminKey,
         {
-          expiresIn: keys.JWTEXPIRETIMESUPERADMIN,
+          expiresIn: keys.jwtAdminExpireTime,
           algorithm: "HS512",
         }
       );
-
       req.session = {
         JWT,
       };
-      res.status(201).send(existingSuperAdmin);
+      res.status(201).send(existingAdmin);
       return;
-    } catch (err) {
-      console.error(err);
-      res.status(401).send(err);
+    } catch (e) {
+      console.error(e);
+      res.status(401).send(e);
       return;
     }
   }
 );
-
-router.post("/api/secure/sAdmin/signOut", (req, res) => {
+router.post("/api/secure/v1/admin/signOut", (req: Request, res: Response) => {
   req.session = null;
   const cookies = req.cookies;
   for (let key in cookies) {
@@ -74,13 +72,13 @@ router.post("/api/secure/sAdmin/signOut", (req, res) => {
       res.clearCookie(key);
     }
   }
-
   res.status(200).send({
     message: "Successfully Signed Out",
   });
 });
+
 router.get(
-  "/api/secure/sAdmin/verifyAuth",
+  "/api/secure/v1/admin/verifyAuth",
   [],
   validateRequest,
   async (req: Request, res: Response) => {
@@ -89,9 +87,9 @@ router.get(
       return;
     } //verify is jwt is valid
     try {
-      await jwt.verify(req.session.JWT, keys.jwtSuperAdminKey);
+      await jwt.verify(req.session.JWT, keys.jwtAdminKey);
       res.status(202).send({
-        message: "Super Admin Verified",
+        message: "Admin Verified",
       });
       return;
     } catch (err) {
@@ -102,10 +100,9 @@ router.get(
     }
   }
 );
-
 router.patch(
-  "/api/secure/sAdmin/changePassword",
-  requireSuperAdmin,
+  "/api/secure/v1/admin/changePassword",
+  requireAdmin,
   [
     body("oldPassword")
       .trim()
@@ -119,24 +116,22 @@ router.patch(
   validateRequest,
   async (req: Request, res: Response) => {
     const { oldPassword, newPassword } = req.body;
-
-    const payload = await jwt.verify(req.session!.JWT, keys.jwtSuperAdminKey);
+    const payload = await jwt.verify(req.session!.JWT, keys.jwtAdminKey);
     // @ts-ignore
     const email = payload.email.toString();
     // @ts-ignore
     const userId = payload.userId.toString();
-    const existingSuperAdmin = await SuperAdmin.findById(userId);
+    const existingAdmin = await Admin.findById(userId);
     const passwordMatches = await Password.compare(
-      existingSuperAdmin!.password,
+      existingAdmin!.password,
       oldPassword
     );
     if (!passwordMatches) {
       throw new BadRequestError("old Password Does Not Match");
     }
-
     //old password matches patch new password and update session
     try {
-      await SuperAdmin.findOneAndUpdate(
+      await Admin.findOneAndUpdate(
         {
           _id: userId,
         },
@@ -150,20 +145,20 @@ router.patch(
       try {
         const JWT = await jwt.sign(
           {
-            userId: existingSuperAdmin!.id,
-            email: existingSuperAdmin!.email,
+            userId: existingAdmin!.id,
+            email: existingAdmin!.email,
+            hotelId: existingAdmin!.hotelId,
           },
-          keys.jwtSuperAdminKey,
+          keys.jwtAdminKey,
           {
-            expiresIn: keys.JWTEXPIRETIMESUPERADMIN,
+            expiresIn: keys.jwtAdminExpireTime,
             algorithm: "HS512",
           }
         );
-
         req.session = {
           JWT,
         };
-        res.status(201).send(existingSuperAdmin);
+        res.status(201).send(existingAdmin);
         return;
       } catch (err) {
         console.error(err);
@@ -178,33 +173,31 @@ router.patch(
   }
 );
 router.post(
-  "/api/secure/sAdmin/requestOTP",
+  "/api/secure/v1/admin/requestOTP",
   [body("email").isEmail().withMessage("Email Must Be Valid")],
   validateRequest,
   async (req: Request, res: Response) => {
     const { email } = req.body;
-    //first check is super admin exists to prevent flooding attacks
-    const doesSuperAdminExists = await SuperAdmin.findOne({ email: email });
-    if (!doesSuperAdminExists) {
-      throw new BadRequestError("Super Admin Does Not Exist");
+    //first check if admin exists to prevent flooding attacks
+    const doesAdminExists = await Admin.findOne({ email: email });
+    if (!doesAdminExists) {
+      throw new BadRequestError("Admin Does Not Exists");
     }
-
     //check if already requested for OTP in last 5 minutes
     const alreadyRequested = await OTP.findOne({ email: email });
     if (alreadyRequested) {
       const { createdAt } = alreadyRequested;
       const lastOTPSentTimeStamp = createdAt.getTime();
       throw new BadRequestError(
-        "OTP Sent Already, Please wait 5 minutes from last sent OTP request"
+        `OTP Sent Already, Please wait 5 minutes from last sent OTP request \n last Sent : ${lastOTPSentTimeStamp}`
       );
     }
     const sixDigitOTP = Math.floor(100000 + Math.random() * 900000);
-
     //send Mail First
     const OTPEmail = {
       to: {
         email: email,
-        name: doesSuperAdminExists.fullName,
+        name: doesAdminExists.companyName,
       },
       from: {
         email: "frixty-security@mails.oncampus.in",
@@ -223,11 +216,10 @@ router.post(
       },
       template_id: keys.forgotPasswordOTPTemplate,
       dynamic_template_data: {
-        name: doesSuperAdminExists.fullName,
+        name: doesAdminExists.companyName,
         OTP: sixDigitOTP,
       },
     };
-
     try {
       // @ts-ignore
       await MailService.send(OTPEmail);
@@ -235,7 +227,7 @@ router.post(
       //IF OTP send successfully in EMAIL
       const userOTP = await OTP.build({
         OTP: sixDigitOTP,
-        email: doesSuperAdminExists.email,
+        email: doesAdminExists.email,
       });
       await userOTP.save();
       res.status(201).send({
@@ -249,66 +241,8 @@ router.post(
     }
   }
 );
-router.post(
-  "/api/secure/sAdmin/signup",
-  requireSuperAdmin,
-  [
-    body("email").isEmail().withMessage("Email Must Be Valid"),
-    body("password")
-      .trim()
-      .isLength({
-        min: 6,
-        max: 20,
-      })
-      .withMessage("Password Must be between 6 and 20"),
-  ],
-  validateRequest,
-  async (req: Request, res: Response) => {
-    const { email, password, fullName, phoneNumber } = req.body;
-    const existingSuperAdmin = await SuperAdmin.findOne({ email: email });
-    if (existingSuperAdmin) {
-      throw new BadRequestError(
-        "Super Admin Already Exists. Please Contact The Database Administrator"
-      );
-    }
-
-    try {
-      const superAdmin = SuperAdmin.build({
-        email: email,
-        fullName: fullName,
-        password: password,
-        phoneNumber: phoneNumber,
-      });
-      await superAdmin.save();
-
-      //Generate jwt and store in session
-      const JWT = await jwt.sign(
-        {
-          userId: superAdmin.id,
-          email: superAdmin.email,
-        },
-        keys.jwtSuperAdminKey,
-        {
-          expiresIn: keys.JWTEXPIRETIMESUPERADMIN,
-          algorithm: "HS512",
-        }
-      );
-
-      req.session = {
-        JWT,
-      };
-
-      res.status(201).send(superAdmin);
-      return;
-    } catch (err) {
-      console.error(err);
-      res.status(400).send(err);
-      return;
-    }
-  }
-);
 router.patch(
-  "/api/secure/sAdmin/verifyOTPAndChangePassword",
+  "/api/secure/v1/admin/verifyOTPAndChangePassword",
   [
     body("email").isEmail().withMessage("Email Must be Valid"),
     body("userOTP")
@@ -328,13 +262,11 @@ router.patch(
   validateRequest,
   async (req: Request, res: Response) => {
     const { email, userOTP, password } = req.body;
-
-    //first check is super admin exists to prevent flooding attacks
-    const doesSuperAdminExists = await SuperAdmin.findOne({ email: email });
-    if (!doesSuperAdminExists) {
-      throw new BadRequestError("Super Admin Does Not Exist");
+    //first check if admin exists to prevent flooding attacks
+    const doesAdminExists = await Admin.findOne({ email: email });
+    if (!doesAdminExists) {
+      throw new BadRequestError("Admin Does Not Exists");
     }
-
     //check if OTP is requested
     const doesOTPRequested = await OTP.findOne({ email: email });
     if (!doesOTPRequested) {
@@ -342,52 +274,49 @@ router.patch(
       throw new BadRequestError(
         "OPT Not Requested or Expired, Please Request For OTP Again"
       );
-    }
-
-    //Now Check if entered OTP is correct
+    } //Now Check if entered OTP is correct
     // @ts-ignore
     const OTPMatch = await OTPService.compare(doesOTPRequested.OTP, userOTP);
     if (!OTPMatch) {
       throw new BadRequestError("Invalid OTP");
     }
-
     //OTP Verified
-    //first make the verified OTP expired
     try {
       await OTP.deleteOne({ email: email });
 
-      //change Password
-      await SuperAdmin.findOneAndUpdate(
-        { email: email },
+      //change password
+      await Admin.findOneAndUpdate(
+        {
+          email: email,
+        },
         {
           $set: {
             password: password,
           },
         }
       );
-
       //generate session and store
       try {
         const JWT = await jwt.sign(
           {
-            userId: doesSuperAdminExists.id,
-            email: doesSuperAdminExists.email,
+            userId: doesAdminExists.id,
+            email: doesAdminExists.email,
+            hotelId: doesAdminExists.hotelId,
           },
-          keys.jwtSuperAdminKey,
+          keys.jwtAdminKey,
           {
-            expiresIn: keys.JWTEXPIRETIMESUPERADMIN,
+            expiresIn: keys.jwtAdminExpireTime,
             algorithm: "HS512",
           }
         );
-
         req.session = {
           JWT,
         };
-        res.status(201).send(doesSuperAdminExists);
+        res.status(201).send(doesAdminExists);
         return;
-      } catch (err) {
-        console.error(err);
-        res.status(400).send(err);
+      } catch (e) {
+        console.error(e);
+        res.status(400).send(e);
         return;
       }
     } catch (err) {
@@ -398,4 +327,4 @@ router.patch(
   }
 );
 
-export { router as superAdminAuthRoutes };
+export { router as adminAuthRouter };

@@ -7,8 +7,10 @@ import { userAuthRouter } from "./routes/users/auth/authRoutes";
 import { getHotelByID } from "./routes/users/hotel/getHotelByID";
 import { searchHotelRouter } from "./routes/users/hotel/searchHotel";
 
-//super admin
+//Admin
+import { adminAuthRouter } from "./routes/admin/auth/authRoutes";
 
+//super admin
 import { superAdminBookingRouter } from "./routes/superAdmin/booking/bookingRoutes";
 import { SuperAdminGeneralRouter } from "./routes/superAdmin/general/generalRoutes";
 import { superAdminAuthRoutes } from "./routes/superAdmin/auth/authRoutes";
@@ -69,6 +71,10 @@ app.use(superAdminUploadRouter);
 app.use(superAdminSubscriptionRouter);
 app.use(superAdminDashboardRouter);
 app.use(superAdminChargesRouter);
+
+//admin
+app.use(adminAuthRouter);
+
 app.use(errorhandler);
 app.all("*", async (req, res) => {
   throw new NotFoundError();
