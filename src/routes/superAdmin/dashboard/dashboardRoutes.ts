@@ -4,8 +4,9 @@ import { Admin } from "../../../models/Admin";
 import { validateRequest } from "../../../errors";
 import { Hotel } from "../../../models/Hotel";
 import { Booking } from "../../../models/Booking";
-import { exchangeRates } from "exchange-rates-api";
-
+import axios from "axios";
+import { ExchangeRatesCache } from "../../../models/Cache/ExchangeRatesCache";
+const keys = require("../../../config/keys");
 const router = express.Router({
   caseSensitive: true,
 });
@@ -117,7 +118,6 @@ router.get(
         const paymentAmount =
           confirmedBookingsTotal[i].bookingDetails.paymentDetails.details
             .totalPayment;
-
         const convertedAmount = parseFloat(
           Math.floor(
             // @ts-ignore
@@ -147,10 +147,34 @@ router.get(
 );
 async function getCurrencyRates(res: Response) {
   try {
-    currencyRates = await exchangeRates().latest().base(baseCurrency).fetch();
+    //check from mongo db first
+    const exchangeRatesCache = await ExchangeRatesCache.findOne({
+      base: baseCurrency,
+    });
+    if (!exchangeRatesCache) {
+      //no cache
+      console.log("Currency Rates Not Serving from cache");
+      const response = await axios.get(
+        "http://api.exchangeratesapi.io/latest",
+        {
+          params: {
+            access_key: keys.exchangeRatesApi,
+            base: baseCurrency,
+          },
+        }
+      );
+      const saveExchangeRatesCache = ExchangeRatesCache.build({
+        base: baseCurrency,
+        rates: response.data.rates,
+      });
+      await saveExchangeRatesCache.save();
+      currencyRates = response.data.rates;
+    } else {
+      console.log("Currency Rates Serving from cache");
+      currencyRates = exchangeRatesCache.rates;
+    }
   } catch (err) {
-    console.error(err);
-    res.status(403).send("Something Went Wrong");
+    res.status(403).send("Something Went Wrong Fetch Base Currency");
   }
 }
 

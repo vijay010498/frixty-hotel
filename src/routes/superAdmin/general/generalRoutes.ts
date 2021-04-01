@@ -1,8 +1,10 @@
 import express, { Request, Response } from "express";
-import { exchangeRates } from "exchange-rates-api";
 import { validateRequest } from "../../../errors";
 import { requireSuperAdmin } from "../../../errors/middleware/SAdmin/require-super-admin";
+import { ExchangeRatesCache } from "../../../models/Cache/ExchangeRatesCache";
+import axios from "axios";
 const alphabetize = require("alphabetize-object-keys");
+const keys = require("../../../config/keys");
 const router = express.Router({
   caseSensitive: true,
 });
@@ -18,14 +20,36 @@ router.get(
       req.query.baseCurrency || req.cookies.baseCurrency || defaultBaseCurrency;
 
     try {
-      const response = await exchangeRates()
-        .latest() // @ts-ignore
-        .base(baseCurrency)
-        .fetch();
-      const sortedOrder = await alphabetize(response);
-      res.cookie("baseCurrency", baseCurrency);
-      res.status(200).send(sortedOrder);
-      return;
+      const exchangeRatesCache = await ExchangeRatesCache.findOne({
+        base: baseCurrency,
+      });
+      if (!exchangeRatesCache) {
+        console.log("Currency Rates Not Serving from cache");
+        const response = await axios.get(
+          "http://api.exchangeratesapi.io/latest",
+          {
+            params: {
+              access_key: keys.exchangeRatesApi,
+              base: baseCurrency,
+            },
+          }
+        );
+        const saveExchangeRatesCache = ExchangeRatesCache.build({
+          base: baseCurrency,
+          rates: response.data.rates,
+        });
+        await saveExchangeRatesCache.save();
+        const sortedOrder = await alphabetize(response.data.rates);
+        res.cookie("baseCurrency", baseCurrency);
+        res.status(200).send(sortedOrder);
+        return;
+      } else {
+        console.log("Currency Rates Serving from cache");
+        const sortedOrder = await alphabetize(exchangeRatesCache.rates);
+        res.cookie("baseCurrency", baseCurrency);
+        res.status(200).send(sortedOrder);
+        return;
+      }
     } catch (err) {
       res.status(403).send(err);
       return;

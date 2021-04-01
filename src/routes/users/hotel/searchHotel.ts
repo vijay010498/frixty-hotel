@@ -1,15 +1,15 @@
 import express, { Request, Response } from "express";
 import { BadRequestError, validateRequest } from "../../../errors";
 import { Hotel } from "../../../models/Hotel";
-import { exchangeRates } from "exchange-rates-api";
 import { SupportedCurrencies } from "../../../models/enums/supportedCurrencies";
 import { Charges } from "../../../models/Charges";
 import { Booking } from "../../../models/Booking";
 import _ from "lodash";
-import Moment from "moment";
-import { extendMoment } from "moment-range";
 import moment from "moment";
 import { updateUserLastLocation } from "../../../errors/middleware/users/updateUserLastLocation";
+import { ExchangeRatesCache } from "../../../models/Cache/ExchangeRatesCache";
+import axios from "axios";
+const keys = require("../../../config/keys");
 const router = express.Router();
 const DEFAULT_METER_RANGE = 50 * 1000; //default nearBy distance is 50KM or 500000 meter
 const PER_PAGE = 10; //
@@ -3091,13 +3091,34 @@ async function checkRequestedCurrency(requestedCurrency: string) {
 
 async function getCurrencyRates(res: Response) {
   try {
-    currencyRates = await exchangeRates()
-      .latest()
-      .base(requestedCurrency)
-      .fetch();
+    //check from mongo db first
+    const exchangeRatesCache = await ExchangeRatesCache.findOne({
+      base: requestedCurrency,
+    });
+    if (!exchangeRatesCache) {
+      //no cache
+      console.log("Currency Rates Not Serving from cache");
+      const response = await axios.get(
+        "http://api.exchangeratesapi.io/latest",
+        {
+          params: {
+            access_key: keys.exchangeRatesApi,
+            base: requestedCurrency,
+          },
+        }
+      );
+      const saveExchangeRatesCache = ExchangeRatesCache.build({
+        base: requestedCurrency,
+        rates: response.data.rates,
+      });
+      await saveExchangeRatesCache.save();
+      currencyRates = response.data.rates;
+    } else {
+      console.log("Currency Rates Serving from cache");
+      currencyRates = exchangeRatesCache.rates;
+    }
   } catch (err) {
-    console.error(err);
-    res.status(403).send("Something Went Wrong");
+    res.status(403).send("Something Went Wrong Fetch Base Currency");
   }
 }
 

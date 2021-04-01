@@ -10,6 +10,7 @@ module.exports = {
   awsSecretKeyId: process.env.awsSecretKeyId,
   redisHost: process.env.redisHost,
   redisPassword: process.env.redisPassword,
+  exchangeRatesApi: process.env.exchangeRatesApi,
 };
 
 //mongodb+srv://vijay:V07Dm5Diwkz95eIj@cluster0.p1weg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
