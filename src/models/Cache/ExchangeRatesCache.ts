@@ -28,7 +28,7 @@ const ExchangeRatesCacheSchema = new mongoose.Schema(
     createdAt: {
       type: Date,
       default: Date.now,
-      expires: 86400, // 24 hrs
+      expires: 43200, // 12 hrs
     },
   },
   {

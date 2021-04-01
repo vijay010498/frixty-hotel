@@ -155,7 +155,7 @@ async function getCurrencyRates(res: Response) {
       //no cache
       console.log("Currency Rates Not Serving from cache");
       const response = await axios.get(
-        "http://api.exchangeratesapi.io/latest",
+        "https://api.exchangeratesapi.io/latest",
         {
           params: {
             access_key: keys.exchangeRatesApi,
