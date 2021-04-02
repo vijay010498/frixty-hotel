@@ -125,10 +125,6 @@ router.post(
         },
       ],
     });
-    const paymentIntetn = await stripe.paymentIntents.retrieve(
-      "pi_1Ibn57SHwVwVyJGFpRC48atI"
-    );
-    res.send(paymentIntetn);
     res.send({ id: session.id });
     return;
   }
