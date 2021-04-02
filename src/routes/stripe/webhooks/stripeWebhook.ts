@@ -10,6 +10,7 @@ router.post("/stripe/webhook", async (req: Request, res: Response) => {
     case "payment_intent.succeeded":
       const paymentIntent = event.data.object;
       console.log(paymentIntent);
+      console.table(paymentIntent.charges.data);
       console.log("Payment Intent was successful");
       break;
     default:
