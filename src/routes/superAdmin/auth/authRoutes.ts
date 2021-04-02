@@ -102,6 +102,18 @@ router.get(
     }
   }
 );
+router.get(
+  "/api/secure/sAdmin/currentSAdmin",
+  requireSuperAdmin,
+  async (req: Request, res: Response) => {
+    const payload = await jwt.verify(req.session!.JWT, keys.jwtSuperAdminKey);
+    // @ts-ignore
+    const userId = payload.userId.toString();
+    const sAdmin = await SuperAdmin.findById(userId);
+    res.status(200).send(sAdmin);
+    return;
+  }
+);
 
 router.patch(
   "/api/secure/sAdmin/changePassword",

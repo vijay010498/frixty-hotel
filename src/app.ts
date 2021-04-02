@@ -7,8 +7,12 @@ import { userAuthRouter } from "./routes/users/auth/authRoutes";
 import { getHotelByID } from "./routes/users/hotel/getHotelByID";
 import { searchHotelRouter } from "./routes/users/hotel/searchHotel";
 
+//stripe
+import { stripeWebhookRouter } from "./routes/stripe/webhooks/stripeWebhook";
+
 //Admin
 import { adminAuthRouter } from "./routes/admin/auth/authRoutes";
+import { adminSubscriptionCharge } from "./routes/admin/AdminSubscription/adminSubscriptionsAndCharge";
 
 //super admin
 import { superAdminBookingRouter } from "./routes/superAdmin/booking/bookingRoutes";
@@ -74,6 +78,10 @@ app.use(superAdminChargesRouter);
 
 //admin
 app.use(adminAuthRouter);
+app.use(adminSubscriptionCharge);
+
+//stripe
+app.use(stripeWebhookRouter);
 
 app.use(errorhandler);
 app.all("*", async (req, res) => {

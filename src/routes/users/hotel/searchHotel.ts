@@ -3139,7 +3139,7 @@ function getDateRange(startDate, endDate) {
 }
 async function convertPrice(amountToConvert: number, currency: string) {
   // @ts-ignore
-  return await Math.floor(amountToConvert / currencyRates[currency].toFixed(2));
+  return Math.floor(amountToConvert / currencyRates[currency].toFixed(2));
 }
 
 export { router as searchHotelRouter };

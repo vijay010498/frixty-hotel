@@ -100,6 +100,20 @@ router.get(
     }
   }
 );
+router.get(
+  "/api/secure/v1/admin/currentAdmin",
+  [],
+  validateRequest,
+  requireAdmin,
+  async (req: Request, res: Response) => {
+    const payload = await jwt.verify(req.session!.JWT, keys.jwtAdminKey);
+    // @ts-ignore
+    const userID = payload.userId.toString();
+    const admin = await Admin.findById(userID);
+    res.status(200).send(admin);
+    return;
+  }
+);
 router.patch(
   "/api/secure/v1/admin/changePassword",
   requireAdmin,

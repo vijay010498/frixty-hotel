@@ -13,6 +13,7 @@ module.exports = {
   exchangeRatesApi: process.env.exchangeRatesApi,
   jwtAdminKey: process.env.jwtAdminKey,
   jwtAdminExpireTime: process.env.jwtAdminExpireTime,
+  stripeSecretKey: process.env.stripeSecretKey,
 };
 
 //mongodb+srv://vijay:V07Dm5Diwkz95eIj@cluster0.p1weg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
