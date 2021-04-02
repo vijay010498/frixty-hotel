@@ -7,6 +7,8 @@ import { ExchangeRatesCache } from "../../../models/Cache/ExchangeRatesCache";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import { Admin } from "../../../models/Admin";
+import { AdminSubscription } from "../../../models/AdminSubscriptions";
+import mongoose from "mongoose";
 const keys = require("../../../config/keys");
 const stripe = require("stripe")(keys.stripeSecretKey);
 let currencyRates = {};
@@ -21,7 +23,51 @@ router.get(
   requireAdmin,
   [],
   validateRequest,
-  async (req: Request, res: Response) => {}
+  async (req: Request, res: Response) => {
+    const payload = jwt.verify(req.session!.JWT, keys.jwtAdminKey);
+    // @ts-ignore
+    const adminId = payload.userId;
+    const subscriptionsThisAdmin = await AdminSubscription.aggregate([
+      {
+        $match: {
+          $and: [
+            {
+              adminId: mongoose.Types.ObjectId(adminId),
+            },
+            {
+              "paymentDetails.status": { $eq: "succeeded" },
+            },
+            {
+              expiry: { $gt: new Date() },
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: "subscriptions",
+          localField: "subscriptionId",
+          foreignField: "_id",
+          as: "subscriptionDetails",
+        },
+      },
+      {
+        $lookup: {
+          from: "admins",
+          localField: "adminId",
+          foreignField: "_id",
+          as: "adminDetails",
+        },
+      },
+    ]);
+    if (subscriptionsThisAdmin.length === 0) {
+      //disable hotel
+      throw new BadRequestError("Not Subscribed To Any Subscription");
+    }
+    await transformAdminSubscription(subscriptionsThisAdmin);
+    res.status(200).send(subscriptionsThisAdmin);
+    return;
+  }
 );
 
 router.get(
@@ -197,6 +243,26 @@ async function convertPrice(amountToConvert: number, currency: string) {
       // @ts-ignore
       Math.floor(amountToConvert / currencyRates[currency].toFixed(2)) * 100
     );
+  }
+}
+
+async function transformAdminSubscription(adminSubscription: Array<any>) {
+  for (let i = 0; i < adminSubscription.length; i++) {
+    adminSubscription[i].id = adminSubscription[i]._id;
+    delete adminSubscription[i]._id;
+    delete adminSubscription[i].__v;
+    for (let j = 0; j < adminSubscription[i].subscriptionDetails.length; j++) {
+      adminSubscription[i].subscriptionDetails[j].id =
+        adminSubscription[i].subscriptionDetails[j]._id;
+      delete adminSubscription[i].subscriptionDetails[j]._id;
+      delete adminSubscription[i].subscriptionDetails[j].__v;
+    }
+    for (let j = 0; j < adminSubscription[i].adminDetails.length; j++) {
+      adminSubscription[i].adminDetails[j].id =
+        adminSubscription[i].adminDetails[j]._id;
+      delete adminSubscription[i].adminDetails[j]._id;
+      delete adminSubscription[i].adminDetails[j].__v;
+    }
   }
 }
 export { router as adminSubscriptionCharge };
