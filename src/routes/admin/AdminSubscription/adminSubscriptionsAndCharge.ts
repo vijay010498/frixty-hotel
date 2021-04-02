@@ -101,12 +101,16 @@ router.post(
       // @ts-ignore
       client_reference_id: payload.userId,
       customer: admin!.stripeAccountId,
+      metadata: {
+        subscription: subscription,
+      },
       line_items: [
         {
           price_data: {
             currency: requestedCurrency,
             product_data: {
-              name: subscription.name,
+              name: `Chill In ${subscription.name} Subscription`,
+              description: `${subscription.totalRoomsPermitted} Rooms \n ${subscription.totalHotelImagesPermitted} Hotel Images \n ${subscription.totalRoomImagesPermitted} Images Per Room \n ${subscription.validityInDays} Days Validity \n`,
             },
             unit_amount: await convertPrice(
               subscription.amount,
