@@ -42,6 +42,7 @@ interface AdminDoc extends mongoose.Document {
   ssmCopyUrl: string;
   companyNameBoardImageUrl: string;
   blocked: boolean;
+  stripeAccountId: string;
 }
 
 const adminSchema = new mongoose.Schema(
@@ -113,6 +114,10 @@ const adminSchema = new mongoose.Schema(
     companyNameBoardImageUrl: {
       type: String,
       required: true,
+    },
+    stripeAccountId: {
+      type: String,
+      default: "default",
     },
   },
   {

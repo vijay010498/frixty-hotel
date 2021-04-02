@@ -6,6 +6,7 @@ import { body } from "express-validator";
 import { ExchangeRatesCache } from "../../../models/Cache/ExchangeRatesCache";
 import axios from "axios";
 import jwt from "jsonwebtoken";
+import { Admin } from "../../../models/Admin";
 const keys = require("../../../config/keys");
 const stripe = require("stripe")(keys.stripeSecretKey);
 let currencyRates = {};
@@ -53,10 +54,45 @@ router.post(
     }
     const payload = await jwt.verify(req.session!.JWT, keys.jwtAdminKey);
     // @ts-ignore
-    console.log(payload.email);
+    const admin = await Admin.findById(payload.userId);
+
+    try {
+      const customer = await stripe.customers.retrieve(admin!.stripeAccountId);
+    } catch (err) {
+      if (err.raw.statusCode === 404) {
+        //no customer create new one
+        const customer = await stripe.customers.create({
+          email: admin!.email,
+          name: admin!.ownerName,
+          phone: admin!.whatsappNumber,
+          address: {
+            city: admin!.hotelAddress.city,
+            country: admin!.hotelAddress.country,
+            postal_code: admin!.hotelAddress.pinCode,
+            state: admin!.hotelAddress.state,
+            line1: admin!.hotelAddress.street,
+          },
+          description: "A Chill-in admin",
+          metadata: {
+            chillInAdminId: admin!.id,
+          },
+        });
+        //update customer id
+        admin!.stripeAccountId = customer.id;
+        await Admin.findOneAndUpdate(
+          {
+            _id: admin!.id,
+          },
+          {
+            $set: {
+              stripeAccountId: customer.id,
+            },
+          }
+        );
+      }
+    }
 
     //create stripe session
-
     const session = await stripe.checkout.sessions.create({
       cancel_url: "http://localhost:3001/admin",
       success_url: "http://localhost:3001/admin",
@@ -64,8 +100,7 @@ router.post(
       payment_method_types: ["card"],
       // @ts-ignore
       client_reference_id: payload.userId,
-      // @ts-ignore
-      customer_email: payload.email,
+      customer: admin!.stripeAccountId,
       line_items: [
         {
           price_data: {
