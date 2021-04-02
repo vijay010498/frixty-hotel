@@ -102,7 +102,7 @@ router.post(
       client_reference_id: payload.userId,
       customer: admin!.stripeAccountId,
       metadata: {
-        subscription: subscription,
+        subscriptionId: subscriptionId,
       },
       line_items: [
         {
