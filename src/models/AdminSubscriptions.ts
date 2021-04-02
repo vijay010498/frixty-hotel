@@ -5,6 +5,7 @@ interface AdminSubscriptionsAttrs {
   adminId: mongoose.Schema.Types.ObjectId;
   subscriptionId: mongoose.Types.ObjectId;
   expiry: string;
+  paymentDetails: object;
 }
 
 interface AdminSubscriptionsModel
@@ -15,6 +16,7 @@ interface AdminSubscriptionsDoc extends mongoose.Document {
   adminId: mongoose.Types.ObjectId;
   subscriptionId: mongoose.Types.ObjectId;
   expiry: string;
+  paymentDetails: object;
 }
 
 const adminSubscriptionSchema = new mongoose.Schema(
@@ -33,6 +35,10 @@ const adminSubscriptionSchema = new mongoose.Schema(
       type: String,
       required: true,
       index: true,
+    },
+    paymentDetails: {
+      type: Object,
+      required: true,
     },
   },
   {

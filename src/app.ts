@@ -8,7 +8,7 @@ import { getHotelByID } from "./routes/users/hotel/getHotelByID";
 import { searchHotelRouter } from "./routes/users/hotel/searchHotel";
 
 //stripe
-import { stripeWebhookRouter } from "./routes/stripe/webhooks/stripeWebhook";
+import { stripeAdminWebhookRouter } from "./routes/stripe/adminWebhooks/stripeAdminWebhook";
 
 //Admin
 import { adminAuthRouter } from "./routes/admin/auth/authRoutes";
@@ -81,7 +81,7 @@ app.use(adminAuthRouter);
 app.use(adminSubscriptionCharge);
 
 //stripe
-app.use(stripeWebhookRouter);
+app.use(stripeAdminWebhookRouter);
 
 app.use(errorhandler);
 app.all("*", async (req, res) => {

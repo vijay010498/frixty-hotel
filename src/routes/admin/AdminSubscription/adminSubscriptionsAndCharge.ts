@@ -104,6 +104,7 @@ router.post(
       payment_intent_data: {
         metadata: {
           subscriptionId: subscriptionId,
+          adminId: admin!.id,
         },
         receipt_email: admin!.email,
       },
@@ -124,6 +125,10 @@ router.post(
         },
       ],
     });
+    const paymentIntetn = await stripe.paymentIntents.retrieve(
+      "pi_1Ibn57SHwVwVyJGFpRC48atI"
+    );
+    res.send(paymentIntetn);
     res.send({ id: session.id });
     return;
   }
