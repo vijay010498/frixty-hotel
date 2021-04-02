@@ -101,8 +101,11 @@ router.post(
       // @ts-ignore
       client_reference_id: payload.userId,
       customer: admin!.stripeAccountId,
-      metadata: {
-        subscriptionId: subscriptionId,
+      payment_intent_data: {
+        metadata: {
+          subscriptionId: subscriptionId,
+        },
+        receipt_email: admin!.email,
       },
       line_items: [
         {
