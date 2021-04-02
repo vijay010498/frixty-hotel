@@ -17,6 +17,14 @@ const router = express.Router({
 const DEFAULT_CURRENCY = "MYR";
 
 router.get(
+  "/api/secure/v1/admin/checkSubscription",
+  requireAdmin,
+  [],
+  validateRequest,
+  async (req: Request, res: Response) => {}
+);
+
+router.get(
   "/api/secure/v1/admin/subscriptions",
   requireAdmin,
   [],

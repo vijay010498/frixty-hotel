@@ -4,8 +4,9 @@ import { SupportedCurrencies } from "./enums/supportedCurrencies";
 interface AdminSubscriptionsAttrs {
   adminId: mongoose.Schema.Types.ObjectId;
   subscriptionId: mongoose.Types.ObjectId;
-  expiry: string;
+  expiryString: string;
   paymentDetails: object;
+  expiry: Date;
 }
 
 interface AdminSubscriptionsModel
@@ -15,8 +16,9 @@ interface AdminSubscriptionsModel
 interface AdminSubscriptionsDoc extends mongoose.Document {
   adminId: mongoose.Types.ObjectId;
   subscriptionId: mongoose.Types.ObjectId;
-  expiry: string;
+  expiryString: string;
   paymentDetails: object;
+  expiry: Date;
 }
 
 const adminSubscriptionSchema = new mongoose.Schema(
@@ -31,8 +33,13 @@ const adminSubscriptionSchema = new mongoose.Schema(
       ref: "Admin",
       required: true,
     },
-    expiry: {
+    expiryString: {
       type: String,
+      required: true,
+      index: true,
+    },
+    expiry: {
+      type: Date,
       required: true,
       index: true,
     },

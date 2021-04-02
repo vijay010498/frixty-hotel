@@ -25,9 +25,10 @@ router.post("/stripe/admin/webhook", async (req: Request, res: Response) => {
         expiry.setDate(expiry.getDate() + subscriptionValidity);
         const adminSubscription = AdminSubscription.build({
           adminId: payment.metadata.adminId,
-          expiry: expiry.toISOString().slice(0, 10),
+          expiryString: expiry.toISOString().slice(0, 10),
           paymentDetails: payment,
           subscriptionId: subscriptionId,
+          expiry: expirys,
         });
         await adminSubscription.save();
         console.log(adminSubscription);
