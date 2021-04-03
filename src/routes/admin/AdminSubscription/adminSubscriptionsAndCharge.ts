@@ -168,8 +168,8 @@ router.post(
 
     //create stripe session
     const session = await stripe.checkout.sessions.create({
-      cancel_url: "http://localhost:3001/admin",
-      success_url: "http://localhost:3001/admin",
+      cancel_url: keys.stripeAdminCheckoutCancelUrl,
+      success_url: keys.stripeAdminCheckoutSuccessUrl,
       mode: "payment",
       payment_method_types: ["card"],
       // @ts-ignore
