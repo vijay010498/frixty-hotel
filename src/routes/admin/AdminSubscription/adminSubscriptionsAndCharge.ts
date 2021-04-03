@@ -81,8 +81,6 @@ router.get(
             },
           }
         );
-      } else {
-        console.log("No Hotel Present");
       }
       throw new BadRequestError("Not Subscribed To Any Subscription");
     }
