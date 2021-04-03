@@ -14,14 +14,29 @@ router.post("/stripe/admin/webhook", async (req: Request, res: Response) => {
     case "payment_intent.created":
       await paymentIntentCreated(event);
       break;
+    case "payment_intent.processing":
+      await paymentIntentProcessing(event);
+      break;
+    case "payment_intent.succeeded":
+      await paymentIntentSucceeded(event);
+      break;
+    case "payment_intent.canceled":
+      await paymentIntentCancelled(event);
+      break;
+    case "payment_intent.payment_failed":
+      await paymentIntentPaymentFailed(event);
+      break;
+    case "payment_intent.requires_action":
+      await paymentIntentRequiresAction(event);
+      break;
+    case "payment_intent.amount_capturable_updated":
+      await paymentIntentAmountCapturableUpdated(event);
+      break;
     case "charge.refunded":
       const data = event.data.object;
       const paymentIntentId = data.payment_intent;
       const payment = await stripe.paymentIntents.retrieve(paymentIntentId);
       console.log(payment);
-      break;
-    case "payment_intent.succeeded":
-      await paymentIntentSucceeded(event);
       break;
     default:
       console.log(`Unhandled event type ${event.type}`);
@@ -55,11 +70,66 @@ async function paymentIntentSucceeded(event: Object) {
   // @ts-ignore
   const paymentIntent = event.data.object;
   const payment = await stripe.paymentIntents.retrieve(paymentIntent.id);
-  //get the already payment from db
+  await updateSubscriptionPaymentDetails(payment.id, payment);
+  console.log("Webhook  - Admin - Subscription With Payment Succeeded");
+  return;
+}
+
+async function paymentIntentCancelled(event: Object) {
+  // @ts-ignore
+  const paymentIntent = event.data.object;
+  const payment = await stripe.paymentIntents.retrieve(paymentIntent.id);
+  await updateSubscriptionPaymentDetails(payment.id, payment);
+  console.log("Webhook  - Admin - Subscription With Payment Succeeded");
+  return;
+}
+async function paymentIntentPaymentFailed(event: Object) {
+  // @ts-ignore
+  const paymentIntent = event.data.object;
+  const payment = await stripe.paymentIntents.retrieve(paymentIntent.id);
+  await updateSubscriptionPaymentDetails(payment.id, payment);
+  console.log("Webhook  - Admin - Subscription With Payment Failed");
+  return;
+}
+async function paymentIntentProcessing(event: Object) {
+  // @ts-ignore
+  const paymentIntent = event.data.object;
+  const payment = await stripe.paymentIntents.retrieve(paymentIntent.id);
+  await updateSubscriptionPaymentDetails(payment.id, payment);
+  console.log("Webhook  - Admin - Subscription With Payment Processing");
+  return;
+}
+
+async function paymentIntentRequiresAction(event: Object) {
+  // @ts-ignore
+  const paymentIntent = event.data.object;
+  const payment = await stripe.paymentIntents.retrieve(paymentIntent.id);
+  await updateSubscriptionPaymentDetails(payment.id, payment);
+  console.log("Webhook  - Admin - Subscription With Payment Requires Action");
+  return;
+}
+
+async function paymentIntentAmountCapturableUpdated(event: Object) {
+  // @ts-ignore
+  const paymentIntent = event.data.object;
+  const payment = await stripe.paymentIntents.retrieve(paymentIntent.id);
+  await updateSubscriptionPaymentDetails(payment.id, payment);
+  console.log(
+    "Webhook  - Admin - Subscription With Payment amount  Capturable Updated"
+  );
+  return;
+}
+
+async function updateSubscriptionPaymentDetails(
+  paymentId: String,
+  payment: Object
+) {
+  // @ts-ignore
   const adminSubscriptionArr = await AdminSubscription.aggregate([
     {
       $match: {
-        "paymentDetails.id": { $eq: payment.id },
+        // @ts-ignore
+        "paymentDetails.id": { $eq: paymentId },
       },
     },
   ]);
