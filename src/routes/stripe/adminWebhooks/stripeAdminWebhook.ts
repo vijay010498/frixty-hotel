@@ -12,7 +12,10 @@ router.post("/stripe/admin/webhook", async (req: Request, res: Response) => {
 
   switch (event.type) {
     case "charge.refunded":
-      console.log(event);
+      const data = event.data.object;
+      const paymentIntentId = data.payment_intent;
+      const payment = await stripe.paymentIntents.retrieve(paymentIntentId);
+      console.log(payment);
       break;
     case "payment_intent.succeeded":
       const paymentIntent = event.data.object;
