@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { BadRequestError, validateRequest } from "../../../errors";
-import { requireAdmin } from "../../../errors/middleware/admin/require-admin";
+import { requireAdminAuth } from "../../../errors/middleware/admin/require-admin-auth";
 import { Subscription } from "../../../models/Subscription";
 import { body } from "express-validator";
 import { ExchangeRatesCache } from "../../../models/Cache/ExchangeRatesCache";
@@ -9,6 +9,7 @@ import jwt from "jsonwebtoken";
 import { Admin } from "../../../models/Admin";
 import { AdminSubscription } from "../../../models/AdminSubscriptions";
 import mongoose from "mongoose";
+import { Hotel } from "../../../models/Hotel";
 const keys = require("../../../config/keys");
 const stripe = require("stripe")(keys.stripeSecretKey);
 let currencyRates = {};
@@ -20,13 +21,15 @@ const DEFAULT_CURRENCY = "MYR";
 
 router.get(
   "/api/secure/v1/admin/checkSubscription",
-  requireAdmin,
+  requireAdminAuth,
   [],
   validateRequest,
   async (req: Request, res: Response) => {
     const payload = jwt.verify(req.session!.JWT, keys.jwtAdminKey);
     // @ts-ignore
     const adminId = payload.userId;
+    // @ts-ignore
+    const hotelId = payload.hotelId;
     const subscriptionsThisAdmin = await AdminSubscription.aggregate([
       {
         $match: {
@@ -62,6 +65,23 @@ router.get(
     ]);
     if (subscriptionsThisAdmin.length === 0) {
       //disable hotel
+      //update hotel not visible
+      //first check if hotel present -
+      const hotel = await Hotel.findById(hotelId);
+      if (hotel) {
+        await Hotel.findOneAndUpdate(
+          {
+            _id: hotel.id,
+          },
+          {
+            $set: {
+              adminSubscribed: false,
+            },
+          }
+        );
+      } else {
+        console.log("No Hotel Present");
+      }
       throw new BadRequestError("Not Subscribed To Any Subscription");
     }
     await transformAdminSubscription(subscriptionsThisAdmin);
@@ -72,7 +92,7 @@ router.get(
 
 router.get(
   "/api/secure/v1/admin/subscriptions",
-  requireAdmin,
+  requireAdminAuth,
   [],
   validateRequest,
   async (req: Request, res: Response) => {
@@ -89,7 +109,7 @@ router.get(
 );
 router.post(
   "/api/secure/v1/admin/create-subscription-checkout",
-  requireAdmin,
+  requireAdminAuth,
   [
     body("subscriptionId")
       .isMongoId()

@@ -2,7 +2,7 @@ import { query } from "express-validator";
 
 const AWS = require("aws-sdk");
 const uuid = require("uuid");
-import { requireSuperAdmin } from "../../../errors/middleware/SAdmin/require-super-admin";
+import { requireSuperAdminAuth } from "../../../errors/middleware/SAdmin/require-super-admin-auth";
 import express, { Request, Response } from "express";
 import { BadRequestError, validateRequest } from "../../../errors";
 import { Admin } from "../../../models/Admin";
@@ -17,7 +17,7 @@ const router = express.Router({
 });
 router.get(
   "/api/secure/sAdmin/uploadAdminFiles",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   [
     query("adminId").isMongoId().withMessage("Admin Id Cannot be empty"),
     query("fileName").isString().withMessage("File Name Cannot be Empty"),

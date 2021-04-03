@@ -3,14 +3,14 @@ import express, { Request, Response } from "express";
 import { validateRequest } from "../../../errors";
 import { Hotel } from "../../../models/Hotel";
 import { BadRequestError } from "../../../errors";
-import { requireSuperAdmin } from "../../../errors/middleware/SAdmin/require-super-admin";
+import { requireSuperAdminAuth } from "../../../errors/middleware/SAdmin/require-super-admin-auth";
 
 const router = express.Router({
   caseSensitive: true,
 });
 router.get(
   "/api/secure/sAdmin/hotels",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   async (req: Request, res: Response) => {
     const hotels = await Hotel.aggregate([
       {
@@ -34,7 +34,7 @@ router.get(
 );
 router.post(
   "/api/secure/sAdmin/createHotel",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   [],
   validateRequest,
   async (req: Request, res: Response) => {
@@ -69,6 +69,7 @@ router.post(
         homeCurrency,
         propertyType,
         isBlockedByAdmin: false,
+        adminSubscribed: false,
       });
       await hotel.save();
 

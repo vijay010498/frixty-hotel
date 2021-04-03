@@ -1,14 +1,14 @@
 import express, { Request, Response } from "express";
 import { BadRequestError, validateRequest } from "../../../errors";
 import { Charges } from "../../../models/Charges";
-import { requireSuperAdmin } from "../../../errors/middleware/SAdmin/require-super-admin";
+import { requireSuperAdminAuth } from "../../../errors/middleware/SAdmin/require-super-admin-auth";
 
 const router = express.Router({
   caseSensitive: true,
 });
 router.post(
   "/api/secure/sAdmin/charges",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   [],
   validateRequest,
   async (req: Request, res: Response) => {
@@ -35,7 +35,7 @@ router.post(
 
 router.get(
   "/api/secure/sAdmin/charges",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   [],
   validateRequest,
   async (req: Request, res: Response) => {
@@ -52,7 +52,7 @@ router.get(
 
 router.delete(
   "/api/secure/sAdmin/charges",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   [],
   validateRequest,
   async (req: Request, res: Response) => {

@@ -86,6 +86,7 @@ router.get(
           _id: mongoose.Types.ObjectId(req.params.hotelId),
           isServiceable: true,
           isBlockedByAdmin: false,
+          adminSubscribed: true,
         },
       },
       {

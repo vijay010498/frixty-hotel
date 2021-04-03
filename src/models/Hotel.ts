@@ -19,6 +19,7 @@ interface HotelAttrs {
   homeCurrency: SupportedCurrencies;
   isBlockedByAdmin: Boolean;
   propertyType: string;
+  adminSubscribed: Boolean;
 }
 
 //An interface that describes the properties that a hotel model has
@@ -40,6 +41,7 @@ interface HotelDoc extends mongoose.Document {
   isServiceable: Boolean;
   isBlockedByAdmin: Boolean;
   propertyType: string;
+  adminSubscribed: Boolean;
 }
 
 const hotelSchema = new mongoose.Schema(
@@ -93,6 +95,11 @@ const hotelSchema = new mongoose.Schema(
       index: true,
     },
     isBlockedByAdmin: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    adminSubscribed: {
       type: Boolean,
       default: false,
       index: true,

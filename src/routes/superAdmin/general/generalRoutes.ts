@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { validateRequest } from "../../../errors";
-import { requireSuperAdmin } from "../../../errors/middleware/SAdmin/require-super-admin";
+import { requireSuperAdminAuth } from "../../../errors/middleware/SAdmin/require-super-admin-auth";
 import { ExchangeRatesCache } from "../../../models/Cache/ExchangeRatesCache";
 import axios from "axios";
 const alphabetize = require("alphabetize-object-keys");
@@ -12,7 +12,7 @@ const defaultBaseCurrency = "MYR";
 
 router.get(
   "/api/secure/sAdmin/getExchangeRates",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   [],
   validateRequest,
   async (req: Request, res: Response) => {

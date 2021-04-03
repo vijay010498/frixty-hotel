@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import { Password } from "../../../services/auth/password";
 import { Admin } from "../../../models/Admin";
-import { requireSuperAdmin } from "../../../errors/middleware/SAdmin/require-super-admin";
+import { requireSuperAdminAuth } from "../../../errors/middleware/SAdmin/require-super-admin-auth";
 import { validateRequest } from "../../../errors";
 import { Hotel } from "../../../models/Hotel";
 import mongoose from "mongoose";
@@ -14,7 +14,7 @@ router.post(
   "/api/secure/sAdmin/createAdmin",
   [],
   validateRequest,
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   async (req: Request, res: Response) => {
     const ADMIN_BUCKET =
       "https://chill-in-admin-files.s3.ap-south-1.amazonaws.com";
@@ -70,7 +70,7 @@ router.get(
   "/api/secure/sAdmin/getAdminAndHotelId",
   [],
   validateRequest,
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   async (req: Request, res: Response) => {
     const adminId = mongoose.Types.ObjectId();
     const hotelId = mongoose.Types.ObjectId();
@@ -83,7 +83,7 @@ router.get(
 );
 router.get(
   "/api/secure/sAdmin/getAllAdmins",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   [],
   validateRequest,
   async (req: Request, res: Response) => {

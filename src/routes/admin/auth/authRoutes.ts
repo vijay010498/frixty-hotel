@@ -3,7 +3,7 @@ import { body } from "express-validator";
 import { Password } from "../../../services/auth/password";
 import { Admin } from "../../../models/Admin";
 import { OTP } from "../../../models/OTP";
-import { requireAdmin } from "../../../errors/middleware/admin/require-admin";
+import { requireAdminAuth } from "../../../errors/middleware/admin/require-admin-auth";
 import { BadRequestError, validateRequest } from "../../../errors";
 import jwt from "jsonwebtoken";
 import MailService from "@sendgrid/mail";
@@ -104,7 +104,7 @@ router.get(
   "/api/secure/v1/admin/currentAdmin",
   [],
   validateRequest,
-  requireAdmin,
+  requireAdminAuth,
   async (req: Request, res: Response) => {
     const payload = await jwt.verify(req.session!.JWT, keys.jwtAdminKey);
     // @ts-ignore
@@ -116,7 +116,7 @@ router.get(
 );
 router.patch(
   "/api/secure/v1/admin/changePassword",
-  requireAdmin,
+  requireAdminAuth,
   [
     body("oldPassword")
       .trim()

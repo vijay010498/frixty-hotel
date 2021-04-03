@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { requireSuperAdmin } from "../../../errors/middleware/SAdmin/require-super-admin";
+import { requireSuperAdminAuth } from "../../../errors/middleware/SAdmin/require-super-admin-auth";
 import { Admin } from "../../../models/Admin";
 import { validateRequest } from "../../../errors";
 import { Hotel } from "../../../models/Hotel";
@@ -17,7 +17,7 @@ let currencyRates = {};
 let baseCurrency: string;
 router.get(
   "/api/secure/sAdmin/dashboard",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   [],
   validateRequest,
   async (req: Request, res: Response) => {

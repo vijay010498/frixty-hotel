@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { Booking } from "../../../models/Booking";
-import { requireSuperAdmin } from "../../../errors/middleware/SAdmin/require-super-admin";
+import { requireSuperAdminAuth } from "../../../errors/middleware/SAdmin/require-super-admin-auth";
 import { BadRequestError, validateRequest } from "../../../errors";
 import { Hotel } from "../../../models/Hotel";
 
@@ -10,7 +10,7 @@ const router = express.Router({
 
 router.post(
   "/api/secure/sAdmin/createBooking",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   [],
   validateRequest,
   async (req: Request, res: Response) => {
@@ -50,7 +50,7 @@ router.post(
 
 router.get(
   "/api/secure/sAdmin/Bookings",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   [],
   validateRequest,
   async (req: Request, res: Response) => {

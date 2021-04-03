@@ -3,7 +3,7 @@ import { body } from "express-validator";
 import { Password } from "../../../services/auth/password";
 import { SuperAdmin } from "../../../models/SuperAdmin";
 import { OTP } from "../../../models/OTP";
-import { requireSuperAdmin } from "../../../errors/middleware/SAdmin/require-super-admin";
+import { requireSuperAdminAuth } from "../../../errors/middleware/SAdmin/require-super-admin-auth";
 import jwt from "jsonwebtoken";
 import { BadRequestError, validateRequest } from "../../../errors";
 import MailService from "@sendgrid/mail";
@@ -104,7 +104,7 @@ router.get(
 );
 router.get(
   "/api/secure/sAdmin/currentSAdmin",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   async (req: Request, res: Response) => {
     const payload = await jwt.verify(req.session!.JWT, keys.jwtSuperAdminKey);
     // @ts-ignore
@@ -117,7 +117,7 @@ router.get(
 
 router.patch(
   "/api/secure/sAdmin/changePassword",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   [
     body("oldPassword")
       .trim()
@@ -263,7 +263,7 @@ router.post(
 );
 router.post(
   "/api/secure/sAdmin/signup",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   [
     body("email").isEmail().withMessage("Email Must Be Valid"),
     body("password")

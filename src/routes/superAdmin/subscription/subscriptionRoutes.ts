@@ -4,7 +4,7 @@ import { validateRequest } from "../../../errors";
 
 import { BadRequestError } from "../../../errors";
 
-import { requireSuperAdmin } from "../../../errors/middleware/SAdmin/require-super-admin";
+import { requireSuperAdminAuth } from "../../../errors/middleware/SAdmin/require-super-admin-auth";
 import { Subscription } from "../../../models/Subscription";
 
 const router = express.Router({
@@ -13,7 +13,7 @@ const router = express.Router({
 
 router.get(
   "/api/secure/sAdmin/subscriptions",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   [],
   validateRequest,
   async (req: Request, res: Response) => {
@@ -31,7 +31,7 @@ router.get(
 
 router.post(
   "/api/secure/sAdmin/subscriptions",
-  requireSuperAdmin,
+  requireSuperAdminAuth,
   [],
   validateRequest,
   async (req: Request, res: Response) => {
