@@ -57,7 +57,7 @@ export const requireAdminSubscription = async (
     if (hotel) {
       await Hotel.findOneAndUpdate(
         {
-          _id: hotel.id,
+          _id: mongoose.Types.ObjectId(hotel.id),
         },
         {
           $set: {

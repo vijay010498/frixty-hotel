@@ -10,6 +10,8 @@ import { Admin } from "../../../models/Admin";
 import { AdminSubscription } from "../../../models/AdminSubscriptions";
 import mongoose from "mongoose";
 import { Hotel } from "../../../models/Hotel";
+import { SupportedCurrencies } from "../../../models/enums/supportedCurrencies";
+import { requireAdminSubscription } from "../../../errors/middleware/admin/require-admin-subscription";
 const keys = require("../../../config/keys");
 const stripe = require("stripe")(keys.stripeSecretKey);
 let currencyRates = {};
@@ -71,7 +73,7 @@ router.get(
       if (hotel) {
         await Hotel.findOneAndUpdate(
           {
-            _id: hotel.id,
+            _id: mongoose.Types.ObjectId(hotel.id),
           },
           {
             $set: {
@@ -96,8 +98,22 @@ router.get(
   [],
   validateRequest,
   async (req: Request, res: Response) => {
+    // @ts-ignore
+    requestedCurrency =
+      req.query.currency || req.cookies.adminBaseCurrency || DEFAULT_CURRENCY;
+    if (requestedCurrency !== DEFAULT_CURRENCY)
+      await checkRequestedCurrency(requestedCurrency);
+    await getCurrencyRates(res);
     try {
-      const subscriptions = await Subscription.find();
+      const subscriptions = await Subscription.aggregate([
+        {
+          $match: {
+            amount: { $gte: 0 },
+          },
+        },
+      ]);
+      await transformAllSubscriptions(subscriptions);
+      res.cookie("adminBaseCurrency", requestedCurrency);
       res.status(200).send(subscriptions);
       return;
     } catch (err) {
@@ -105,6 +121,44 @@ router.get(
       res.status(401).send(err);
       return;
     }
+  }
+);
+
+router.get(
+  "/api/secure/v1/admin/getAdminSubscriptions",
+  requireAdminAuth,
+  requireAdminSubscription,
+  [],
+  validateRequest,
+  async (req: Request, res: Response) => {
+    const payload = jwt.verify(req.session!.JWT, keys.jwtAdminKey);
+    // @ts-ignore
+    const adminId = payload.userId;
+    const adminSubscriptions = await AdminSubscription.aggregate([
+      {
+        $match: {
+          adminId: mongoose.Types.ObjectId(adminId),
+        },
+      },
+      {
+        $sort: {
+          expiry: -1,
+        },
+      },
+      {
+        $lookup: {
+          from: "subscriptions",
+          localField: "subscriptionId",
+          foreignField: "_id",
+          as: "subscriptionDetails",
+        },
+      },
+    ]);
+    await transformGetSubscriptions(adminSubscriptions);
+    res.status(200).send({
+      subscriptions: adminSubscriptions,
+    });
+    return;
   }
 );
 router.post(
@@ -119,7 +173,12 @@ router.post(
   async (req: Request, res: Response) => {
     const { subscriptionId } = req.body;
     // @ts-ignore
-    requestedCurrency = req.body.requestedCurrency || DEFAULT_CURRENCY;
+    requestedCurrency =
+      req.body.requestedCurrency ||
+      req.cookies.adminBaseCurrency ||
+      DEFAULT_CURRENCY;
+    if (requestedCurrency !== DEFAULT_CURRENCY)
+      await checkRequestedCurrency(requestedCurrency);
     await getCurrencyRates(res);
     //first get subscription details
     const subscription = await Subscription.findById(subscriptionId);
@@ -155,7 +214,7 @@ router.post(
         admin!.stripeAccountId = customer.id;
         await Admin.findOneAndUpdate(
           {
-            _id: admin!.id,
+            _id: mongoose.Types.ObjectId(admin!.id),
           },
           {
             $set: {
@@ -190,7 +249,7 @@ router.post(
               name: `Chill In ${subscription.name} Subscription`,
               description: `${subscription.totalRoomsPermitted} Rooms \n ${subscription.totalHotelImagesPermitted} Hotel Images \n ${subscription.totalRoomImagesPermitted} Images Per Room \n ${subscription.validityInDays} Days Validity \n`,
             },
-            unit_amount: await convertPrice(
+            unit_amount: await convertCheckoutStripePrice(
               subscription.amount,
               subscription.currency
             ),
@@ -235,7 +294,10 @@ async function getCurrencyRates(res: Response) {
     res.status(403).send("Something Went Wrong Fetch Base Currency");
   }
 }
-async function convertPrice(amountToConvert: number, currency: string) {
+async function convertCheckoutStripePrice(
+  amountToConvert: number,
+  currency: string
+) {
   if (
     requestedCurrency === "BIF" ||
     requestedCurrency === "CLP" ||
@@ -284,5 +346,37 @@ async function transformAdminSubscription(adminSubscription: Array<any>) {
       delete adminSubscription[i].adminDetails[j].__v;
     }
   }
+}
+async function transformAllSubscriptions(subscriptions: Array<any>) {
+  for (let i = 0; i < subscriptions.length; i++) {
+    subscriptions[i].id = subscriptions[i]._id;
+    delete subscriptions[i]._id;
+    delete subscriptions[i].__v;
+
+    //convert price
+    subscriptions[i].amount = await convertPrice(
+      subscriptions[i].amount,
+      subscriptions[i].currency
+    );
+    subscriptions[i].currency = requestedCurrency;
+  }
+}
+async function transformGetSubscriptions(subscriptions: Array<any>) {
+  for (let i = 0; i < subscriptions.length; i++) {
+    subscriptions[i].id = subscriptions[i]._id;
+    delete subscriptions[i]._id;
+    delete subscriptions[i].__v;
+  }
+}
+async function checkRequestedCurrency(requestedCurrency: string) {
+  // @ts-ignore
+  if (Object.values(SupportedCurrencies).indexOf(requestedCurrency) === -1) {
+    throw new BadRequestError(`${requestedCurrency} is not supported`);
+  }
+}
+
+async function convertPrice(amountToConvert: number, currency: string) {
+  // @ts-ignore
+  return Math.floor(amountToConvert / currencyRates[currency].toFixed(2));
 }
 export { router as adminSubscriptionCharge };

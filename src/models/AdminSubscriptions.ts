@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { SupportedCurrencies } from "./enums/supportedCurrencies";
 
 interface AdminSubscriptionsAttrs {
   adminId: mongoose.Schema.Types.ObjectId;
