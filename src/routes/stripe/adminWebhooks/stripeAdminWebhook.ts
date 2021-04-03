@@ -11,6 +11,9 @@ router.post("/stripe/admin/webhook", async (req: Request, res: Response) => {
   const event = req.body;
 
   switch (event.type) {
+    case "charge.refunded":
+      console.log(event);
+      break;
     case "payment_intent.succeeded":
       const paymentIntent = event.data.object;
       if (paymentIntent.status === "succeeded") {
