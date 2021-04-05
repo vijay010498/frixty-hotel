@@ -60,6 +60,17 @@ async function transformMyBookingsConfirmed(bookings: Array<any>) {
     bookings[i].id = bookings[i]._id;
     delete bookings[i]._id;
     delete bookings[i].__id;
+    if (bookings[i].bookingDetails.checkInDateTime) {
+      bookings[i].title = "Check In";
+      bookings[i].color = "green";
+      bookings[i].start = new Date(bookings[i].bookingDetails.checkInDateTime);
+      bookings[i].end = new Date(bookings[i].bookingDetails.checkInDateTime);
+    } else {
+      bookings[i].title = "Check Out";
+      bookings[i].color = "red";
+      bookings[i].start = new Date(bookings[i].bookingDetails.checkOutDateTime);
+      bookings[i].end = new Date(bookings[i].bookingDetails.checkOutDateTime);
+    }
   }
 }
 

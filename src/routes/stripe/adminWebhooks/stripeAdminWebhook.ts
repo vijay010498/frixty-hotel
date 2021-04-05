@@ -137,7 +137,9 @@ async function chargeSucceeded(event: Object) {
   const paymentIntentId = data.payment_intent;
   const payment = await stripe.paymentIntents.retrieve(paymentIntentId);
   await updateSubscriptionPaymentDetails(paymentIntentId, payment);
-  console.log("Webhook  - Admin - Subscription With Charge Succeeded");
+  console.log(
+    "Webhook  - Admin - Subscription With Charge Succeeded  Hotel is now visible"
+  );
   return;
 }
 async function chargeUpdated(event: Object) {
