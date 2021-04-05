@@ -8,6 +8,7 @@ import { BadRequestError, validateRequest } from "../../../errors";
 import jwt from "jsonwebtoken";
 import MailService from "@sendgrid/mail";
 import { OTPService } from "../../../services/auth/OTPService";
+import { Hotel } from "../../../models/Hotel";
 const keys = require("../../../config/keys");
 const router = express.Router({
   caseSensitive: true,
@@ -338,6 +339,23 @@ router.patch(
       res.status(400).send(err);
       return;
     }
+  }
+);
+
+router.get(
+  "/api/secure/v1/admin/checkRegistration",
+  requireAdminAuth,
+  async (req: Request, res: Response) => {
+    const payload = await jwt.verify(req.session!.JWT, keys.jwtAdminKey);
+    // @ts-ignore
+    const hotelId = payload.hotelId;
+    //check if hotel exists in hotels collection
+    const hotel = await Hotel.findById(hotelId);
+    if (!hotel) {
+      throw new BadRequestError("Not Registered");
+    }
+    res.status(200).send(hotel);
+    return;
   }
 );
 

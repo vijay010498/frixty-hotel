@@ -42,6 +42,7 @@ interface HotelDoc extends mongoose.Document {
   isBlockedByAdmin: Boolean;
   propertyType: string;
   adminSubscribed: Boolean;
+  adminId: mongoose.Types.ObjectId;
 }
 
 const hotelSchema = new mongoose.Schema(
@@ -109,6 +110,10 @@ const hotelSchema = new mongoose.Schema(
       required: true,
       index: true,
       uppercase: true,
+    },
+    adminId: {
+      type: mongoose.Types.ObjectId,
+      required: true,
     },
   },
   {
