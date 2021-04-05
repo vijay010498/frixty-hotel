@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { Subscription } from "../../../models/Subscription";
 import { AdminSubscription } from "../../../models/AdminSubscriptions";
+import { Hotel } from "../../../models/Hotel";
 
 const keys = require("../../../config/keys");
 const stripe = require("stripe")(keys.stripeSecretKey);
@@ -112,8 +113,22 @@ async function chargeRefunded(event: Object) {
   const data = event.data.object;
   const paymentIntentId = data.payment_intent;
   const payment = await stripe.paymentIntents.retrieve(paymentIntentId);
+  //update hotel adminSubscribed first
+  const adminId = payment.metadata.adminId;
+  await Hotel.updateOne(
+    {
+      adminId: adminId,
+    },
+    {
+      $set: {
+        adminSubscribed: true,
+      },
+    }
+  );
   await updateSubscriptionPaymentDetails(paymentIntentId, payment);
-  console.log("Webhook  - Admin - Subscription With Charge Refunded");
+  console.log(
+    "Webhook  - Admin - Subscription With Charge Refunded Hotel is now visible"
+  );
   return;
 }
 async function chargeSucceeded(event: Object) {
@@ -197,8 +212,23 @@ async function paymentIntentSucceeded(event: Object) {
   // @ts-ignore
   const paymentIntent = event.data.object;
   const payment = await stripe.paymentIntents.retrieve(paymentIntent.id);
+  //update hotel adminSubscribed first
+  const adminId = payment.metadata.adminId;
+  await Hotel.updateOne(
+    {
+      adminId: adminId,
+    },
+    {
+      $set: {
+        adminSubscribed: true,
+      },
+    }
+  );
+
   await updateSubscriptionPaymentDetails(payment.id, payment);
-  console.log("Webhook  - Admin - Subscription With Payment Succeeded");
+  console.log(
+    "Webhook  - Admin - Subscription With Payment Succeeded Hotel is now visible"
+  );
   return;
 }
 

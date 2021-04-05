@@ -13,6 +13,7 @@ import { stripeAdminWebhookRouter } from "./routes/stripe/adminWebhooks/stripeAd
 //Admin
 import { adminAuthRouter } from "./routes/admin/auth/authRoutes";
 import { adminSubscriptionCharge } from "./routes/admin/AdminSubscription/adminSubscriptionsAndCharge";
+import { adminBookingsRouter } from "./routes/admin/Bookings/bookingsRoute";
 
 //super admin
 import { superAdminBookingRouter } from "./routes/superAdmin/booking/bookingRoutes";
@@ -79,6 +80,7 @@ app.use(superAdminChargesRouter);
 //admin
 app.use(adminAuthRouter);
 app.use(adminSubscriptionCharge);
+app.use(adminBookingsRouter);
 
 //stripe
 app.use(stripeAdminWebhookRouter);
