@@ -29,6 +29,14 @@ router.get(
           "bookingDetails.checkOutDateTime": 0,
         },
       },
+      {
+        $lookup: {
+          from: "hotels",
+          localField: "hotelId",
+          foreignField: "_id",
+          as: "hotel",
+        },
+      },
     ]);
     const bookingsCheckOut = await Booking.aggregate([
       {
@@ -40,6 +48,14 @@ router.get(
       {
         $project: {
           "bookingDetails.checkInDateTime": 0,
+        },
+      },
+      {
+        $lookup: {
+          from: "hotels",
+          localField: "hotelId",
+          foreignField: "_id",
+          as: "hotel",
         },
       },
     ]);
@@ -59,7 +75,7 @@ async function transformMyBookingsConfirmed(bookings: Array<any>) {
   for (let i = 0; i < bookings.length; i++) {
     bookings[i].id = bookings[i]._id;
     delete bookings[i]._id;
-    delete bookings[i].__id;
+    delete bookings[i].__v;
     if (bookings[i].bookingDetails.checkInDateTime) {
       bookings[i].title = "Check In";
       bookings[i].color = "green";
@@ -70,6 +86,22 @@ async function transformMyBookingsConfirmed(bookings: Array<any>) {
       bookings[i].color = "red";
       bookings[i].start = new Date(bookings[i].bookingDetails.checkOutDateTime);
       bookings[i].end = new Date(bookings[i].bookingDetails.checkOutDateTime);
+    }
+    for (let j = 0; j < bookings[i].hotel.length; j++) {
+      bookings[i].hotel[j].id = bookings[i].hotel[j]._id;
+      delete bookings[i].hotel[j]._id;
+      delete bookings[i].hotel[j].__v;
+      for (let k = 0; k < bookings[i].hotel[j].rooms.length; k++) {
+        bookings[i].hotel[j].rooms[k].id = bookings[i].hotel[j].rooms[k]._id;
+        delete bookings[i].hotel[j].rooms[k]._id;
+        delete bookings[i].hotel[j].rooms[k].__v;
+        if (
+          bookings[i].hotel[j].rooms[k].id.toString() ===
+          bookings[i].roomId.toString()
+        ) {
+          bookings[i].roomType = bookings[i].hotel[j].rooms[k].roomType;
+        }
+      }
     }
   }
 }
