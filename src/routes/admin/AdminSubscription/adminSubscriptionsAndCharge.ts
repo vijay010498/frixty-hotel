@@ -136,6 +136,7 @@ router.get(
       {
         $match: {
           adminId: mongoose.Types.ObjectId(adminId),
+          "paymentDetails.status": { $eq: "succeeded" },
         },
       },
       {
