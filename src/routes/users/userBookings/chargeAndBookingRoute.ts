@@ -21,6 +21,7 @@ router.post(
     body("totalGuests").isNumeric().withMessage("Total Guests Is Required"),
     body("totalAmount").isNumeric().withMessage("Total Amount Is Required"),
     body("currency").isString().withMessage("Currency Is Required"),
+    body("rooms").isNumeric().withMessage("Rooms Is Required"),
   ],
   validateRequest,
   async (req: Request, res: Response) => {
@@ -77,6 +78,8 @@ router.post(
         totalGuests: req.body.totalGuests,
         totalAmount: req.body.totalAmount,
         currency: req.body.currency,
+        userId: user!.id,
+        rooms: req.body.rooms,
       },
     });
     res.send({
