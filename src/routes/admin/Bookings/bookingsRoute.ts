@@ -3,6 +3,7 @@ import { Booking } from "../../../models/Booking";
 import { requireAdminAuth } from "../../../errors/middleware/admin/require-admin-auth";
 import { requireAdminSubscription } from "../../../errors/middleware/admin/require-admin-subscription";
 import jwt from "jsonwebtoken";
+import _ from "lodash";
 import { BadRequestError } from "../../../errors";
 import mongoose from "mongoose";
 const keys = require("../../../config/keys");
@@ -17,7 +18,23 @@ router.get(
     const payload = jwt.verify(req.session?.JWT, keys.jwtAdminKey);
     // @ts-ignore
     const hotelId = payload.hotelId;
-    const bookingsCheckIn = await Booking.aggregate([
+    const bookings = await Booking.aggregate([
+      {
+        $match: {
+          hotelId: mongoose.Types.ObjectId(hotelId),
+          "bookingDetails.bookingStatus": { $eq: "confirmed" },
+        },
+      },
+      {
+        $lookup: {
+          from: "hotels",
+          localField: "hotelId",
+          foreignField: "_id",
+          as: "hotel",
+        },
+      },
+    ]);
+    /* const bookingsCheckIn = await Booking.aggregate([
       {
         $match: {
           hotelId: mongoose.Types.ObjectId(hotelId),
@@ -59,7 +76,7 @@ router.get(
         },
       },
     ]);
-    const bookings = [...bookingsCheckIn, ...bookingsCheckOut];
+    const bookings = [...bookingsCheckIn, ...bookingsCheckOut];*/
     if (bookings.length === 0) {
       throw new BadRequestError("no Bookings Found");
     }
@@ -76,7 +93,7 @@ async function transformMyBookingsConfirmed(bookings: Array<any>) {
     bookings[i].id = bookings[i]._id;
     delete bookings[i]._id;
     delete bookings[i].__v;
-    if (bookings[i].bookingDetails.checkInDateTime) {
+    /*  if (bookings[i].bookingDetails.checkInDateTime) {
       bookings[i].title = "Check In";
       bookings[i].color = "green";
       bookings[i].start = new Date(bookings[i].bookingDetails.checkInDateTime);
@@ -86,7 +103,7 @@ async function transformMyBookingsConfirmed(bookings: Array<any>) {
       bookings[i].color = "red";
       bookings[i].start = new Date(bookings[i].bookingDetails.checkOutDateTime);
       bookings[i].end = new Date(bookings[i].bookingDetails.checkOutDateTime);
-    }
+    }*/
     for (let j = 0; j < bookings[i].hotel.length; j++) {
       bookings[i].hotel[j].id = bookings[i].hotel[j]._id;
       delete bookings[i].hotel[j]._id;
@@ -100,6 +117,15 @@ async function transformMyBookingsConfirmed(bookings: Array<any>) {
           bookings[i].roomId.toString()
         ) {
           bookings[i].roomType = bookings[i].hotel[j].rooms[k].roomType;
+          bookings[i].title = bookings[i].id.toString().slice(18, 24);
+          const titleColors = ["orange", "green", "danger", "azure", "warning"];
+          bookings[i].color = _.sample(titleColors);
+          bookings[i].start = new Date(
+            bookings[i].bookingDetails.checkInDateTime
+          );
+          bookings[i].end = new Date(
+            bookings[i].bookingDetails.checkOutDateTime
+          );
         }
       }
     }
