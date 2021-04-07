@@ -21,6 +21,7 @@ interface UserDoc extends mongoose.Document {
   passportNumber: string;
   phoneNumber: string;
   lastLocation: {};
+  stripeAccountId: string;
 }
 
 const UserSchema = new mongoose.Schema(
@@ -57,6 +58,10 @@ const UserSchema = new mongoose.Schema(
         type: [Number],
         default: [0, 0],
       },
+    },
+    stripeAccountId: {
+      type: String,
+      default: "default",
     },
   },
   {

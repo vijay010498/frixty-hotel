@@ -14,6 +14,7 @@ module.exports = {
   jwtAdminKey: process.env.jwtAdminKey,
   jwtAdminExpireTime: process.env.jwtAdminExpireTime,
   stripeSecretKey: process.env.stripeSecretKey,
+  stripeUserSecretKey: process.env.stripeUserSecretKey,
   stripeAdminCheckoutSuccessUrl: process.env.stripeAdminCheckoutSuccessUrl,
   stripeAdminCheckoutCancelUrl: process.env.stripeAdminCheckoutCancelUrl,
 };

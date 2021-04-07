@@ -4,4 +4,7 @@ export enum BookingStatus {
 
   //Booking Cancelled
   Cancelled = "cancelled",
+
+  //payment initiated
+  PaymentInitiated = "paymentInitiated",
 }

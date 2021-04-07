@@ -38,25 +38,8 @@ const bookingDetailsObject = {
     index: true,
   },
   paymentDetails: {
-    isOnlinePayment: {
-      type: Boolean,
-      required: true,
-    },
-    details: {
-      paymentMode: {
-        type: String,
-        required: true,
-      },
-      totalPayment: {
-        type: Number,
-        required: true,
-      },
-      paymentCurrency: {
-        type: String,
-        enum: Object.values(SupportedCurrencies),
-        required: true,
-      },
-    },
+    type: Object,
+    required: true,
   },
 };
 

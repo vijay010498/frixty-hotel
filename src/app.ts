@@ -6,7 +6,8 @@ import cookieParser from "cookie-parser";
 import { userAuthRouter } from "./routes/users/auth/authRoutes";
 import { getHotelByID } from "./routes/users/hotel/getHotelByID";
 import { searchHotelRouter } from "./routes/users/hotel/searchHotel";
-
+import { userChargeAndBookingRouter } from "./routes/users/userBookings/chargeAndBookingRoute";
+import { userStripeWebhookRouter } from "./routes/stripe/userWebhooks/stripeUserWebhook";
 //stripe
 import { stripeAdminWebhookRouter } from "./routes/stripe/adminWebhooks/stripeAdminWebhook";
 
@@ -65,7 +66,8 @@ app.set("trust proxy", true);
 app.use(userAuthRouter);
 app.use(getHotelByID);
 app.use(searchHotelRouter);
-
+app.use(userChargeAndBookingRouter);
+app.use(userStripeWebhookRouter);
 //super admin
 app.use(superAdminAuthRoutes);
 app.use(superAdminHotelRouter);
