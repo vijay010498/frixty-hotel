@@ -6,5 +6,17 @@ export enum BookingStatus {
   Cancelled = "cancelled",
 
   //payment initiated
-  AwaitingPayment = "AwaitingPayment",
+  AwaitingPayment = "awaitingPayment",
+
+  //payment Processing
+  ProcessingPayment = "processingPayment",
+
+  //payment Failed
+  PaymentFailed = "paymentFailed",
+
+  //payment cancelled
+  PaymentCancelled = "paymentCancelled",
+
+  //payment Refunded
+  PaymentRefunded = "paymentRefunded",
 }
