@@ -19,4 +19,16 @@ export enum BookingStatus {
 
   //payment Refunded
   PaymentRefunded = "paymentRefunded",
+
+  //customer checked-in
+  CheckedIn = "checkedIn",
+
+  //customer checked-out
+  CheckedOut = "checkedOut",
+
+  //completed
+  Completed = "completed",
+
+  //customer not visited
+  NotVisited = "notVisited",
 }

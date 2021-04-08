@@ -4,8 +4,11 @@ import { requireAdminAuth } from "../../../errors/middleware/admin/require-admin
 import { requireAdminSubscription } from "../../../errors/middleware/admin/require-admin-subscription";
 import jwt from "jsonwebtoken";
 import _ from "lodash";
-import { BadRequestError } from "../../../errors";
+import { BadRequestError, validateRequest } from "../../../errors";
 import mongoose from "mongoose";
+import { requireBooking } from "../../../errors/middleware/booking/require-booking";
+import { BookingStatus } from "../../../models/enums/booking-status";
+import { body } from "express-validator";
 const keys = require("../../../config/keys");
 const router = express.Router({
   caseSensitive: true,
@@ -87,6 +90,81 @@ router.get(
     return;
   }
 );
+
+router.patch(
+  "/api/secure/v1/admin/updateBooking",
+  requireAdminAuth,
+  requireAdminSubscription,
+  [
+    body("bookingId").isMongoId().withMessage("booking id required"),
+    body("status").isString().withMessage("status is required"),
+  ],
+  validateRequest,
+  requireBooking,
+  async (req: Request, res: Response) => {
+    const { bookingId, status } = req.body;
+    await checkBookingStatus(status);
+    await updateBookingStatus(bookingId, status);
+    res.status(200).send({
+      message: "Booking Updated",
+    });
+  }
+);
+
+router.post(
+  "/api/secure/v1/admin/booking/getAvailableBookingStatus",
+  requireAdminAuth,
+  requireAdminSubscription,
+  [body("bookingId").isMongoId().withMessage("booking id required")],
+  validateRequest,
+  requireBooking,
+  async (req: Request, res: Response) => {
+    //first get current booking status
+    const { bookingId } = req.body;
+    const booking = await Booking.findById(bookingId);
+    // @ts-ignore
+    const bookingStatus = booking.bookingDetails.bookingStatus;
+    const availableStatus = await getAvailableBookingStatus(
+      bookingStatus.toString()
+    );
+    res.send({
+      availableStatus,
+    });
+  }
+);
+
+async function getAvailableBookingStatus(currentStatus: string) {
+  let status = [];
+  switch (currentStatus) {
+    case "confirmed":
+      status.push("checkedIn", "notVisited");
+      break;
+    case "checkedIn":
+      status.push("checkedOut");
+      break;
+  }
+  return status;
+}
+async function updateBookingStatus(bookingId: string, status: string) {
+  await Booking.findOneAndUpdate(
+    {
+      _id: mongoose.Types.ObjectId(bookingId),
+    },
+    {
+      $set: {
+        "bookingDetails.bookingStatus": status,
+      },
+    }
+  );
+  return;
+}
+
+async function checkBookingStatus(status: String) {
+  // @ts-ignore
+  if (Object.values(BookingStatus).indexOf(status) === -1) {
+    throw new BadRequestError(`${status} is not a valid status`);
+  }
+}
 
 async function transformMyBookingsConfirmed(bookings: Array<any>) {
   for (let i = 0; i < bookings.length; i++) {

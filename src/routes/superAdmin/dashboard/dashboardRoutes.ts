@@ -96,13 +96,12 @@ router.get(
       ]);
       const totalCheckOutToday = checkOutToday.length || 0;
 
-      //total booking amount in dashboard currency
+      /* //total booking amount in dashboard currency
       baseCurrency =
         req.query.baseCurrency ||
         req.cookies.dashboardBaseCurrency ||
         defaultBaseCurrency;
       await getCurrencyRates(res);
-      //get All bookings
       const confirmedBookingsTotal = await Booking.aggregate([
         {
           $match: {
@@ -125,7 +124,7 @@ router.get(
           ).toFixed(2)
         );
         totalConfirmedBookingsAmount += convertedAmount;
-      }
+      }*/
       res.cookie("dashboardBaseCurrency", baseCurrency);
       res.status(200).send({
         totalAdmins,
@@ -135,7 +134,7 @@ router.get(
         totalCancelledBookings,
         totalCheckInToday,
         totalCheckOutToday,
-        totalConfirmedBookingsAmount,
+        //totalConfirmedBookingsAmount,
       });
       return;
     } catch (err) {
