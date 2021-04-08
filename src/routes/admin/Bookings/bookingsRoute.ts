@@ -120,6 +120,7 @@ async function transformMyBookingsConfirmed(bookings: Array<any>) {
           bookings[i].title = bookings[i].id.toString().slice(18, 24);
           const titleColors = ["orange", "green", "danger", "azure", "warning"];
           bookings[i].color = _.sample(titleColors);
+          bookings[i].allDay = true;
           bookings[i].start = new Date(
             bookings[i].bookingDetails.checkInDateTime
           );
