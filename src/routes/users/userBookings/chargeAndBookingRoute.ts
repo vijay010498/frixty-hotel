@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { User } from "../../../models/User";
 import mongoose from "mongoose";
 import { body } from "express-validator";
+import { Hotel } from "../../../models/Hotel";
 const router = express.Router();
 const keys = require("../../../config/keys");
 const stripe = require("stripe")(keys.stripeUserSecretKey);
@@ -29,6 +30,8 @@ router.post(
     const payload = await jwt.verify(req.body.jwtAuthToken, keys.jwtKey);
     // @ts-ignore
     const user = await User.findById(payload.userId);
+
+    const hotel = await Hotel.findById(req.body.hotelId);
 
     try {
       const customer = await stripe.customers.retrieve(user!.stripeAccountId);
@@ -89,7 +92,15 @@ router.post(
           price_data: {
             currency: req.body.currency,
             product_data: {
-              name: `Chill In booking from ${req.body.checkIn} to ${req.body.checkOut}`,
+              name: `Chill In booking from ${req.body.checkIn} to ${
+                req.body.checkOut
+              } at ${hotel!.name}`,
+              description: `${hotel!.address.street},${hotel!.address.city},${
+                hotel!.address.area
+              },${hotel!.address.state},${hotel!.address.country},${
+                hotel!.address.pinCode
+              }.`,
+              images: [hotel!.images[0]],
             },
             unit_amount: await convertStripeAmount(
               req.body.totalAmount,
