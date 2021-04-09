@@ -58,8 +58,52 @@ router.post(
         );
       }
     }
+
+    //create stripe session
+
+    const session = await stripe.checkout.sessions.create({
+      cancel_url: "https://chillin/cancel",
+      success_url: "https://chillin/success",
+      mode: "payment",
+      payment_method_types: ["card"],
+
+      client_reference_id: user!.id,
+      customer: user!.stripeAccountId,
+      payment_intent_data: {
+        metadata: {
+          hotelId: req.body.hotelId,
+          roomId: req.body.roomId,
+          roomConfig: req.body.roomConfig,
+          checkIn: req.body.checkIn,
+          checkOut: req.body.checkOut,
+          totalDays: req.body.totalDays,
+          totalGuests: req.body.totalGuests,
+          totalAmount: req.body.totalAmount,
+          currency: req.body.currency,
+          userId: user!.id,
+          rooms: req.body.rooms,
+        },
+      },
+      line_items: [
+        {
+          price_data: {
+            currency: req.body.currency,
+            product_data: {
+              name: `Chill In booking from ${req.body.checkIn} to ${req.body.checkOut}`,
+            },
+            unit_amount: await convertStripeAmount(
+              req.body.totalAmount,
+              req.body.currency
+            ),
+          },
+          quantity: 1,
+        },
+      ],
+    });
+    res.send({ id: session.id });
+    return;
     //create stripe
-    const paymentIntent = await stripe.paymentIntents.create({
+    /* const paymentIntent = await stripe.paymentIntents.create({
       currency: req.body.currency,
       amount: await convertStripeAmount(
         req.body.totalAmount,
@@ -84,7 +128,7 @@ router.post(
     });
     res.send({
       clientSecret: paymentIntent.client_secret,
-    });
+    });*/
   }
 );
 async function convertStripeAmount(amountToConvert: number, currency: string) {
