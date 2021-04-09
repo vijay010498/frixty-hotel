@@ -130,7 +130,7 @@ async function chargeCaptured(event: Object) {
   const payment = await stripe.paymentIntents.retrieve(paymentIntentId);
   await updateBookingPaymentDetails(paymentIntentId, payment, "confirmed");
   console.log(
-    "Webhook  - Admin - Subscription With Charge Booking status Confirmed"
+    "Webhook  - User - Subscription With Charge Booking status Confirmed"
   );
   return;
 }
@@ -141,7 +141,7 @@ async function chargeExpired(event: Object) {
   const payment = await stripe.paymentIntents.retrieve(paymentIntentId);
   await updateBookingPaymentDetails(paymentIntentId, payment, "paymentFailed");
   console.log(
-    "Webhook  - Admin - Subscription With Charge Booking status paymentFailed"
+    "Webhook  - User - Subscription With Charge Booking status paymentFailed"
   );
   return;
 }
@@ -152,7 +152,7 @@ async function chargeFailed(event: Object) {
   const payment = await stripe.paymentIntents.retrieve(paymentIntentId);
   await updateBookingPaymentDetails(paymentIntentId, payment, "paymentFailed");
   console.log(
-    "Webhook  - Admin - Subscription With Charge Booking status paymentFailed"
+    "Webhook  - User - Subscription With Charge Booking status paymentFailed"
   );
   return;
 }
@@ -167,7 +167,7 @@ async function chargePending(event: Object) {
     "awaitingPayment"
   );
   console.log(
-    "Webhook  - Admin - Subscription With Charge Booking status awaitingPayment"
+    "Webhook  - User - Subscription With Charge Booking status awaitingPayment"
   );
   return;
 }
@@ -182,7 +182,7 @@ async function chargeRefunded(event: Object) {
     "paymentRefunded"
   );
   console.log(
-    "Webhook  - Admin - Subscription With Charge Booking status paymentRefunded"
+    "Webhook  - User - Subscription With Charge Booking status paymentRefunded"
   );
   return;
 }
@@ -193,7 +193,7 @@ async function chargeSucceeded(event: Object) {
   const payment = await stripe.paymentIntents.retrieve(paymentIntentId);
   await updateBookingPaymentDetails(paymentIntentId, payment, "confirmed");
   console.log(
-    "Webhook  - Admin - Subscription With Charge Booking status confirmed"
+    "Webhook  - User - Subscription With Charge Booking status confirmed"
   );
   return;
 }
