@@ -8,7 +8,8 @@ import axios from "axios";
 import jwt from "jsonwebtoken";
 import { Admin } from "../../../models/Admin";
 import { AdminSubscription } from "../../../models/AdminSubscriptions";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
+import moment from "moment";
 import { Hotel } from "../../../models/Hotel";
 import { SupportedCurrencies } from "../../../models/enums/supportedCurrencies";
 import { requireAdminSubscription } from "../../../errors/middleware/admin/require-admin-subscription";
@@ -156,6 +157,40 @@ router.get(
     await transformGetSubscriptions(adminSubscriptions);
     res.status(200).send({
       subscriptions: adminSubscriptions,
+    });
+    return;
+  }
+);
+router.get(
+  "/api/secure/v1/admin/remainingSubscriptionDays",
+  requireAdminAuth,
+  requireAdminSubscription,
+  [],
+  validateRequest,
+  async (req: Request, res: Response) => {
+    const payload = jwt.verify(req.session!.JWT, keys.jwtAdminKey);
+    // @ts-ignore
+    const adminId = payload.userId;
+    const adminSubscriptions = await AdminSubscription.aggregate([
+      {
+        $match: {
+          adminId: mongoose.Types.ObjectId(adminId),
+          "paymentDetails.status": { $eq: "succeeded" },
+        },
+      },
+      {
+        $sort: {
+          expiry: -1,
+        },
+      },
+    ]);
+    await transformGetSubscriptions(adminSubscriptions);
+    const today = moment(new Date());
+    const expiry = moment(adminSubscriptions[0].expiry);
+
+    res.status(200).send({
+      subscription: adminSubscriptions,
+      totalDaysRemaining: expiry.diff(today, "days"),
     });
     return;
   }

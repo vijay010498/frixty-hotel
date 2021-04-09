@@ -45,7 +45,7 @@ router.post(
           },
         });
         //update stripe customer id
-        user!.stripeAccountId = customer.idl;
+        user!.stripeAccountId = customer.id;
         await User.findOneAndUpdate(
           {
             _id: mongoose.Types.ObjectId(user!.id),
