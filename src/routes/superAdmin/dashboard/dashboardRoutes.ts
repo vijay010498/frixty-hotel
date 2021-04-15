@@ -96,7 +96,7 @@ router.get(
       ]);
       const totalCheckOutToday = checkOutToday.length || 0;
 
-      /* //total booking amount in dashboard currency
+      //total booking amount in dashboard currency
       baseCurrency =
         req.query.baseCurrency ||
         req.cookies.dashboardBaseCurrency ||
@@ -112,11 +112,10 @@ router.get(
       let totalConfirmedBookingsAmount = 0;
       for (let i = 0; i < confirmedBookingsTotal.length; i++) {
         const paymentCurrency =
-          confirmedBookingsTotal[i].bookingDetails.paymentDetails.details
-            .paymentCurrency;
+          confirmedBookingsTotal[i].bookingDetails.paymentDetails.currency;
         const paymentAmount =
-          confirmedBookingsTotal[i].bookingDetails.paymentDetails.details
-            .totalPayment;
+          confirmedBookingsTotal[i].bookingDetails.paymentDetails
+            .amount_received / 100;
         const convertedAmount = parseFloat(
           Math.floor(
             // @ts-ignore
@@ -124,7 +123,7 @@ router.get(
           ).toFixed(2)
         );
         totalConfirmedBookingsAmount += convertedAmount;
-      }*/
+      }
       res.cookie("dashboardBaseCurrency", baseCurrency);
       res.status(200).send({
         totalAdmins,
