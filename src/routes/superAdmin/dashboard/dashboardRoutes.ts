@@ -114,8 +114,7 @@ router.get(
         const paymentCurrency =
           confirmedBookingsTotal[i].bookingDetails.paymentDetails.currency;
         const paymentAmount =
-          confirmedBookingsTotal[i].bookingDetails.paymentDetails
-            .amount_received / 100;
+          confirmedBookingsTotal[i].bookingDetails.paymentDetails.amount / 100;
         const convertedAmount = parseFloat(
           Math.floor(
             // @ts-ignore
