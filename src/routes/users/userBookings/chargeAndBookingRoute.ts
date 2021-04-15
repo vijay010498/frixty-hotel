@@ -1,11 +1,12 @@
 import express, { Request, Response } from "express";
 import { requireUserAuth } from "../../../errors/middleware/users/require-user-auth";
-import { validateRequest } from "../../../errors";
+import { BadRequestError, validateRequest } from "../../../errors";
 import jwt from "jsonwebtoken";
 import { User } from "../../../models/User";
 import mongoose from "mongoose";
-import { body } from "express-validator";
+import { body, query } from "express-validator";
 import { Hotel } from "../../../models/Hotel";
+import { Booking } from "../../../models/Booking";
 const router = express.Router();
 const keys = require("../../../config/keys");
 const stripe = require("stripe")(keys.stripeUserSecretKey);
@@ -166,5 +167,35 @@ async function convertStripeAmount(amountToConvert: number, currency: string) {
     return amountToConvert * 100;
   }
 }
+
+//get user bookings
+router.post(
+  "/api/v1/bookings/getUserBookings",
+  requireUserAuth,
+  [
+    body("jwtAuthToken")
+      .isString()
+      .withMessage("Please include user jwt auth token"),
+  ],
+  validateRequest,
+  async (req: Request, res: Response) => {
+    const payload = await jwt.verify(req.body.jwtAuthToken, keys.jwtKey);
+    // @ts-ignore
+    const user = await User.findById(payload.userId);
+    //get user bookings
+    const bookings = await Booking.find({
+      userId: user!.id,
+    }).sort({
+      createdAt: -1,
+    });
+    if (bookings.length === 0) {
+      throw new BadRequestError("No Bookings Found");
+    }
+    res.status(200).send({
+      bookings,
+    });
+    return;
+  }
+);
 
 export { router as userChargeAndBookingRouter };
